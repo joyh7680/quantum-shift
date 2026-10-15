@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "checks": [
+    "adjacent downward drag and visible insertion cue",
+    "adjacent upward drag",
+    "first to last, last to first, duplicate blocks retained",
+    "palette drag inserts at indicated boundary",
+    "drop outside cancels cleanly",
+    "arrow and delete buttons remain functional",
+    "editing and drag disabled during execution",
+    "drag works after stop",
+    "1280px layout has no horizontal overflow"
+  ],
+  "errors": []
+}

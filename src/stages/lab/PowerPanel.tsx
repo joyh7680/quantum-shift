@@ -7,6 +7,8 @@ import { DeviceGuide } from "./DeviceGuide.tsx";
 export function PowerPanel() {
   const lab = useGame((s) => s.lab);
   const [help, setHelp] = useState(false);
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dropSlot, setDropSlot] = useState<number | null>(null);
   const codeList = useRef<HTMLOListElement>(null);
   const running = lab.run === "running";
   useEffect(() => {
@@ -16,13 +18,37 @@ export function PowerPanel() {
         behavior: "smooth",
       });
   }, [lab.index, lab.run]);
+  function clearDrag() {
+    setDragging(null);
+    setDropSlot(null);
+  }
+  function insertionSlot(event: React.DragEvent<HTMLElement>, index: number) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    return index + (event.clientY >= bounds.top + bounds.height / 2 ? 1 : 0);
+  }
+  function dragOver(event: React.DragEvent, index: number) {
+    if (running) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = dragging === null ? "copy" : "move";
+    setDropSlot(index);
+    // Keep long programs reachable while the block is held near an edge.
+    const scroll = codeList.current?.closest(".editor-scroll");
+    if (scroll) {
+      const bounds = scroll.getBoundingClientRect();
+      if (event.clientY < bounds.top + 40) scroll.scrollTop -= 14;
+      else if (event.clientY > bounds.bottom - 40) scroll.scrollTop += 14;
+    }
+  }
   function drop(event: React.DragEvent, index: number) {
     event.preventDefault();
+    clearDrag();
     if (running) return;
     const source = event.dataTransfer.getData("text/plain");
     const code = [...lab.code];
     if (source.startsWith("code:")) {
+      if (!/^code:\d+$/.test(source)) return;
       const from = Number(source.slice(5));
+      if (!Number.isInteger(from) || from < 0 || from >= code.length) return;
       const [command] = code.splice(from, 1);
       if (command) code.splice(index > from ? index - 1 : index, 0, command);
     } else if (
@@ -33,6 +59,7 @@ export function PowerPanel() {
         lab.chips.includes(source as "battery" | "power" | "vent"))
     )
       code.splice(index, 0, source as Command);
+    else return;
     editCode(code);
   }
   function move(index: number, direction: number) {
@@ -78,7 +105,11 @@ export function PowerPanel() {
                   key={id}
                   draggable={available && !running}
                   disabled={!available || running}
-                  onDragStart={(e) => e.dataTransfer.setData("text/plain", id)}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("text/plain", id);
+                    e.dataTransfer.effectAllowed = "copy";
+                  }}
+                  onDragEnd={clearDrag}
                   onClick={() => editCode([...lab.code, id])}
                   style={
                     {
@@ -110,7 +141,13 @@ export function PowerPanel() {
           <ol
             ref={codeList}
             className="escape-code"
-            onDragOver={(e) => e.preventDefault()}
+            onDragOver={(e) => {
+              if (e.target === e.currentTarget) dragOver(e, lab.code.length);
+            }}
+            onDragLeave={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null))
+                setDropSlot(null);
+            }}
             onDrop={(e) => {
               if (e.target === e.currentTarget) drop(e, lab.code.length);
             }}
@@ -118,24 +155,48 @@ export function PowerPanel() {
             {lab.code.map((id, index) => (
               <li
                 key={index}
-                className={
+                className={[
                   index === lab.index
                     ? lab.run === "failed"
                       ? "failed"
                       : "executing"
-                    : ""
-                }
+                    : "",
+                  dragging === index ? "code-dragging" : "",
+                  dropSlot === index ? "drop-before" : "",
+                  dropSlot === lab.code.length && index === lab.code.length - 1
+                    ? "drop-after"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 draggable={!running}
-                onDragStart={(e) =>
-                  e.dataTransfer.setData("text/plain", `code:${index}`)
-                }
-                onDragOver={(e) => e.preventDefault()}
+                onDragStart={(e) => {
+                  if (running || (e.target as HTMLElement).closest("button")) {
+                    e.preventDefault();
+                    return;
+                  }
+                  e.dataTransfer.setData("text/plain", `code:${index}`);
+                  e.dataTransfer.effectAllowed = "move";
+                  setDragging(index);
+                }}
+                onDragEnd={clearDrag}
+                onDragOver={(e) => {
+                  e.stopPropagation();
+                  dragOver(e, insertionSlot(e, index));
+                }}
                 onDrop={(e) => {
                   e.stopPropagation();
-                  drop(e, index);
+                  drop(e, insertionSlot(e, index));
                 }}
                 aria-current={index === lab.index ? "step" : undefined}
               >
+                <span
+                  className="code-grip"
+                  aria-hidden="true"
+                  title="드래그로 순서 변경"
+                >
+                  ⠿
+                </span>
                 <span className="code-index">
                   {String(index + 1).padStart(2, "0")}
                 </span>
@@ -169,7 +230,10 @@ export function PowerPanel() {
             ))}
             <li
               className="code-drop"
-              onDragOver={(e) => e.preventDefault()}
+              onDragOver={(e) => {
+                e.stopPropagation();
+                dragOver(e, lab.code.length);
+              }}
               onDrop={(e) => {
                 e.stopPropagation();
                 drop(e, lab.code.length);
