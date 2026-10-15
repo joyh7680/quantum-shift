@@ -5,6 +5,19 @@ import { TitleScene } from "./TitleScene";
 import { useGame } from "./store";
 import { CITY_STAGES } from "./stages";
 
+function CharacterThumbnail({ id }: { id: string }) {
+  return (
+    <img
+      className="character-thumbnail"
+      src={`/character-thumbnails/${id}.png`}
+      alt=""
+      width={30}
+      height={30}
+      draggable={false}
+    />
+  );
+}
+
 function MenuDialog({
   title,
   onClose,
@@ -143,10 +156,16 @@ export function MainMenu() {
             게임 시작 <span>↗</span>
           </button>
           <button
-            className="city-secondary"
+            className="city-secondary character-trigger"
+            aria-label={`캐릭터 선택: ${asset.name}`}
+            aria-haspopup="dialog"
             onClick={() => setModal("characters")}
           >
-            <span>◇</span> 캐릭터 선택
+            <CharacterThumbnail id={id} />
+            <span className="character-trigger-copy">
+              <small>캐릭터 선택</small>
+              <strong>{asset.name}</strong>
+            </span>
           </button>
           <button
             className="city-secondary"
@@ -180,7 +199,7 @@ export function MainMenu() {
             <span>총 {CHARACTERS.length}종</span>
           </div>
           <div className="explorer-grid">
-            {CHARACTERS.map((c, i) => (
+            {CHARACTERS.map((c) => (
               <button
                 key={c.id}
                 aria-label={`${c.name} 선택`}
@@ -188,9 +207,9 @@ export function MainMenu() {
                 className={c.id === id ? "chosen" : ""}
                 onClick={() => useGame.getState().patch({ character: c.id })}
               >
-                <small>{String(i + 1).padStart(2, "0")}</small>
-                <span>{c.name}</span>
-                <b>{c.id === id ? "✓" : "◇"}</b>
+                <CharacterThumbnail id={c.id} />
+                <span className="explorer-name">{c.name}</span>
+                <b aria-hidden="true">{c.id === id ? "✓" : ""}</b>
               </button>
             ))}
           </div>

@@ -1,0 +1,237 @@
+[
+  {
+    "id": "alien",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-alien.beeb9b2d46926431.glb",
+    "sha256": "beeb9b2d469264318427f854d6350e070bb19437f468a735e9c5e10a876bd632"
+  },
+  {
+    "id": "armstrong",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-armstrong.ae1e0bee0abbe0cc.glb",
+    "sha256": "ae1e0bee0abbe0cc79c0e73b68ea0a45fb02e39e88412ad7901dbbb39a2c168f"
+  },
+  {
+    "id": "baker",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-baker.bcdae33aea914417.glb",
+    "sha256": "bcdae33aea914417f0e77a9c62d1b9a91f29fa819d0e2239f87da430247e92f2"
+  },
+  {
+    "id": "barista",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-barista.fac81b37faefc64a.glb",
+    "sha256": "fac81b37faefc64a1da17554ad77e2e7dbd1eb0d0be9208f6ce8d5e599d05b39"
+  },
+  {
+    "id": "basic",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-basic.d28f39cda2680f93.glb",
+    "sha256": "d28f39cda2680f93bfdf7aea7b3841efadec9bb61f898706e3ab561852b9368d"
+  },
+  {
+    "id": "bear",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-bear.0d054f341668672d.glb",
+    "sha256": "0d054f341668672de1adf45293364b6b44a6e22c383e4f6a895874063aa06244"
+  },
+  {
+    "id": "black",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-black.f960ae5499636dd9.glb",
+    "sha256": "f960ae5499636dd91fea29c02c09670cd29f81f252e42410a42cc1755721f8d3"
+  },
+  {
+    "id": "bookmon",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-bookmon.0f75b3800493e335.glb",
+    "sha256": "0f75b3800493e3359e5555664cd25a47d56c23ed3a59afa0f11545be4cd890a3"
+  },
+  {
+    "id": "br_bira",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-br_bira.bc1f3788d682d33a.glb",
+    "sha256": "bc1f3788d682d33ac3af6bb780b762df5b17cd4a2cd8fd451fcc85810924e438"
+  },
+  {
+    "id": "br_flora",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-br_flora.5033be1d6cdc8dea.glb",
+    "sha256": "5033be1d6cdc8dea82658879e808d879e9dcbc1109c2000684e06c883d948773"
+  },
+  {
+    "id": "br_isabele",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-br_isabele.ff77b3f7a869298c.glb",
+    "sha256": "ff77b3f7a869298ce339034a0eaacc4a3db7377e288f2075915b58470c86f040"
+  },
+  {
+    "id": "br_lorenzo",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-br_lorenzo.66c9ee9c20065f31.glb",
+    "sha256": "66c9ee9c20065f3108a921781b1fd0658cd20b4a3703953fcf1136614b9776db"
+  },
+  {
+    "id": "cloud",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-cloud.5aff475bb64d237b.glb",
+    "sha256": "5aff475bb64d237bb70f8c9471b61fcd6c7fef1dc9952c82b16bb0baa2468919"
+  },
+  {
+    "id": "cloudbounce",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-cloudbounce.c5ab33ef30d81219.glb",
+    "sha256": "c5ab33ef30d812193ac6ea98168afb5e3d22e9e378bb81e44e6c179c679dd653"
+  },
+  {
+    "id": "codmos_bora",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-codmos_bora.b99a62998435e3b2.glb",
+    "sha256": "b99a62998435e3b2366f82ab232079df36a4b4b77302d8dde27a60af8ad4eda8"
+  },
+  {
+    "id": "codmos_jet",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-codmos_jet.db556af412918b22.glb",
+    "sha256": "db556af412918b221fe082a99c5e9b8d84f90c6963299682d6c6556b92ea1c3d"
+  },
+  {
+    "id": "codmos_nova",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-codmos_nova.ccc50cc5e696425c.glb",
+    "sha256": "ccc50cc5e696425c1386b5844e75cbc5709d7c51010c780700b51f1f045aeff6"
+  },
+  {
+    "id": "codmos_poby",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-codmos_poby.e290f2a8fa575c29.glb",
+    "sha256": "e290f2a8fa575c29831276910b168e5b42c56cc259a8b11fc25cfd5f50e7bcef"
+  },
+  {
+    "id": "codmos_remy",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-codmos_remy.334d3b605a0674a8.glb",
+    "sha256": "334d3b605a0674a87a1583c4f012f8d9119848dd50a32680a7820cfc47697798"
+  },
+  {
+    "id": "codmos_teo",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-codmos_teo.47aec88eeec24a80.glb",
+    "sha256": "47aec88eeec24a80de686abc2c93918386b3c717d2493d7e8106989cce4076e1"
+  },
+  {
+    "id": "delicious",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-delicious.a9ebe6c7e481ca9c.glb",
+    "sha256": "a9ebe6c7e481ca9cdb28ac6b791209e9b6ae936da99cc79ff30f8698c73d3c5e"
+  },
+  {
+    "id": "dino",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-dino.7138eb28d41e2b87.glb",
+    "sha256": "7138eb28d41e2b87126bcb82a5b3ea84a3d050bde22a8191860d7bbfe4f5ed5c"
+  },
+  {
+    "id": "dragon",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-dragon.e3438e50f1646781.glb",
+    "sha256": "e3438e50f1646781686825ea212e007590752000d101b9d054997c5e2817c8cd"
+  },
+  {
+    "id": "ecofarm",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-ecofarm.0654477bc0b807b4.glb",
+    "sha256": "0654477bc0b807b4ecee1d53e13fdb4c860f15d8623d948cde44fd312761a710"
+  },
+  {
+    "id": "fairy",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-fairy.24c46f676ef07e6b.glb",
+    "sha256": "24c46f676ef07e6b67d0df1661951071907282eb5a650edf3c9053ed1217ac82"
+  },
+  {
+    "id": "flapint",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-flapint.0fc737f0667d8de8.glb",
+    "sha256": "0fc737f0667d8de8cfcf19352f11df4ae03be791a01308323021ff472dafa374"
+  },
+  {
+    "id": "hero",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-hero.fa44458a82047b76.glb",
+    "sha256": "fa44458a82047b76e9f47a491ac949121a5e571fd9b386be982a809b03cacfd5"
+  },
+  {
+    "id": "lucy",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-lucy.e6db56a469bfe9db.glb",
+    "sha256": "e6db56a469bfe9dba35ce946feb418a53eddb6d6e7eb11ab9015db62cc858d5d"
+  },
+  {
+    "id": "marble",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-marble.e7f51189129e9624.glb",
+    "sha256": "e7f51189129e9624b9292575acbbfaea2508fe328c3a950e15aff3bbb1870d6c"
+  },
+  {
+    "id": "miner",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-miner.82dce1c3d19682f9.glb",
+    "sha256": "82dce1c3d19682f916cc5fb2544acfd8fbe9da566b794ef31c30364e6c371be3"
+  },
+  {
+    "id": "monitorhead",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-monitorhead.0326e9c4604baecd.glb",
+    "sha256": "0326e9c4604baecd29d0097f362d8cafc9a645f7bcda6c14ea4140d820c267ac"
+  },
+  {
+    "id": "pattern",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-pattern.4b1ed4e1c435974d.glb",
+    "sha256": "4b1ed4e1c435974dc4398689e7d8791e3cd134aece0b4e209adc12ce83eaf9f3"
+  },
+  {
+    "id": "pharos",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-pharos.55f947d94e060263.glb",
+    "sha256": "55f947d94e0602631e9c1e60f84b110edcb527989de343c014f9ec291dc4e6fb"
+  },
+  {
+    "id": "pierrot",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-pierrot.6bcfb097e8925d87.glb",
+    "sha256": "6bcfb097e8925d87e457b09464386e008e8fa10d7f0b5029128dec80a1e27201"
+  },
+  {
+    "id": "pink",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-pink.5e50476bbce5ebfc.glb",
+    "sha256": "5e50476bbce5ebfc478bd97dd4e616fdbcc05d298ae3ffebb9df0617b3721d85"
+  },
+  {
+    "id": "plant",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-plant.4936f4b444e8f3f6.glb",
+    "sha256": "4936f4b444e8f3f6afdac79a4450971b105bff20a8fcf11b7ea437befc813d8c"
+  },
+  {
+    "id": "purple",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-purple.1a2dfdfe8e1f6d07.glb",
+    "sha256": "1a2dfdfe8e1f6d07dd1e74addb41cf3744342c8100ab4e9ee4c8e77488d79113"
+  },
+  {
+    "id": "rose",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-rose.a872a7a80c4cd93a.glb",
+    "sha256": "a872a7a80c4cd93a1c17a850b454e1da8345e15fd12e30ce1da11c874285fb9a"
+  },
+  {
+    "id": "runner",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-runner.cb5506e5ad09ddf8.glb",
+    "sha256": "cb5506e5ad09ddf87f140d80db4da89a8f39ad01a4c43fbda99d1d7b28bacd77"
+  },
+  {
+    "id": "santa",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-santa.13f294c03c3d088c.glb",
+    "sha256": "13f294c03c3d088ce5ef37bb17cfbcbc61d1368a511fc9f4bfc6b2ed3098bcbd"
+  },
+  {
+    "id": "sherlock",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-sherlock.843ec613cdb5c23d.glb",
+    "sha256": "843ec613cdb5c23d0b31ac108592a9b5cb27e02844a7d2f66b7323f491774fc9"
+  },
+  {
+    "id": "snackking",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-snackking.da26da2c563e2037.glb",
+    "sha256": "da26da2c563e203743cb49d24eb589517a713006fd1b42b2dc9eff4f9774ddbe"
+  },
+  {
+    "id": "soldier",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-soldier.6a180df0677d35f7.glb",
+    "sha256": "6a180df0677d35f78852beffd39a68f40283f8f4add057c12c1de7cfcc0e0920"
+  },
+  {
+    "id": "volta",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-volta.8f2c3bc611f3bcc8.glb",
+    "sha256": "8f2c3bc611f3bcc86c3d340b49421c1ef8e4ab5d2872d829f265ec3995c689df"
+  },
+  {
+    "id": "wildland",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-wildland.ca0df6ac783ef1c4.glb",
+    "sha256": "ca0df6ac783ef1c44fbed904831981603c41382c89066eb6d693f079d2ac5963"
+  },
+  {
+    "id": "wizard",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-wizard.46ea24b6d0b1747a.glb",
+    "sha256": "46ea24b6d0b1747a2b6e486ad2eb3a9bee9e07b467b1447bf04c3584eea96daa"
+  },
+  {
+    "id": "yellow",
+    "model": "/codmos-glb-assets-2026-10-15/models/dosan-park/characters/character-yellow.cc16b662aa1adb06.glb",
+    "sha256": "cc16b662aa1adb069fcc02703afdd82d055ca60805d47f0e7c31acd26871d071"
+  }
+]

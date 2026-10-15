@@ -279,6 +279,42 @@
   border-color: #80d9f0aa;
   background: #294260aa;
 }
+.character-thumbnail {
+  display: block;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 7px;
+  object-fit: contain;
+  background: linear-gradient(145deg, #30465d, #102035);
+  box-shadow: inset 0 0 0 1px #9dd9ed20;
+}
+.city-secondary.character-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  text-align: left;
+}
+.character-trigger > .character-trigger-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  margin: 0;
+}
+.character-trigger-copy small {
+  font-size: 9px;
+  color: #91acc8;
+}
+.character-trigger-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cfdef1;
+}
 .city-footer {
   position: absolute;
   bottom: 0;
@@ -500,18 +536,22 @@
 .explorer-grid button {
   background: #19263e;
   border: 1px solid #4e64804d;
-  padding: 12px;
+  height: 40px;
+  padding: 4px 10px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   font-size: 11px;
   text-align: left;
 }
-.explorer-grid button small {
-  font-size: 9px;
-  color: #708aa9;
+.explorer-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .explorer-grid button b {
+  flex: 0 0 10px;
   margin-left: auto;
   color: #8edaea;
   font-weight: 400;
@@ -750,9 +790,26 @@
     max-height: 43dvh;
   }
   .explorer-grid button {
-    padding: 10px;
+    height: 36px;
+    padding: 4px 8px;
     font-size: 10px;
     gap: 7px;
+  }
+  .explorer-grid .character-thumbnail {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+    border-radius: 6px;
+  }
+  .city-secondary.character-trigger {
+    padding: 5px 8px;
+    gap: 7px;
+  }
+  .character-trigger-copy small {
+    font-size: 8px;
+  }
+  .character-trigger-copy strong {
+    font-size: 10px;
   }
 }
 @media (max-height: 550px) {

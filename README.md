@@ -26,6 +26,7 @@ npm run audit:assets
 
 - 게임 시작: 선택한 캐릭터로 STAGE 1 거인의 연구실에 진입합니다.
 - 캐릭터 선택: 기존 47종을 선택하며 메인 화면과 플레이어에 동일하게 적용합니다.
+- 캐릭터 옵션은 원본 GLB를 정면 렌더링한 얼굴 썸네일·이름·선택 체크를 표시합니다. 선택창을 닫아도 선택 버튼에 현재 캐릭터의 썸네일과 이름이 유지됩니다.
 - 스테이지 안내: 5개 스테이지의 경로와 목표·주요 플레이를 확인합니다. STAGE 1만 플레이 가능하며, STAGE 2~4는 확인된 기획 데이터가 없어 미공개 구역으로, STAGE 5는 거대 로봇 보스로 표시합니다. 미구현 구역의 진입은 잠겨 있습니다.
 - 모달은 닫기 버튼, 배경 클릭, ESC로 닫히며 키보드 포커스가 열었던 버튼으로 복귀합니다.
 - 메인 메뉴에서는 게임 플레이어·물리·이동 입력·포인터 잠금이 연결되지 않습니다. 게임의 일시정지 화면과 클리어 화면에서 메인 메뉴로 돌아갈 수 있습니다. 복귀 시 선택한 캐릭터는 유지되며 진행은 초기화됩니다.
@@ -66,6 +67,7 @@ npm run audit:assets
 - 브라우저는 `/codmos-glb-assets-2026-10-15/models/...glb` URL을 사용합니다. 로드 오류는 화면에 표시하며 임의 캐릭터로 대체하지 않습니다.
 - 검사 결과: [artifacts/asset-audit.json](artifacts/asset-audit.json)
 - 프로덕션 빌드에는 플레이어 캐릭터 47종만 포함하며 사용하지 않는 회사 소품과 우주선은 제외합니다. 제공된 원본 폴더는 그대로 보존합니다.
+- `public/character-thumbnails/`의 47종 PNG는 같은 ID의 GLB에서 생성했습니다. `manifest.json`에 원본 URL과 SHA-256을 기록합니다. 개발 서버 실행 후 `node scripts/render-character-thumbnails.mjs`로 다시 생성할 수 있으며, `QC_QA_URL`로 서버 주소를 지정합니다. 썸네일은 프로덕션 빌드에도 포함됩니다.
 
 ## 코드 구조
 
@@ -90,6 +92,7 @@ npm run audit:assets
 
 ```powershell
 node scripts/menu-smoke.mjs       # 기본 5173, QC_QA_URL로 실제 개발 서버 지정
+node scripts/character-ui-qa.mjs  # 47종 썸네일 매칭, 선택 동기화, 데스크톱·모바일 배치
 node scripts/playthrough.mjs      # QC_QA_URL로 실제 개발 서버 지정
 node scripts/asset-browser-qa.mjs
 ```
