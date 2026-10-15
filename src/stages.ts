@@ -1,26 +1,33 @@
-// The current game's `stage` field tracks seven missions INSIDE Stage 01.
-// These city-stage briefs are informational; only Stage 01 is playable.
+// Stages 1 and 2 have separate playable scenes and progress; later stages are briefs.
 export const CITY_STAGES = [
   {
     number: 1,
     name: "거인의 연구실",
     available: true,
-    description: "크기를 바꾸며 거대한 연구실을 탐험하고 탈출하세요.",
-    objective: "크기 변환과 코딩으로 장치를 복구하고 연구실을 탈출하세요.",
-    codingTags: ["블록 코딩", "바이브 코딩"],
+    description:
+      "거대한 책상과 연필 사이에서 명령 블록을 모으고 환풍구로 탈출하세요.",
+    objective: "모은 블록으로 크기 변환과 행동 순서를 구성해 탈출하기",
+    learning: "알고리즘 · 순차 실행",
+    codingTags: ["블록 코딩"],
     play: [
       "크기 변환으로 연구실 탐험",
-      "블록 코딩으로 전원 복구",
-      "바이브 코딩으로 슈트 능력 제작",
+      "도전하고 명령 블록 수집",
+      "탈출 프로그램 조립과 실행",
     ],
   },
   {
     number: 2,
     name: "마이크로 회로",
-    available: false,
-    description: "초소형으로 변신해 컴퓨터 내부를 탐험하고 회로를 복구.",
-    objective: "슈트에 자동 장애물 회피 기능 제작",
+    available: true,
+    description:
+      "자동 축소 슈트를 개발해 레이저를 통과하고 수호자에 도전하세요.",
+    objective: "자동 축소 슈트 개발 → 레이저 통과 → 수호자 전투",
     learning: "바이브 코딩 · 조건문",
+    play: [
+      "자연어로 슈트 능력 생성·테스트·장착",
+      "자동 축소로 레이저 통과",
+      "자동 회피 후 거대화하여 수호자 약점 3회 공격",
+    ],
   },
   {
     number: 3,

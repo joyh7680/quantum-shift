@@ -1,0 +1,41 @@
+{
+  "checkedOn": "2026-10-15 (Asia/Seoul)",
+  "project": "C:\\workspace\\quantum-shift",
+  "url": "http://127.0.0.1:5177",
+  "passed": true,
+  "sourceStatus": "STAGE 1 implementation complete; existing STAGE 2 and character selection retained",
+  "checks": {
+    "typecheck": "PASS: npx tsc --noEmit and tsc -b",
+    "build": "PASS: npm run build",
+    "unitTests": "PASS: 15/15",
+    "playerAssets": "PASS: 47 original GLB characters loaded with browser GLTFLoader; authored animations absent",
+    "fullPlay": "PASS without chip/position fixtures: low passage, book jumps, all three chips, electric death and retention, wrong command failure, carried battery stop/reset, preserved code/inventory, extra transformation, maintenance fan slowdown, physical vent escape",
+    "editor": "PASS: empty initial code, repeated blocks, click add, reorder buttons, drag reorder, delete, clear, execution locks, highlight; current execution block automatically scrolls into view (1280x720 verified)",
+    "collision": "PASS: normal blocked at low passage, tiny passes, giant growth blocked under equipment, giant follows safe program path, normal/tiny cannot bypass final vent manually",
+    "layout": "PASS: 1280x720, 1440x960, 390x844 bounds and horizontal overflow; screenshots inspected",
+    "stageTransition": "PASS: full actual collection-to-STAGE-1-clear-to-STAGE-2-clear playthrough, independent lab stats preserved, Stage 2 replay from menu",
+    "browserErrors": [],
+    "failedRequests": []
+  },
+  "evidence": [
+    "artifacts/lab-result.json",
+    "artifacts/lab-runtime-result.json",
+    "artifacts/stage2-result.json",
+    "artifacts/character-load-results.json",
+    "artifacts/lab-wrong-order.png",
+    "artifacts/lab-runtime-fan.png",
+    "artifacts/lab-code-390.png",
+    "artifacts/lab-escape-clear.png",
+    "artifacts/playthrough-result.json"
+  ],
+  "preservedWork": "artifacts/pre-stage1-blocks/ holds the pre-change working copies. No reset/checkout/revert was used.",
+  "knownWarnings": [
+    "Vite reports a JS chunk above 500 kB; production build succeeds."
+  ],
+  "notVerified": [
+    "Full playthrough for every one of the 47 characters",
+    "Firefox/Safari and performance on physical GPUs/devices",
+    "Student playtesting and the intended 10-15 minute learning duration",
+    "Audible output through physical speakers"
+  ]
+}

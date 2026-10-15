@@ -5,6 +5,7 @@ import { TitleScene } from "./TitleScene";
 import { TitleLogo } from "./TitleLogo";
 import { useGame } from "./store";
 import { CITY_STAGES } from "./stages";
+import type { StageId } from "./stages/shared";
 
 function CharacterThumbnail({ id }: { id: string }) {
   return (
@@ -82,10 +83,15 @@ function MenuDialog({
 
 export function MainMenu() {
   const id = useGame((s) => s.character);
+  const stageTwoUnlocked = useGame((s) => s.lab.cleared);
+  const canEnter = (number: number) =>
+    CITY_STAGES[number - 1]?.available &&
+    (number === 1 || (number === 2 && stageTwoUnlocked));
   const [modal, setModal] = useState<"characters" | "stages" | null>(null);
   const [selectedStage, setSelectedStage] = useState(1);
   const asset = CHARACTERS.find((c) => c.id === id)!;
   const stage = CITY_STAGES[selectedStage - 1];
+  const playable = canEnter(selectedStage);
   const start = () => useGame.getState().start(id);
   useEffect(() => {
     if (document.pointerLockElement) document.exitPointerLock?.();
@@ -99,7 +105,8 @@ export function MainMenu() {
           <span className="quantum-symbol">Q</span> QUANTUM CITY
         </a>
         <span className="city-system">
-          <i /> QUANTUM LINK ONLINE <b>01 / 05 SECTORS</b>
+          <i /> QUANTUM LINK ONLINE{" "}
+          <b>{stageTwoUnlocked ? "02" : "01"} / 05 SECTORS</b>
         </span>
       </header>
       <section className="city-intro">
@@ -111,11 +118,7 @@ export function MainMenu() {
             aria-hidden="true"
             focusable="false"
           >
-            <path
-              d="M2 1H54L42 15H0"
-              stroke="#7fb7d4"
-              strokeOpacity=".45"
-            />
+            <path d="M2 1H54L42 15H0" stroke="#7fb7d4" strokeOpacity=".45" />
             <path d="M54 1L42 15" stroke="#a4ebff" strokeWidth="2" />
           </svg>
           A NEW DIMENSION OF ADVENTURE
@@ -240,7 +243,7 @@ export function MainMenu() {
             {CITY_STAGES.map((s) => (
               <button
                 key={s.number}
-                className={`route-card ${selectedStage === s.number ? "active" : ""} ${s.available ? "available" : "locked"}`}
+                className={`route-card ${selectedStage === s.number ? "active" : ""} ${canEnter(s.number) ? "available" : "locked"}`}
                 aria-pressed={selectedStage === s.number}
                 onClick={() => setSelectedStage(s.number)}
               >
@@ -251,7 +254,11 @@ export function MainMenu() {
                 <strong>{s.name}</strong>
                 <p>{s.description}</p>
                 <span className="route-status">
-                  {s.available ? "● 플레이 가능" : "◇ 준비 중"}
+                  {canEnter(s.number)
+                    ? "● 플레이 가능"
+                    : s.number === 2
+                      ? "◇ STAGE 1 클리어 후 해금"
+                      : "◇ 준비 중"}
                 </span>
               </button>
             ))}
@@ -278,7 +285,14 @@ export function MainMenu() {
             <div>
               <h4>{stage.learning ? "학습 요소" : "주요 플레이"}</h4>
               {stage.learning ? (
-                <p>{stage.learning}</p>
+                <>
+                  <p>{stage.learning}</p>
+                  <ul>
+                    {stage.play?.map((p) => (
+                      <li key={p}>{p}</li>
+                    ))}
+                  </ul>
+                </>
               ) : (
                 <ul>
                   {stage.play?.map((p) => (
@@ -290,17 +304,25 @@ export function MainMenu() {
           </section>
           <footer className="dialog-footer">
             <span>
-              {stage.available
-                ? "현재 STAGE 1을 플레이할 수 있습니다."
-                : "이 구역은 준비 중입니다. 추후 공개됩니다."}
+              {playable
+                ? `STAGE ${stage.number}을 플레이할 수 있습니다.`
+                : stage.number === 2
+                  ? "STAGE 1을 클리어하면 진입할 수 있습니다."
+                  : "이 구역은 준비 중입니다. 추후 공개됩니다."}
             </span>
             <button
               className="city-launch"
-              disabled={!stage.available}
-              onClick={start}
+              disabled={!playable}
+              onClick={() =>
+                useGame.getState().start(id, selectedStage as StageId)
+              }
             >
-              {stage.available ? "STAGE 1 시작" : "준비 중 · 진입 불가"}
-              <span>{stage.available ? "→" : "◇"}</span>
+              {playable
+                ? `STAGE ${stage.number} 시작`
+                : stage.number === 2
+                  ? "STAGE 1 클리어 필요"
+                  : "준비 중 · 진입 불가"}
+              <span>{playable ? "→" : "◇"}</span>
             </button>
           </footer>
         </MenuDialog>

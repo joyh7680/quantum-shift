@@ -5,10 +5,6 @@ export type SuitProgram = {
   restore: "previous-safe";
   range: number;
 };
-export const VALID_ORDER = ["메인 전원", "A", "B", "C"];
-export function checkOrder(order: string[]) {
-  return order.join("|") === VALID_ORDER.join("|");
-}
 export function compileRequest(input: string): {
   program?: SuitProgram;
   error?: string;
@@ -81,27 +77,3 @@ export const SIZE_NAMES: Record<Scale, string> = {
   1: "일반",
   2.5: "거대",
 };
-export const MISSIONS = [
-  [
-    "연구실 탐험",
-    "WASD로 이동하고 Space로 점프하세요. 1·2·3으로 크기를 바꿔보세요.",
-  ],
-  [
-    "작아져야 보이는 길",
-    "1키로 초소형이 되어 앞쪽의 낮은 환풍구를 통과하세요.",
-  ],
-  [
-    "잠든 연구실 깨우기",
-    "3키로 거대화 → 배터리에서 E → 발전기에 운반 후 E. 일반 크기로 전원 콘솔을 조작하세요.",
-  ],
-  [
-    "나만의 슈트 개발",
-    "앞 방의 보라색 슈트 콘솔에서 E. 능력을 생성하고 테스트한 뒤 장착하세요.",
-  ],
-  ["빛보다 작은 존재", "Q로 자동 축소를 켜고 레이저 통로를 통과하세요."],
-  [
-    "연구실의 수호자",
-    "레이저를 자동 축소로 피하면 약점이 열립니다. 거대화 후 가까이서 E로 3회 공격하세요.",
-  ],
-  ["마지막 한 걸음", "열린 민트색 탈출문으로 이동하세요."],
-];

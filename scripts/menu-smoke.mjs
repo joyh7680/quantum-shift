@@ -23,7 +23,7 @@ const state = () =>
       ? {
           screen: s.screen,
           character: s.character,
-          time: s.time,
+          time: (s.activeStage === 1 ? s.lab : s.circuit).time,
           size: s.size,
           pos: s.pos,
           panel: s.panel,
@@ -75,12 +75,17 @@ try {
   for (let i = 1; i < 5; i++) {
     const card = page.locator(".route-card").nth(i);
     assert.equal(await card.isEnabled(), true);
-    assert.match(await card.innerText(), /준비 중/);
+    assert.match(
+      await card.innerText(),
+      i === 1 ? /STAGE 1 클리어 후 해금/ : /준비 중/,
+    );
     await card.click();
     assert.equal(await card.getAttribute("aria-pressed"), "true");
     assert.equal(
       await page
-        .getByRole("button", { name: /준비 중 · 진입 불가/ })
+        .getByRole("button", {
+          name: i === 1 ? /STAGE 1 클리어 필요/ : /준비 중 · 진입 불가/,
+        })
         .isDisabled(),
       true,
     );
@@ -89,8 +94,8 @@ try {
       const expected = [
         [
           "마이크로 회로",
-          "초소형으로 변신해 컴퓨터 내부를 탐험하고 회로를 복구.",
-          "슈트에 자동 장애물 회피 기능 제작",
+          "자동 축소 슈트를 개발해 레이저를 통과하고 수호자에 도전하세요.",
+          "자동 축소 슈트 개발 → 레이저 통과 → 수호자 전투",
           "바이브 코딩 · 조건문",
         ],
         [
@@ -149,7 +154,7 @@ try {
   assert.equal(await page.locator(".city-menu").count(), 0);
   if (!production) {
     await page.waitForFunction(
-      () => window.__quantumGame.getState().time > 0.5,
+      () => window.__quantumGame.getState().lab.time > 0.5,
     );
     const s = await state();
     assert.equal(s.screen, "game");

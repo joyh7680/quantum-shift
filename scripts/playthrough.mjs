@@ -1,5 +1,6 @@
 import { chromium } from "@playwright/test";
 import fs from "node:fs";
+import { runLab } from "./lab-playthrough.mjs";
 const browser = await chromium.launch({
   executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
   headless: true,
@@ -7,6 +8,7 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
 const errors = [];
+let completedLab;
 const suitOnly = process.env.QC_QA_SUIT_ONLY === "1";
 page.on("pageerror", (e) => {
   console.log("PAGE ERROR", e.message);
@@ -15,7 +17,10 @@ page.on("pageerror", (e) => {
 const state = () =>
   page.evaluate(() => {
     const s = window.__quantumGame.getState();
-    return JSON.parse(JSON.stringify(s));
+    const progress = s.activeStage === 1 ? s.lab : s.circuit;
+    return JSON.parse(
+      JSON.stringify({ ...s, ...progress, stage: progress.mission }),
+    );
   });
 const assert = (v, m) => {
   if (!v) throw Error(m);
@@ -59,85 +64,31 @@ try {
   if (suitOnly) {
     // Isolate studio interactions from the preceding movement puzzles.
     await page.evaluate(() => {
-      window.__quantumGame.getState().patch({
-        screen: "game",
-        panel: "suit",
-        power: true,
-        stage: 3,
-      });
+      const game = window.__quantumGame.getState();
+      game.patchLab({ power: true, cleared: true });
+      game.start(game.character, 2);
+      game.patch({ panel: "suit" });
     });
   } else {
     await page.getByRole("button", { name: /게임 시작/ }).click();
-    await waitFor((s) => s.time > 0.5, "simulation ready");
-    await page.evaluate(() => {
-      const useGame = window.__quantumGame;
-      window.__maxJump = 0;
-      const record = () => {
-        window.__maxJump = Math.max(
-          window.__maxJump,
-          useGame.getState().pos[1],
-        );
-        requestAnimationFrame(record);
-      };
-      record();
-    });
-    await page.keyboard.press("Space");
-    await page.waitForTimeout(600);
+    await runLab(page, { extended: false });
+    completedLab = JSON.stringify((await state()).lab);
+    await page.screenshot({ path: "artifacts/stage1-clear.png" });
+    await page.getByRole("button", { name: /STAGE 2로 이동/ }).click();
+    await waitFor((s) => s.activeStage === 2 && s.time > 0.5, "Stage 2 start");
     assert(
-      await page.evaluate(() => window.__maxJump > 0.2),
-      "jump should leave ground",
+      Math.abs((await state()).pos[2] - 32) < 0.5,
+      "Stage 2 starts at its own checkpoint",
     );
-    await page.waitForTimeout(700);
-    await move(0, 8);
-    await page.keyboard.down("KeyW");
-    await page.waitForTimeout(650);
-    await page.keyboard.up("KeyW");
-    assert((await state()).pos[2] < 8.5, "normal capsule blocked by vent");
-    await page.keyboard.press("Digit1");
-    await move(0, 10);
-    await page.keyboard.press("Digit3");
-    assert((await state()).size === 0.25, "growth must be blocked inside vent");
-    await page.screenshot({ path: "artifacts/vent-clearance.png" });
-    await move(0, 18);
-    assert((await state()).stage === 2, "vent milestone");
-    await page.keyboard.press("Digit3");
-    await move(-2.8, 18);
-    await page.keyboard.press("KeyE");
-    assert((await state()).battery === "carried", "giant battery pickup");
-    await move(3.8, 20);
-    await page.keyboard.press("KeyE");
-    assert((await state()).battery === "installed", "battery socket");
-    await page.keyboard.press("Digit2");
-    await move(4, 22.7);
-    await page.keyboard.press("KeyE");
-    await page.getByRole("dialog", { name: "전원 알고리즘" }).waitFor();
-    const pausedTime = (await state()).time;
-    await page.waitForTimeout(300);
-    assert((await state()).time === pausedTime, "coding panel pauses game");
-    for (const n of ["A", "메인 전원", "B", "C"])
-      await page
-        .getByRole("button", {
-          name: new RegExp(
-            "^" + (n === "메인 전원" ? "⏻" : "↳") + " " + n + "$",
-          ),
-        })
-        .click();
-    await page.getByRole("button", { name: "순서 실행" }).click();
-    await page.getByText("연결 실패 ·", { exact: false }).waitFor();
-    await page.getByRole("button", { name: "초기화", exact: true }).click();
-    for (const n of ["메인 전원", "A", "B", "C"])
-      await page
-        .getByRole("button", {
-          name: new RegExp(
-            "^" + (n === "메인 전원" ? "⏻" : "↳") + " " + n + "$",
-          ),
-        })
-        .click();
-    await page.screenshot({ path: "artifacts/power-puzzle.png" });
-    await page.getByRole("button", { name: "순서 실행" }).click();
-    assert((await state()).power, "power unlocked");
-    await move(0, 27);
-    await move(0, 33);
+    assert(
+      (await state()).stage === 0 && (await state()).deaths === 0,
+      "Stage 2 has fresh progress",
+    );
+    assert(
+      (await page.locator(".ability-card").count()) === 1,
+      "Stage 2 shows ability UI",
+    );
+    await page.screenshot({ path: "artifacts/stage2-start.png" });
     await move(-2, 34);
     await page.keyboard.press("KeyE");
   }
@@ -270,7 +221,10 @@ try {
   );
   await page.screenshot({ path: "artifacts/suit-studio.png" });
   await page.getByRole("button", { name: "슈트에 장착" }).click();
-  assert((await state()).equipped, "suit equipped");
+  assert(
+    (await state()).equipped && (await state()).stage === 1,
+    "suit equipped advances Stage 2 only",
+  );
   if (suitOnly) {
     assert(errors.length === 0, "no browser errors");
     console.log(
@@ -317,6 +271,11 @@ try {
   await move(0, 76);
   await waitFor((s) => s.screen === "clear", "clear screen");
   await page.screenshot({ path: "artifacts/clear-screen.png" });
+  assert((await state()).circuit.cleared, "Stage 2 independently cleared");
+  assert(
+    JSON.stringify((await state()).lab) === completedLab,
+    "Stage 2 never changes lab progress or stats",
+  );
   console.log("PLAYTHROUGH PASS", JSON.stringify(await state()));
   assert(errors.length === 0, "no browser errors");
   fs.writeFileSync(
@@ -324,6 +283,22 @@ try {
     JSON.stringify({ passed: true, errors, state: await state() }, null, 2),
   );
   await page.getByRole("button", { name: /메인 메뉴로/ }).click();
+  await page.getByRole("button", { name: /스테이지 안내/ }).click();
+  await page.locator(".route-card").nth(1).click();
+  const stageTwoStart = page.getByRole("button", { name: /STAGE 2 시작/ });
+  assert(await stageTwoStart.isEnabled(), "Stage 2 remains unlocked in menu");
+  await stageTwoStart.click();
+  await waitFor((s) => s.activeStage === 2 && s.time > 0.5, "Stage 2 replay");
+  assert(
+    (await state()).bossHP === 3 && !(await state()).equipped,
+    "Stage 2 replay starts clean",
+  );
+  assert(
+    JSON.stringify((await state()).lab) === completedLab,
+    "Stage 2 replay preserves lab",
+  );
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "메인 메뉴로", exact: true }).click();
   assert(
     (await state()).screen === "start",
     "restart returns to character selection",

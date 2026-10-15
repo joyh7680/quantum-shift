@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "url": "http://127.0.0.1:5177",
+  "transition": true,
+  "errors": [],
+  "state": {
+    "panel": null,
+    "size": 2.5,
+    "yaw": 0,
+    "moving": true,
+    "airborne": false,
+    "prompt": "",
+    "tutorial": 0,
+    "cameraCaptured": false,
+    "screen": "clear",
+    "activeStage": 2,
+    "character": "codmos_nova",
+    "lab": {
+      "mission": 2,
+      "cleared": true,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 75,
+      "deaths": 2,
+      "chips": [
+        "battery",
+        "power",
+        "vent"
+      ],
+      "code": [
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": true,
+      "fan": 0,
+      "index": 5,
+      "step": 4,
+      "elapsed": 0,
+      "run": "success",
+      "feedback": "환풍구 탈출 성공!",
+      "collectedAt": 0
+    },
+    "circuit": {
+      "mission": 2,
+      "cleared": true,
+      "checkpoint": [
+        0,
+        0,
+        58
+      ],
+      "time": 42.84999999999885,
+      "deaths": 1,
+      "suitRequest": "레이저가 오면 작아지고 원래 크기로 돌아와",
+      "program": {
+        "trigger": "laser-near",
+        "action": "shrink",
+        "restore": "previous-safe",
+        "range": 2.4
+      },
+      "tested": true,
+      "equipped": true,
+      "ability": true,
+      "automatic": false,
+      "pendingRestore": false,
+      "bossHP": 0,
+      "bossPhase": "defeated",
+      "bossTime": 0,
+      "bossDodged": false
+    },
+    "pos": [
+      -0.3084562122821808,
+      0.014862775802612305,
+      75.38329315185547
+    ],
+    "respawn": 4,
+    "toast": "수호자 정지! 탈출문이 열렸습니다.",
+    "toastId": 11,
+    "flash": 17
+  }
+}

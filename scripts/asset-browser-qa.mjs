@@ -7,7 +7,7 @@ const browser = await chromium.launch({
 });
 try {
   const page = await browser.newPage();
-  await page.goto("http://127.0.0.1:5173/");
+  await page.goto(process.env.QC_QA_URL || "http://127.0.0.1:5173/");
   const catalog = JSON.parse(fs.readFileSync("src/characters.json", "utf8"));
   const results = await page.evaluate(async (catalog) => {
     const { GLTFLoader } =

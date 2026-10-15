@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "fixture": "Focused runtime QA supplies an exit checkpoint and chips/code. Movement, collision, device operation and escape use real physics. Full collection is verified separately without fixtures.",
+  "errors": [],
+  "state": {
+    "panel": null,
+    "size": 0.25,
+    "yaw": -0.00030402223455501835,
+    "moving": false,
+    "airborne": false,
+    "prompt": "",
+    "tutorial": 1,
+    "cameraCaptured": false,
+    "screen": "clear",
+    "activeStage": 1,
+    "character": "codmos_nova",
+    "lab": {
+      "mission": 2,
+      "cleared": true,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 3.049999999999994,
+      "deaths": 0,
+      "chips": [
+        "vent",
+        "power",
+        "battery"
+      ],
+      "code": [
+        "tiny",
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": true,
+      "fan": 0,
+      "index": 6,
+      "step": 4,
+      "elapsed": 0,
+      "run": "success",
+      "feedback": "환풍구 탈출 성공!",
+      "collectedAt": 0
+    },
+    "circuit": {
+      "mission": 0,
+      "cleared": false,
+      "checkpoint": [
+        0,
+        0,
+        32
+      ],
+      "time": 0,
+      "deaths": 0,
+      "suitRequest": "",
+      "program": null,
+      "tested": false,
+      "equipped": false,
+      "ability": false,
+      "automatic": false,
+      "pendingRestore": false,
+      "bossHP": 3,
+      "bossPhase": "idle",
+      "bossTime": 0,
+      "bossDodged": false
+    },
+    "pos": [
+      2.0448711438803002E-05,
+      -0.0028564929962158203,
+      28.9327335357666
+    ],
+    "respawn": 3,
+    "toast": "실험 시작! 크기를 바꾸면 새로운 길이 보입니다.",
+    "toastId": 1,
+    "flash": 5
+  }
+}

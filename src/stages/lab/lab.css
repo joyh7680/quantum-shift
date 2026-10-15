@@ -1,0 +1,425 @@
+.lab-game {
+  --mint: #77ddff;
+  --navy: #091728;
+  color: #e0f3ff;
+}
+.lab-game .mission-card,
+.lab-game .size-control,
+.lab-game .chip-hud {
+  background: linear-gradient(130deg, #10233bef, #091629ed);
+  border: 1px solid #5bcfee4d;
+  box-shadow: 0 8px 35px #020a1b55;
+}
+.lab-game .game-top {
+  background: linear-gradient(#071322e8, transparent);
+}
+.lab-game .mission-card {
+  width: 320px;
+  word-break: keep-all;
+}
+.chip-hud {
+  position: absolute;
+  top: 350px;
+  left: 30px;
+  width: 320px;
+  border-radius: 9px;
+  padding: 16px 19px;
+  pointer-events: none;
+  animation: chipPulse 0.6s ease-out;
+}
+.chip-hud > span {
+  display: block;
+  font: 9px monospace;
+  color: #6eabc1;
+  letter-spacing: 2px;
+}
+.chip-hud > b {
+  display: block;
+  margin: 8px 0 12px;
+  font-size: 18px;
+}
+.chip-hud > div {
+  display: grid;
+  gap: 7px;
+  font-size: 11px;
+  color: #71869b;
+}
+.chip-hud .found {
+  color: #93e9ff;
+}
+@keyframes chipPulse {
+  from {
+    box-shadow: 0 0 35px #59dcff66;
+  }
+  to {
+    box-shadow: 0 8px 35px #020a1b55;
+  }
+}
+.coding-open .game-canvas {
+  right: 40%;
+}
+.coding-open .hud {
+  display: none;
+}
+.lab-live-caption {
+  max-width: 300px;
+  position: absolute;
+  left: 22px;
+  top: 22px;
+  width: calc(60% - 44px);
+  padding: 14px 18px;
+  background: #09172cdb;
+  border: 1px solid #4abed450;
+  border-radius: 8px;
+  pointer-events: none;
+}
+.lab-live-caption > span {
+  color: #6cdaec;
+  font: 10px monospace;
+  letter-spacing: 1px;
+}
+.lab-live-caption b {
+  display: block;
+  font-size: 20px;
+  margin: 7px 0;
+}
+.lab-live-caption p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #b1ccd9;
+}
+.escape-editor {
+  position: absolute;
+  inset: 0 0 0 60%;
+  background: linear-gradient(150deg, #11233a, #091322);
+  border-left: 1px solid #62cce85c;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  z-index: 10;
+}
+.escape-editor > header {
+  padding: 23px 24px 18px;
+  border-bottom: 1px solid #71abc630;
+}
+.escape-editor > header > span {
+  color: #6dcfe7;
+  font: 9px monospace;
+  letter-spacing: 1.5px;
+}
+.escape-editor h2 {
+  font-size: 25px;
+  margin: 9px 0 5px;
+  letter-spacing: -1px;
+}
+.escape-editor header p {
+  color: #8ca6bf;
+  font-size: 11px;
+}
+.editor-scroll {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 20px 22px;
+}
+.lab-section-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.lab-section-label h3 {
+  font-size: 14px;
+}
+.lab-section-label span,
+.lab-section-label small {
+  font-size: 10px;
+  font-weight: 400;
+  color: #80a5ba;
+}
+.lab-section-label button,
+.lab-help {
+  color: #9dc9df;
+  font-size: 11px;
+  background: transparent;
+  padding: 5px;
+}
+.escape-palette {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.escape-palette button {
+  color: var(--block-color);
+  border: 1px solid color-mix(in srgb, var(--block-color) 40%, transparent);
+  background: color-mix(in srgb, var(--block-color) 9%, #0b1a2d);
+  text-align: left;
+  padding: 12px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  min-height: 43px;
+}
+.escape-palette button span {
+  font-size: 17px;
+  margin-right: 7px;
+}
+.escape-palette button small {
+  display: block;
+  font-size: 9px;
+  margin-top: 3px;
+}
+.escape-palette button:hover:not(:disabled) {
+  background: #2c4a65;
+}
+.editor-instruction {
+  color: #859fb5;
+  font-size: 10px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.escape-code {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  min-height: 90px;
+}
+.escape-code li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #49658269;
+  background: #172e46;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  min-height: 47px;
+}
+.escape-code .code-index {
+  color: #698ca6;
+  font: 10px monospace;
+}
+.escape-code b {
+  font-size: 12px;
+  font-weight: 500;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.escape-code button {
+  color: #c4e2f1;
+  background: #42607e40;
+  border-radius: 3px;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  padding: 0;
+}
+.escape-code .code-drop {
+  font-size: 11px;
+  color: #7298b1;
+  border-style: dashed;
+  background: #0b192b;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.7;
+}
+.escape-code .executing {
+  border-color: #5ce6ff;
+  background: #16465c;
+  box-shadow: 0 0 18px #5ce6ff20;
+}
+.escape-code .failed {
+  border-color: #ff9c82;
+  background: #512b35;
+}
+.lab-help {
+  border-bottom: 1px solid #497c9b55;
+}
+.observation-help {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #a6d4e2;
+  padding: 12px 0;
+}
+.escape-editor footer {
+  border-top: 1px solid #71abc630;
+  padding: 12px 22px 16px;
+  background: #0b182a;
+}
+.run-feedback {
+  color: #9cc4d3;
+  min-height: 38px;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+.run-feedback.error {
+  color: #ffb39b;
+}
+.run-actions {
+  display: flex;
+  gap: 10px;
+}
+.run-actions button {
+  flex: 1;
+  justify-content: center;
+  padding: 12px;
+}
+.explore-return {
+  display: block;
+  width: 100%;
+  padding: 12px 6px 0;
+  color: #93b8cf;
+  font-size: 11px;
+  background: transparent;
+}
+@media (max-height: 760px) {
+  .escape-editor > header {
+    padding: 14px 20px;
+  }
+  .escape-editor h2 {
+    font-size: 21px;
+  }
+  .editor-scroll {
+    padding: 14px 18px;
+  }
+  .escape-palette {
+    margin-bottom: 16px;
+  }
+  .escape-editor footer {
+    padding: 10px 18px;
+  }
+  .chip-hud {
+    top: 275px;
+  }
+}
+@media (max-width: 900px) {
+  .escape-editor > header {
+    padding: 15px 12px;
+  }
+  .editor-scroll {
+    padding: 14px 10px;
+  }
+  .escape-palette {
+    grid-template-columns: 1fr;
+  }
+  .escape-code li {
+    gap: 4px;
+    padding: 8px 5px;
+    flex-wrap: wrap;
+  }
+  .escape-code b {
+    font-size: 11px;
+  }
+  .escape-code button {
+    width: 22px;
+  }
+  .escape-editor footer {
+    padding: 10px;
+  }
+  .run-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lab-live-caption {
+    left: 12px;
+    width: calc(60% - 24px);
+    padding: 10px;
+  }
+  .lab-live-caption p {
+    font-size: 10px;
+  }
+  .lab-live-caption b {
+    font-size: 16px;
+  }
+  .chip-hud {
+    left: 15px;
+    top: 270px;
+    width: 255px;
+  }
+}
+@media (max-width: 580px) {
+  .lab-game .mission-card {
+    width: 235px;
+  }
+  .chip-hud {
+    top: 240px;
+    left: 12px;
+    width: 235px;
+    padding: 12px;
+  }
+  .chip-hud > b {
+    font-size: 15px;
+  }
+  .escape-editor h2 {
+    font-size: 17px;
+  }
+  .escape-editor header > span {
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+  .escape-editor header p {
+    font-size: 9px;
+  }
+  .lab-section-label {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .lab-section-label h3 {
+    font-size: 12px;
+  }
+  .escape-palette button {
+    padding: 8px;
+    font-size: 10px;
+  }
+  .escape-code b {
+    flex-basis: 70%;
+  }
+  .lab-live-caption p {
+    line-height: 1.7;
+  }
+  .run-feedback {
+    font-size: 10px;
+  }
+}
+.chip-transfer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  color: #a0f0ff;
+  font-size: 36px;
+  z-index: 14;
+  pointer-events: none;
+  opacity: 0;
+  text-shadow: 0 0 20px #60dfff;
+  animation: chipTransfer 0.8s ease-in forwards;
+}
+@keyframes chipTransfer {
+  0% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 100px;
+    top: 390px;
+    transform: scale(0.3);
+    opacity: 0;
+  }
+}
+@media (max-height: 760px) and (min-width: 901px) {
+  .chip-hud {
+    top: 335px;
+  }
+}
+@media (max-width: 900px) and (min-width: 581px) {
+  .lab-game .mission-card {
+    width: 255px;
+  }
+  .chip-hud {
+    top: 310px;
+  }
+}

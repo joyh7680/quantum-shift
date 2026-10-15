@@ -1,0 +1,230 @@
+import { useEffect, useRef, useState } from "react";
+import { useGame } from "../../store";
+import { COMMANDS, PALETTE } from "./state";
+import type { Command } from "./state";
+import { editCode, resetPuzzle, startProgram } from "./gameplay";
+export function PowerPanel() {
+  const lab = useGame((s) => s.lab);
+  const [help, setHelp] = useState(false);
+  const codeList = useRef<HTMLOListElement>(null);
+  const running = lab.run === "running";
+  useEffect(() => {
+    if ((lab.run === "running" || lab.run === "failed") && lab.index >= 0)
+      codeList.current?.children[lab.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [lab.index, lab.run]);
+  function drop(event: React.DragEvent, index: number) {
+    event.preventDefault();
+    if (running) return;
+    const source = event.dataTransfer.getData("text/plain");
+    const code = [...lab.code];
+    if (source.startsWith("code:")) {
+      const from = Number(source.slice(5));
+      const [command] = code.splice(from, 1);
+      if (command) code.splice(index > from ? index - 1 : index, 0, command);
+    } else if (
+      PALETTE.includes(source as Command) &&
+      (source === "tiny" ||
+        source === "normal" ||
+        source === "giant" ||
+        lab.chips.includes(source as "battery" | "power" | "vent"))
+    )
+      code.splice(index, 0, source as Command);
+    editCode(code);
+  }
+  function move(index: number, direction: number) {
+    const code = [...lab.code];
+    [code[index], code[index + direction]] = [
+      code[index + direction],
+      code[index],
+    ];
+    editCode(code);
+  }
+  return (
+    <>
+      <div className="lab-live-caption">
+        <span>LIVE / 실제 3D 실행</span>
+        <b>거인의 연구실</b>
+        <p>
+          배터리{" "}
+          {lab.battery === "installed"
+            ? "연결됨"
+            : lab.battery === "carried"
+              ? "운반 중"
+              : "미연결"}{" "}
+          · 정비 전원 {lab.power ? "ON" : "OFF"} · 팬{" "}
+          {lab.fan === 0 ? "정지" : lab.fan < 1 ? "감속 중" : "회전 중"}
+        </p>
+      </div>
+      <section className="escape-editor" aria-label="탈출 블록 코딩">
+        <header>
+          <span>ESCAPE PROGRAM / 블록 코딩</span>
+          <h2>탈출 프로그램</h2>
+          <p>알고리즘 · 순차 실행</p>
+        </header>
+        <div className="editor-scroll">
+          <div className="lab-section-label">
+            <h3>블록 보관함</h3>
+            <span>반복 사용 가능</span>
+          </div>
+          <div className="escape-palette">
+            {PALETTE.map((id) => {
+              const available =
+                ["tiny", "normal", "giant"].includes(id) ||
+                lab.chips.includes(id as "battery" | "power" | "vent");
+              return (
+                <button
+                  key={id}
+                  draggable={available && !running}
+                  disabled={!available || running}
+                  onDragStart={(e) => e.dataTransfer.setData("text/plain", id)}
+                  onClick={() => editCode([...lab.code, id])}
+                  style={
+                    {
+                      "--block-color": COMMANDS[id].color,
+                    } as React.CSSProperties
+                  }
+                >
+                  <span>{COMMANDS[id].icon}</span>
+                  {COMMANDS[id].label}
+                  {!available && <small>미수집</small>}
+                </button>
+              );
+            })}
+          </div>
+          <div className="lab-section-label">
+            <h3>
+              내 코드 <small>{lab.code.length} 블록</small>
+            </h3>
+            <button
+              disabled={running || !lab.code.length}
+              onClick={() => editCode([])}
+            >
+              초기화
+            </button>
+          </div>
+          <p className="editor-instruction">
+            클릭·드래그로 추가 · 드래그 또는 ↑↓로 순서 변경
+          </p>
+          <ol
+          ref={codeList}
+            className="escape-code"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              if (e.target === e.currentTarget) drop(e, lab.code.length);
+            }}
+          >
+            {lab.code.map((id, index) => (
+              <li
+                key={index}
+                className={
+                  index === lab.index
+                    ? lab.run === "failed"
+                      ? "failed"
+                      : "executing"
+                    : ""
+                }
+                draggable={!running}
+                onDragStart={(e) =>
+                  e.dataTransfer.setData("text/plain", `code:${index}`)
+                }
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.stopPropagation();
+                  drop(e, index);
+                }}
+                aria-current={index === lab.index ? "step" : undefined}
+              >
+                <span className="code-index">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <b>
+                  {COMMANDS[id].icon} {COMMANDS[id].label}
+                </b>
+                <button
+                  aria-label={`${index + 1}번 블록 위로`}
+                  disabled={running || index === 0}
+                  onClick={() => move(index, -1)}
+                >
+                  ↑
+                </button>
+                <button
+                  aria-label={`${index + 1}번 블록 아래로`}
+                  disabled={running || index === lab.code.length - 1}
+                  onClick={() => move(index, 1)}
+                >
+                  ↓
+                </button>
+                <button
+                  aria-label={`${index + 1}번 블록 삭제`}
+                  disabled={running}
+                  onClick={() =>
+                    editCode(lab.code.filter((_, i) => i !== index))
+                  }
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+            <li
+              className="code-drop"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.stopPropagation();
+                drop(e, lab.code.length);
+              }}
+            >
+              {lab.code.length
+                ? "여기에 블록 추가"
+                : "아직 코드가 없어요. 보관함에서 블록을 골라보세요."}
+            </li>
+          </ol>
+          <button
+            className="lab-help"
+            aria-expanded={help}
+            onClick={() => setHelp(!help)}
+          >
+            관찰 도움말 {help ? "−" : "+"}
+          </button>
+          {help && (
+            <p className="observation-help">
+              배터리는 얼마나 무거울까요? 정밀 조작대의 높이는 어떤가요? 팬과
+              정비 전원은 어떻게 연결되어 있을까요?
+            </p>
+          )}
+        </div>
+        <footer>
+          <p
+            className={"run-feedback " + (lab.run === "failed" ? "error" : "")}
+            role={lab.run === "failed" ? "alert" : "status"}
+          >
+            {lab.chips.length < 3
+              ? `실행하려면 명령 칩 ${3 - lab.chips.length}개가 더 필요해요.`
+              : lab.feedback || "블록을 배치하고 실행 결과를 관찰해보세요."}
+          </p>
+          <div className="run-actions">
+            <button
+              className="secondary"
+              disabled={!running}
+              onClick={() => resetPuzzle("실행을 중단하고 장치를 복원했어요.")}
+            >
+              실행 중단
+            </button>
+            <button
+              className="primary"
+              disabled={running || lab.chips.length !== 3 || !lab.code.length}
+              onClick={startProgram}
+            >
+              {lab.run === "failed" ? "재실행" : "실행"} ▶
+            </button>
+          </div>
+          <button
+            className="explore-return"
+            onClick={() => resetPuzzle("", true)}
+          >
+            ← 탐험으로 돌아가기
+          </button>
+        </footer>
+      </section>
+    </>
+  );
+}

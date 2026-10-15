@@ -1,119 +1,181 @@
 import { create } from "zustand";
-import type { Scale, SuitProgram } from "./rules";
+import type { Scale } from "./rules.ts";
+import { createLabState } from "./stages/lab/state.ts";
+import type { LabState } from "./stages/lab/state.ts";
+import { createCircuitState } from "./stages/circuit/state.ts";
+import type { CircuitState } from "./stages/circuit/state.ts";
+import type { StageId, Vec } from "./stages/shared.ts";
+export type { Vec } from "./stages/shared.ts";
 export type Panel = "power" | "suit" | "pause" | null;
-export type Vec = [number, number, number];
-type GameState = {
+export type GameState = {
   screen: "start" | "game" | "clear";
+  activeStage: StageId;
+  lab: LabState;
+  circuit: CircuitState;
   character: string;
   panel: Panel;
-  stage: number;
   size: Scale;
   pos: Vec;
   yaw: number;
   moving: boolean;
   airborne: boolean;
   prompt: string;
-  battery: "floor" | "carried" | "installed";
-  power: boolean;
-  suitRequest: string;
-  program: SuitProgram | null;
-  tested: boolean;
-  equipped: boolean;
-  ability: boolean;
-  automatic: boolean;
-  pendingRestore: boolean;
-  bossHP: number;
-  bossPhase: "idle" | "charge" | "fire" | "weak" | "shield" | "defeated";
-  bossTime: number;
-  bossDodged: boolean;
-  time: number;
-  deaths: number;
-  checkpoint: Vec;
   respawn: number;
   toast: string;
   toastId: number;
   flash: number;
-  startedAt: number;
   tutorial: number;
   cameraCaptured: boolean;
   patch: (v: Partial<GameState>) => void;
+  patchLab: (v: Partial<LabState>) => void;
+  patchCircuit: (v: Partial<CircuitState>) => void;
+  completeLab: () => void;
+  completeCircuit: () => void;
+  nextStage: () => void;
   notify: (v: string) => void;
-  start: (id: string) => void;
+  start: (id: string, stage?: StageId) => void;
   reset: () => void;
   die: (reason: string) => void;
 };
-const initial = {
-  screen: "start" as const,
-  character: "codmos_nova",
+const transient = () => ({
   panel: null,
-  stage: 0,
   size: 1 as Scale,
-  pos: [0, 0, -2] as Vec,
   yaw: 0,
   moving: false,
   airborne: false,
   prompt: "",
-  battery: "floor" as const,
-  power: false,
-  suitRequest: "",
-  program: null,
-  tested: false,
-  equipped: false,
-  ability: false,
-  automatic: false,
-  pendingRestore: false,
-  bossHP: 3,
-  bossPhase: "idle" as const,
-  bossTime: 0,
-  bossDodged: false,
-  time: 0,
-  deaths: 0,
-  checkpoint: [0, 0, -2] as Vec,
+  tutorial: 0,
+  cameraCaptured: false,
+});
+const initial = () => ({
+  ...transient(),
+  screen: "start" as const,
+  activeStage: 1 as StageId,
+  character: "codmos_nova",
+  lab: createLabState(),
+  circuit: createCircuitState(),
+  pos: [0, 0, -2] as Vec,
   respawn: 0,
   toast: "",
   toastId: 0,
   flash: 0,
-  startedAt: 0,
-  tutorial: 0,
-  cameraCaptured: false,
-};
+});
+function releasePointer() {
+  if (typeof document !== "undefined" && document.pointerLockElement)
+    document.exitPointerLock?.();
+}
 export const useGame = create<GameState>((set, get) => ({
-  ...initial,
+  ...initial(),
   patch: (v) => set(v),
+  patchLab: (v) => set((s) => ({ lab: { ...s.lab, ...v } })),
+  patchCircuit: (v) => set((s) => ({ circuit: { ...s.circuit, ...v } })),
   notify: (toast) => set((s) => ({ toast, toastId: s.toastId + 1 })),
-  start: (character) =>
+  start: (character, activeStage = 1) => {
+    const s = get();
+    if (activeStage === 2 && !s.lab.cleared) return;
+    releasePointer();
+    // Restart only the selected stage; its neighbour keeps its own progress.
+    const lab = activeStage === 1 ? createLabState() : s.lab;
+    const circuit = activeStage === 2 ? createCircuitState() : s.circuit;
+    const progress = activeStage === 1 ? lab : circuit;
     set({
-      ...initial,
-      screen: "game",
+      ...transient(),
       character,
-      startedAt: Date.now(),
-      toast: "실험 시작! 크기를 바꾸면 새로운 길이 보입니다.",
-      toastId: get().toastId + 1,
-    }),
+      activeStage,
+      lab,
+      circuit,
+      screen: "game",
+      pos: [...progress.checkpoint],
+      respawn: s.respawn + 1,
+      toast:
+        activeStage === 1
+          ? "실험 시작! 크기를 바꾸면 새로운 길이 보입니다."
+          : "STAGE 2 · 슈트 콘솔에서 자동 축소 능력을 개발하세요.",
+      toastId: s.toastId + 1,
+    });
+  },
+  completeLab: () => {
+    const s = get();
+    if (
+      s.activeStage !== 1 ||
+      s.lab.run !== "success" ||
+      s.lab.fan !== 0 ||
+      s.size !== 0.25 ||
+      s.pos[2] < 28 ||
+      s.lab.cleared
+    )
+      return;
+    set({
+      lab: { ...s.lab, cleared: true },
+      screen: "clear",
+      panel: null,
+      prompt: "",
+    });
+    releasePointer();
+  },
+  completeCircuit: () => {
+    const s = get();
+    if (
+      s.activeStage !== 2 ||
+      !s.circuit.equipped ||
+      s.circuit.mission !== 2 ||
+      s.circuit.bossHP !== 0 ||
+      s.circuit.cleared
+    )
+      return;
+    set({
+      circuit: { ...s.circuit, cleared: true },
+      screen: "clear",
+      panel: null,
+      prompt: "",
+    });
+    releasePointer();
+  },
+  nextStage: () => {
+    const s = get();
+    if (s.activeStage === 1 && s.screen === "clear" && s.lab.cleared)
+      s.start(s.character, 2);
+  },
   reset: () => {
-    if (document.pointerLockElement) document.exitPointerLock?.();
-    set({ ...initial, character: get().character });
+    releasePointer();
+    // Returning to the menu retains session progress and the Stage 2 unlock.
+    set({ ...transient(), screen: "start", toast: "" });
   },
   die: (reason) =>
     set((s) => ({
-      deaths: s.deaths + 1,
+      ...(s.activeStage === 1
+        ? {
+            lab: {
+              ...s.lab,
+              deaths: s.lab.deaths + 1,
+              battery:
+                s.lab.battery === "carried"
+                  ? ("floor" as const)
+                  : s.lab.battery,
+            },
+          }
+        : {
+            circuit: {
+              ...s.circuit,
+              deaths: s.circuit.deaths + 1,
+              automatic: false,
+              pendingRestore: false,
+              bossTime: 0,
+              bossDodged: false,
+            },
+          }),
       respawn: s.respawn + 1,
       size: 1,
-      automatic: false,
-      pendingRestore: false,
-      battery: s.battery === "carried" ? "floor" : s.battery,
-      bossTime: 0,
-      bossDodged: false,
+      prompt: "",
       toast: reason + " · 체크포인트에서 재시작합니다.",
       toastId: s.toastId + 1,
       flash: s.flash + 1,
     })),
 }));
-// Read-only browser QA observes the same store used by the rendered app.
-// Vite removes this development-only hook from production builds.
 declare global {
   interface Window {
     __quantumGame?: typeof useGame;
   }
 }
-if (import.meta.env.DEV) window.__quantumGame = useGame;
+if (import.meta.env?.DEV && typeof window !== "undefined")
+  window.__quantumGame = useGame;

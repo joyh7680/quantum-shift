@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "errors": [],
+  "requests": [],
+  "state": {
+    "panel": null,
+    "size": 0.25,
+    "yaw": -0.00030402223455501835,
+    "moving": false,
+    "airborne": false,
+    "prompt": "",
+    "tutorial": 1,
+    "cameraCaptured": false,
+    "screen": "clear",
+    "activeStage": 1,
+    "character": "codmos_nova",
+    "lab": {
+      "mission": 2,
+      "cleared": true,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 60.73333333333117,
+      "deaths": 2,
+      "chips": [
+        "vent",
+        "battery",
+        "power"
+      ],
+      "code": [
+        "tiny",
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": true,
+      "fan": 0,
+      "index": 6,
+      "step": 4,
+      "elapsed": 0,
+      "run": "success",
+      "feedback": "환풍구 탈출 성공!",
+      "collectedAt": 1792052445811
+    },
+    "circuit": {
+      "mission": 0,
+      "cleared": false,
+      "checkpoint": [
+        0,
+        0,
+        32
+      ],
+      "time": 0,
+      "deaths": 0,
+      "suitRequest": "",
+      "program": null,
+      "tested": false,
+      "equipped": false,
+      "ability": false,
+      "automatic": false,
+      "pendingRestore": false,
+      "bossHP": 3,
+      "bossPhase": "idle",
+      "bossTime": 0,
+      "bossDodged": false
+    },
+    "pos": [
+      0.000020448711438803002,
+      -0.0028564929962158203,
+      28.9327335357666
+    ],
+    "respawn": 12,
+    "toast": "비상 전기 바닥에 닿았어요 · 체크포인트에서 재시작합니다.",
+    "toastId": 7,
+    "flash": 9
+  }
+}

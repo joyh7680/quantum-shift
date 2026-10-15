@@ -2,22 +2,97 @@
   "passed": true,
   "errors": [],
   "state": {
-    "screen": "clear",
-    "character": "codmos_nova",
     "panel": null,
-    "stage": 6,
     "size": 2.5,
-    "pos": [
-      0.38848429918289185,
-      0.014364480972290039,
-      75.471435546875
-    ],
-    "yaw": 0,
+    "yaw": -0.7853981633974483,
     "moving": true,
     "airborne": false,
     "prompt": "",
-    "battery": "installed",
-    "power": true,
+    "tutorial": 0,
+    "cameraCaptured": false,
+    "screen": "clear",
+    "activeStage": 2,
+    "character": "codmos_nova",
+    "lab": {
+      "mission": 2,
+      "cleared": true,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 74.44999999999706,
+      "deaths": 1,
+      "chips": [
+        "vent",
+        "battery",
+        "power"
+      ],
+      "code": [
+        "tiny",
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": true,
+      "fan": 0,
+      "index": 6,
+      "step": 4,
+      "elapsed": 0,
+      "run": "success",
+      "feedback": "환풍구 탈출 성공!",
+      "collectedAt": 1792052549882
+    },
+    "circuit": {
+      "mission": 2,
+      "cleared": true,
+      "checkpoint": [
+        0,
+        0,
+        58
+      ],
+      "time": 43.84999999999879,
+      "deaths": 1,
+      "suitRequest": "레이저가 오면 작아지고 원래 크기로 돌아와",
+      "program": {
+        "trigger": "laser-near",
+        "action": "shrink",
+        "restore": "previous-safe",
+        "range": 2.4
+      },
+      "tested": true,
+      "equipped": true,
+      "ability": true,
+      "automatic": false,
+      "pendingRestore": false,
+      "bossHP": 0,
+      "bossPhase": "defeated",
+      "bossTime": 0,
+      "bossDodged": false
+    },
+    "pos": [
+      1.2141804695129395,
+      0.014738798141479492,
+      75.48591613769531
+    ],
+    "respawn": 13,
+    "toast": "수호자 정지! 탈출문이 열렸습니다.",
+    "toastId": 16,
+    "flash": 24,
+    "mission": 2,
+    "cleared": true,
+    "checkpoint": [
+      0,
+      0,
+      58
+    ],
+    "time": 43.84999999999879,
+    "deaths": 1,
+    "suitRequest": "레이저가 오면 작아지고 원래 크기로 돌아와",
     "program": {
       "trigger": "laser-near",
       "action": "shrink",
@@ -33,19 +108,6 @@
     "bossPhase": "defeated",
     "bossTime": 0,
     "bossDodged": false,
-    "time": 84.48333333332982,
-    "deaths": 1,
-    "checkpoint": [
-      0,
-      0,
-      58
-    ],
-    "respawn": 1,
-    "toast": "수호자 정지! 탈출문이 열렸습니다.",
-    "toastId": 15,
-    "flash": 19,
-    "startedAt": 1792040670685,
-    "tutorial": 1,
-    "cameraCaptured": false
+    "stage": 2
   }
 }

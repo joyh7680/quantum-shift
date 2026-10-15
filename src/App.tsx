@@ -9,8 +9,15 @@ import "./menu.css";
 import { World } from "./World";
 import { Player } from "./Player";
 import { useGame } from "./store";
-import { MISSIONS, SIZE_NAMES } from "./rules";
-import { PausePanel, PowerPanel, SuitPanel } from "./Panels";
+import { SIZE_NAMES } from "./rules";
+import { LAB_MISSIONS, LAB_ZONES } from "./stages/lab/state";
+import { CIRCUIT_MISSIONS, CIRCUIT_ZONES } from "./stages/circuit/state";
+import { CITY_STAGES } from "./stages";
+import { PausePanel } from "./Panels";
+import { PowerPanel } from "./stages/lab/PowerPanel";
+import { SuitPanel } from "./stages/circuit/SuitPanel";
+import { COMMANDS } from "./stages/lab/state";
+import "./stages/lab/lab.css";
 class AssetBoundary extends Component<
   { children: ReactNode },
   { error: Error | null }
@@ -67,24 +74,31 @@ function Loading() {
   ) : null;
 }
 function HUD() {
-  const stage = useGame((s) => s.stage),
+  const lab = useGame((s) => s.lab);
+  const activeStage = useGame((s) => s.activeStage),
+    progress = useGame((s) => (s.activeStage === 1 ? s.lab : s.circuit)),
     size = useGame((s) => s.size),
-    ability = useGame((s) => s.ability),
-    equipped = useGame((s) => s.equipped),
-    automatic = useGame((s) => s.automatic),
-    pending = useGame((s) => s.pendingRestore),
+    ability = useGame((s) => s.circuit.ability),
+    equipped = useGame((s) => s.circuit.equipped),
+    automatic = useGame((s) => s.circuit.automatic),
+    pending = useGame((s) => s.circuit.pendingRestore),
     prompt = useGame((s) => s.prompt),
-    hp = useGame((s) => s.bossHP),
-    phase = useGame((s) => s.bossPhase),
+    hp = useGame((s) => s.circuit.bossHP),
+    phase = useGame((s) => s.circuit.bossPhase),
     captured = useGame((s) => s.cameraCaptured),
-    deaths = useGame((s) => s.deaths);
+    deaths = progress.deaths;
+  const stage = progress.mission;
+  const missions = activeStage === 1 ? LAB_MISSIONS : CIRCUIT_MISSIONS;
+  const zones = activeStage === 1 ? LAB_ZONES : CIRCUIT_ZONES;
+  const brief = CITY_STAGES[activeStage - 1];
   return (
     <div className="hud">
       <header className="game-top">
         <Logo />
         <div className="game-location">
           <span className="green-dot" />
-          거인의 연구실 <small>STAGE 01</small>
+          {brief.name}{" "}
+          <small>STAGE {String(activeStage).padStart(2, "0")}</small>
         </div>
         <button
           onClick={() => {
@@ -97,15 +111,37 @@ function HUD() {
           Ⅱ
         </button>
       </header>
+      {activeStage === 1 && (
+        <div className="chip-hud" key={lab.collectedAt}>
+          <span>COMMAND INVENTORY</span>
+          <b>명령 칩 {lab.chips.length}/3</b>
+          <div>
+            {(["battery", "power", "vent"] as const).map((id) => (
+              <span key={id} className={lab.chips.includes(id) ? "found" : ""}>
+                {COMMANDS[id].icon} {COMMANDS[id].label}
+                {lab.chips.includes(id) ? " ✓" : ""}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      {activeStage === 1 && lab.collectedAt > 0 && (
+        <div className="chip-transfer" key={"chip-" + lab.collectedAt}>
+          {COMMANDS[lab.chips[lab.chips.length - 1]].icon}
+        </div>
+      )}
       <aside className="mission-card">
         <div className="mission-label">
           <span>CURRENT OBJECTIVE</span>
-          <span>{String(stage + 1).padStart(2, "0")} / 07</span>
+          <span>
+            {String(stage + 1).padStart(2, "0")} /{" "}
+            {String(missions.length).padStart(2, "0")}
+          </span>
         </div>
-        <h2>{MISSIONS[stage][0]}</h2>
-        <p>{MISSIONS[stage][1]}</p>
+        <h2>{missions[stage][0]}</h2>
+        <p>{missions[stage][1]}</p>
         <div className="mission-track">
-          {MISSIONS.map((_, i) => (
+          {missions.map((_, i) => (
             <span
               key={i}
               className={i < stage ? "done" : i === stage ? "active" : ""}
@@ -117,22 +153,10 @@ function HUD() {
         </span>
       </aside>
       <div className="zone-index">
-        <b>LAB — 001</b>
-        <span>
-          {
-            [
-              "EXPLORATION",
-              "VENTILATION",
-              "POWER SYSTEM",
-              "SUIT DEVELOPMENT",
-              "LASER ARRAY",
-              "SENTINEL",
-              "EXIT",
-            ][stage]
-          }
-        </span>
+        <b>{activeStage === 1 ? "LAB — 001" : "CIRCUIT — 002"}</b>
+        <span>{zones[stage]}</span>
       </div>
-      {stage === 5 && (
+      {activeStage === 2 && stage === 2 && hp > 0 && (
         <div className="boss-hud">
           <span>SENTINEL / 경비 로봇</span>
           <div>
@@ -174,7 +198,10 @@ function HUD() {
       </div>
       <div className="size-control">
         <div className="size-label">
-          QUANTUM SCALE <span>{automatic ? "AUTO SHIFT" : "MANUAL SHIFT"}</span>
+          QUANTUM SCALE{" "}
+          <span>
+            {activeStage === 2 && automatic ? "AUTO SHIFT" : "MANUAL SHIFT"}
+          </span>
         </div>
         <div className="size-buttons">
           {([0.25, 1, 2.5] as const).map((scale, i) => (
@@ -194,28 +221,30 @@ function HUD() {
           ))}
         </div>
       </div>
-      <div className={"ability-card " + (ability ? "on" : "")}>
-        <div>
-          <span className="ability-icon">⌘</span>
+      {activeStage === 2 && (
+        <div className={"ability-card " + (ability ? "on" : "")}>
           <div>
-            <small>SUIT ABILITY</small>
-            <b>자동 축소</b>
+            <span className="ability-icon">⌘</span>
+            <div>
+              <small>SUIT ABILITY</small>
+              <b>자동 축소</b>
+            </div>
+            <kbd>Q</kbd>
           </div>
-          <kbd>Q</kbd>
+          <p>
+            <span className="green-dot" />
+            {!equipped
+              ? "미장착 · 슈트 개발 필요"
+              : pending
+                ? "복귀 공간 대기 중"
+                : automatic
+                  ? "레이저 감지 · 초소형 회피"
+                  : ability
+                    ? "활성 · 레이저 감지 대기"
+                    : "비활성"}
+          </p>
         </div>
-        <p>
-          <span className="green-dot" />
-          {!equipped
-            ? "미장착 · 슈트 개발 필요"
-            : pending
-              ? "복귀 공간 대기 중"
-              : automatic
-                ? "레이저 감지 · 초소형 회피"
-                : ability
-                  ? "활성 · 레이저 감지 대기"
-                  : "비활성"}
-        </p>
-      </div>
+      )}
     </div>
   );
 }
@@ -240,52 +269,85 @@ function ShiftFX() {
   return id > 0 ? <div key={id} className="shift-fx" /> : null;
 }
 function Clear() {
-  const time = useGame((s) => s.time),
-    deaths = useGame((s) => s.deaths);
+  const activeStage = useGame((s) => s.activeStage);
+  const progress = useGame((s) => (s.activeStage === 1 ? s.lab : s.circuit));
+  const count = (activeStage === 1 ? LAB_MISSIONS : CIRCUIT_MISSIONS).length;
   return (
     <div className="clear-screen">
       <div className="clear-orbit">✧</div>
-      <span className="eyebrow mint">EXPERIMENT COMPLETE</span>
+      <span className="eyebrow mint">STAGE {activeStage} COMPLETE</span>
       <h1>
-        작은 당신의
+        {CITY_STAGES[activeStage - 1].name}
         <br />
-        <span>거대한 성공.</span>
+        <span>클리어.</span>
       </h1>
       <p>
-        거인의 연구실을 탈출했습니다.
-        <br />
-        크기를 바꾸고, 코드를 만들고, 불가능을 통과했습니다.
+        {activeStage === 1 ? (
+          <>
+            직접 만든 블록 프로그램으로 환풍구를 탈출했습니다.
+            <br />
+            다음 스테이지로 이동할 수 있습니다.
+          </>
+        ) : (
+          <>
+            자동 축소 슈트로 레이저를 통과하고
+            <br />
+            수호자를 정지시켰습니다.
+          </>
+        )}
       </p>
       <div className="clear-stats">
         <div>
-          <strong>07 / 07</strong>
+          <strong>
+            {String(count).padStart(2, "0")} / {String(count).padStart(2, "0")}
+          </strong>
           <span>미션 완료</span>
         </div>
         <div>
           <strong>
-            {Math.floor(time / 60)}:
-            {String(Math.floor(time % 60)).padStart(2, "0")}
+            {Math.floor(progress.time / 60)}:
+            {String(Math.floor(progress.time % 60)).padStart(2, "0")}
           </strong>
           <span>탐사 시간</span>
         </div>
         <div>
-          <strong>{deaths}</strong>
+          <strong>{progress.deaths}</strong>
           <span>체크포인트 재시작</span>
         </div>
       </div>
-      <button className="primary" onClick={() => useGame.getState().reset()}>
+      {activeStage === 1 && (
+        <button
+          className="primary"
+          onClick={() => useGame.getState().nextStage()}
+        >
+          STAGE 2로 이동 <span>→</span>
+        </button>
+      )}
+      <button
+        className={activeStage === 1 ? "secondary" : "primary"}
+        onClick={() => useGame.getState().reset()}
+      >
         메인 메뉴로 <span>↻</span>
       </button>
-      <span className="clear-foot">QUANTUM CITY / STAGE 1 CLEARED</span>
+      <span className="clear-foot">
+        QUANTUM CITY / STAGE {activeStage} CLEARED
+      </span>
     </div>
   );
 }
 export default function App() {
   const screen = useGame((s) => s.screen),
-    panel = useGame((s) => s.panel);
+    panel = useGame((s) => s.panel),
+    activeStage = useGame((s) => s.activeStage);
   return (
     <AssetBoundary>
-      <div className="app">
+      <div
+        className={
+          "app " +
+          (activeStage === 1 && screen !== "start" ? "lab-game " : "") +
+          (activeStage === 1 && panel === "power" ? "coding-open" : "")
+        }
+      >
         <Loading />
         {screen !== "start" && (
           <div className="game-canvas">
@@ -307,7 +369,12 @@ export default function App() {
             >
               <Suspense fallback={null}>
                 <Physics
-                  paused={screen !== "game" || panel !== null}
+                  key={activeStage}
+                  paused={
+                    screen !== "game" ||
+                    (panel !== null &&
+                      !(activeStage === 1 && panel === "power"))
+                  }
                   timeStep={1 / 60}
                   gravity={[0, -18, 0]}
                 >
@@ -327,8 +394,8 @@ export default function App() {
             <HUD />
             <Toast />
             <ShiftFX />
-            {panel === "power" && <PowerPanel />}
-            {panel === "suit" && <SuitPanel />}
+            {activeStage === 1 && panel === "power" && <PowerPanel />}
+            {activeStage === 2 && panel === "suit" && <SuitPanel />}
             {panel === "pause" && <PausePanel />}
           </>
         )}

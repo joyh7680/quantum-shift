@@ -1,17 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  checkOrder,
-  compileRequest,
-  suitDecision,
-  testSuit,
-} from "../src/rules.ts";
-test("power accepts only the exact connected sequence", () => {
-  assert.equal(checkOrder(["메인 전원", "A", "B", "C"]), true);
-  assert.equal(checkOrder(["A", "메인 전원", "B", "C"]), false);
-  assert.equal(checkOrder(["메인 전원", "A", "B"]), false);
-  assert.equal(checkOrder(["메인 전원", "A", "B", "C", "C"]), false);
-});
+import { compileRequest, suitDecision, testSuit } from "../src/rules.ts";
 test("natural-language simulation rejects unsupported and incomplete abilities", () => {
   for (const input of [
     "무적이 되어줘",
