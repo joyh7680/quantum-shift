@@ -412,12 +412,8 @@ export function Player() {
       );
     }
     if (s.activeStage === 1 && s.panel === "power") {
-      const focus = new Vector3(p.x * 0.35, 0.7, 19 + (p.z - 19) * 0.35);
-      camera.position.lerp(
-        new Vector3(1 + focus.x * 0.2, 18, 8 + (p.z - 13) * 0.15),
-        1 - Math.exp(-dt * 4),
-      );
-      camera.lookAt(focus);
+      // The coding camera follows independently and remains mouse-controllable
+      // while the program owns character movement.
       return;
     }
     target.set(p.x, p.y + H * localSize.current * 0.2, p.z);

@@ -88,6 +88,30 @@
   line-height: 1.8;
   color: #b1ccd9;
 }
+.lab-camera-tools {
+  margin-top: 12px;
+  border-top: 1px solid #4abed430;
+  padding-top: 9px;
+}
+.lab-camera-tools > p {
+  font-size: 10px;
+}
+.lab-camera-tools > button {
+  pointer-events: auto;
+  margin-top: 6px;
+  padding: 5px 8px;
+  border: 1px solid #4abed450;
+  border-radius: 4px;
+  background: #16334a;
+  color: #a6e4f5;
+  font-size: 10px;
+}
+.coding-open .game-canvas canvas {
+  cursor: grab;
+}
+.coding-open .game-canvas canvas:active {
+  cursor: grabbing;
+}
 .escape-editor {
   position: absolute;
   inset: 0 0 0 60%;

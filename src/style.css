@@ -1247,70 +1247,6 @@ kbd {
   color: #94b3a6;
   line-height: 2.2;
 }
-.clear-screen {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: radial-gradient(ellipse at 50% 30%, #3a6a58e8, #112a38f7 70%);
-  overflow: auto;
-  padding: 30px;
-}
-.clear-orbit {
-  width: 95px;
-  height: 95px;
-  border: 1px solid #9ceac558;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 50px;
-  color: var(--mint);
-  box-shadow: 0 0 70px #9ceac524;
-  margin-bottom: 25px;
-  animation: float 3s ease-in-out infinite;
-}
-.clear-screen h1 {
-  font-size: 52px;
-  letter-spacing: -3px;
-  line-height: 1.3;
-  margin: 20px 0;
-}
-.clear-screen h1 span {
-  color: var(--orange);
-}
-.clear-screen > p {
-  font-size: 12px;
-  line-height: 1.9;
-  color: #b6d1c3;
-}
-.clear-stats {
-  display: flex;
-  gap: 45px;
-  margin: 35px 0;
-}
-.clear-stats strong {
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--mint);
-}
-.clear-stats span {
-  display: block;
-  font-size: 9px;
-  color: #86aa99;
-  margin-top: 10px;
-}
-.clear-screen > .primary {
-  width: 280px;
-}
-.clear-foot {
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #72998c;
-  margin-top: 25px;
-}
 .fatal {
   position: fixed;
   inset: 0;
@@ -1693,15 +1629,6 @@ kbd {
     top: auto;
     bottom: 132px;
     white-space: nowrap;
-  }
-  .clear-screen h1 {
-    font-size: 39px;
-  }
-  .clear-stats {
-    gap: 28px;
-  }
-  .clear-stats strong {
-    font-size: 19px;
   }
 }
 

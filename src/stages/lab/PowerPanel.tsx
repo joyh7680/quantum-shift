@@ -4,6 +4,7 @@ import { COMMANDS, PALETTE } from "./state";
 import type { Command } from "./state";
 import { editCode, resetPuzzle, startProgram } from "./gameplay";
 import { DeviceGuide } from "./DeviceGuide.tsx";
+import { useLabCamera } from "./cameraState";
 export function PowerPanel() {
   const lab = useGame((s) => s.lab);
   const [help, setHelp] = useState(false);
@@ -78,6 +79,12 @@ export function PowerPanel() {
         <div className="stage-coding-tags">
           <span>알고리즘</span>
           <span>순차 실행</span>
+        </div>
+        <div className="lab-camera-tools">
+          <p>드래그로 시점 회전 · 휠로 확대/축소</p>
+          <button onClick={() => useLabCamera.getState().reset()}>
+            ↻ 시점 초기화
+          </button>
         </div>
       </div>
       <DeviceGuide />

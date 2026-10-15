@@ -5,6 +5,7 @@ import { useProgress } from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { MainMenu } from "./MainMenu";
+import { ClearScreen } from "./ClearScreen";
 import "./menu.css";
 import { World } from "./World";
 import { Player } from "./Player";
@@ -15,6 +16,7 @@ import { CIRCUIT_MISSIONS, CIRCUIT_ZONES } from "./stages/circuit/state";
 import { CITY_STAGES } from "./stages";
 import { PausePanel } from "./Panels";
 import { PowerPanel } from "./stages/lab/PowerPanel";
+import { LabCamera } from "./stages/lab/LabCamera";
 import { SuitPanel } from "./stages/circuit/SuitPanel";
 import { COMMANDS } from "./stages/lab/state";
 import "./stages/lab/lab.css";
@@ -268,73 +270,6 @@ function ShiftFX() {
   const id = useGame((s) => s.flash);
   return id > 0 ? <div key={id} className="shift-fx" /> : null;
 }
-function Clear() {
-  const activeStage = useGame((s) => s.activeStage);
-  const progress = useGame((s) => (s.activeStage === 1 ? s.lab : s.circuit));
-  const count = (activeStage === 1 ? LAB_MISSIONS : CIRCUIT_MISSIONS).length;
-  return (
-    <div className="clear-screen">
-      <div className="clear-orbit">✧</div>
-      <span className="eyebrow mint">STAGE {activeStage} COMPLETE</span>
-      <h1>
-        {CITY_STAGES[activeStage - 1].name}
-        <br />
-        <span>클리어.</span>
-      </h1>
-      <p>
-        {activeStage === 1 ? (
-          <>
-            직접 만든 블록 프로그램으로 환풍구를 탈출했습니다.
-            <br />
-            다음 스테이지로 이동할 수 있습니다.
-          </>
-        ) : (
-          <>
-            자동 축소 슈트로 레이저를 통과하고
-            <br />
-            수호자를 정지시켰습니다.
-          </>
-        )}
-      </p>
-      <div className="clear-stats">
-        <div>
-          <strong>
-            {String(count).padStart(2, "0")} / {String(count).padStart(2, "0")}
-          </strong>
-          <span>미션 완료</span>
-        </div>
-        <div>
-          <strong>
-            {Math.floor(progress.time / 60)}:
-            {String(Math.floor(progress.time % 60)).padStart(2, "0")}
-          </strong>
-          <span>탐사 시간</span>
-        </div>
-        <div>
-          <strong>{progress.deaths}</strong>
-          <span>체크포인트 재시작</span>
-        </div>
-      </div>
-      {activeStage === 1 && (
-        <button
-          className="primary"
-          onClick={() => useGame.getState().nextStage()}
-        >
-          STAGE 2로 이동 <span>→</span>
-        </button>
-      )}
-      <button
-        className={activeStage === 1 ? "secondary" : "primary"}
-        onClick={() => useGame.getState().reset()}
-      >
-        메인 메뉴로 <span>↻</span>
-      </button>
-      <span className="clear-foot">
-        QUANTUM CITY / STAGE {activeStage} CLEARED
-      </span>
-    </div>
-  );
-}
 export default function App() {
   const screen = useGame((s) => s.screen),
     panel = useGame((s) => s.panel),
@@ -381,6 +316,9 @@ export default function App() {
                   <World />
                   <Player />
                 </Physics>
+                {screen === "game" &&
+                  activeStage === 1 &&
+                  panel === "power" && <LabCamera />}
               </Suspense>
             </Canvas>
           </div>
@@ -388,7 +326,7 @@ export default function App() {
         {screen === "start" ? (
           <MainMenu />
         ) : screen === "clear" ? (
-          <Clear />
+          <ClearScreen />
         ) : (
           <>
             <HUD />

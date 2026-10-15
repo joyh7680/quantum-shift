@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": [
+    "idle drag rotates camera without moving player or changing code",
+    "canvas wheel zooms",
+    "reset restores overview",
+    "editor scrolling does not zoom camera",
+    "running drag and zoom work while manual size, movement and code editing stay locked",
+    "stop resets the puzzle, retains code and leaves camera usable",
+    "return to exploration restores pointer-lock mouse look",
+    "program reaches Stage 1 clear after camera interaction and orbit controls detach"
+  ],
+  "errors": []
+}
