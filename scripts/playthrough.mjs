@@ -1,0 +1,205 @@
+import { chromium } from "@playwright/test";
+import fs from "node:fs";
+const browser = await chromium.launch({
+  executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  headless: true,
+  args: ["--enable-webgl", "--use-angle=swiftshader"],
+});
+const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+const errors = [];
+page.on("pageerror", (e) => {
+  console.log("PAGE ERROR", e.message);
+  errors.push(e.message);
+});
+const state = () =>
+  page.evaluate(() => {
+    const s = window.__quantumGame.getState();
+    return JSON.parse(JSON.stringify(s));
+  });
+const assert = (v, m) => {
+  if (!v) throw Error(m);
+};
+const waitFor = async (fn, label, ms = 20000) => {
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    const s = await state();
+    if (fn(s)) return s;
+    await page.waitForTimeout(100);
+  }
+  throw Error("Timeout " + label + " " + JSON.stringify(await state()));
+};
+async function move(x, z, tolerance = 0.3) {
+  const until = Date.now() + 30000;
+  let held = [];
+  try {
+    while (Date.now() < until) {
+      const s = await state();
+      if (s.screen === "clear") return;
+      if (s.panel) throw Error("Unexpected panel " + s.panel);
+      const dx = x - s.pos[0],
+        dz = z - s.pos[2];
+      if (Math.hypot(dx, dz) < tolerance) return;
+      const next = [];
+      if (Math.abs(dx) > 0.16) next.push(dx > 0 ? "KeyA" : "KeyD");
+      if (Math.abs(dz) > 0.16) next.push(dz > 0 ? "KeyW" : "KeyS");
+      for (const k of held) if (!next.includes(k)) await page.keyboard.up(k);
+      for (const k of next) if (!held.includes(k)) await page.keyboard.down(k);
+      held = next;
+      await page.waitForTimeout(60);
+    }
+    throw Error("Movement stuck " + JSON.stringify(await state()));
+  } finally {
+    for (const k of held) await page.keyboard.up(k);
+  }
+}
+try {
+  await page.goto("http://127.0.0.1:5173/");
+  await page.waitForTimeout(6000);
+  await page.getByRole("button", { name: "연구실에 들어가기" }).click();
+  await waitFor((s) => s.time > 0.5, "simulation ready");
+  await page.evaluate(() => {
+    const useGame = window.__quantumGame;
+    window.__maxJump = 0;
+    const record = () => {
+      window.__maxJump = Math.max(window.__maxJump, useGame.getState().pos[1]);
+      requestAnimationFrame(record);
+    };
+    record();
+  });
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(600);
+  assert(
+    await page.evaluate(() => window.__maxJump > 0.2),
+    "jump should leave ground",
+  );
+  await page.waitForTimeout(700);
+  await move(0, 8);
+  await page.keyboard.down("KeyW");
+  await page.waitForTimeout(650);
+  await page.keyboard.up("KeyW");
+  assert((await state()).pos[2] < 8.5, "normal capsule blocked by vent");
+  await page.keyboard.press("Digit1");
+  await move(0, 10);
+  await page.keyboard.press("Digit3");
+  assert((await state()).size === 0.25, "growth must be blocked inside vent");
+  await page.screenshot({ path: "artifacts/vent-clearance.png" });
+  await move(0, 18);
+  assert((await state()).stage === 2, "vent milestone");
+  await page.keyboard.press("Digit3");
+  await move(-2.8, 18);
+  await page.keyboard.press("KeyE");
+  assert((await state()).battery === "carried", "giant battery pickup");
+  await move(3.8, 20);
+  await page.keyboard.press("KeyE");
+  assert((await state()).battery === "installed", "battery socket");
+  await page.keyboard.press("Digit2");
+  await move(4, 22.7);
+  await page.keyboard.press("KeyE");
+  await page.getByRole("dialog", { name: "전원 알고리즘" }).waitFor();
+  const pausedTime = (await state()).time;
+  await page.waitForTimeout(300);
+  assert((await state()).time === pausedTime, "coding panel pauses game");
+  for (const n of ["A", "메인 전원", "B", "C"])
+    await page
+      .getByRole("button", {
+        name: new RegExp("^" + (n === "메인 전원" ? "⏻" : "↳") + " " + n + "$"),
+      })
+      .click();
+  await page.getByRole("button", { name: "순서 실행" }).click();
+  await page.getByText("연결 실패 ·", { exact: false }).waitFor();
+  await page.getByRole("button", { name: "초기화", exact: true }).click();
+  for (const n of ["메인 전원", "A", "B", "C"])
+    await page
+      .getByRole("button", {
+        name: new RegExp("^" + (n === "메인 전원" ? "⏻" : "↳") + " " + n + "$"),
+      })
+      .click();
+  await page.screenshot({ path: "artifacts/power-puzzle.png" });
+  await page.getByRole("button", { name: "순서 실행" }).click();
+  assert((await state()).power, "power unlocked");
+  await move(0, 27);
+  await move(0, 33);
+  await move(-2, 34);
+  await page.keyboard.press("KeyE");
+  await page.getByRole("dialog", { name: "슈트 개발" }).waitFor();
+  await page.getByLabel("어떤 능력을 만들까요?").fill("무적이 되어줘");
+  await page.getByRole("button", { name: "능력 생성하기" }).click();
+  await page.getByRole("alert").waitFor();
+  assert(!(await state()).program, "unsupported ability rejected");
+  await page
+    .getByLabel("어떤 능력을 만들까요?")
+    .fill("레이저가 접근하면 작아지고 지나가면 이전 크기로 복귀해줘");
+  await page.getByRole("button", { name: "능력 생성하기" }).click();
+  assert(
+    await page.getByRole("button", { name: "슈트에 장착" }).isDisabled(),
+    "equip locked before testing",
+  );
+  await page.getByRole("button", { name: "능력 테스트", exact: false }).click();
+  await waitFor((s) => s.tested, "sandbox test");
+  await page.screenshot({ path: "artifacts/suit-studio.png" });
+  await page.getByRole("button", { name: "슈트에 장착" }).click();
+  assert((await state()).equipped, "suit equipped");
+  await move(0, 38);
+  await page.keyboard.press("KeyQ");
+  assert(!(await state()).ability, "Q disables");
+  await page.keyboard.down("KeyW");
+  await waitFor((s) => s.deaths === 1, "laser death checkpoint");
+  await page.keyboard.up("KeyW");
+  await waitFor((s) => Math.abs(s.pos[2] - 38) < 0.4, "checkpoint position");
+  assert((await state()).size === 1, "checkpoint restores normal collider");
+  await page.keyboard.press("KeyQ");
+  await move(0, 44);
+  assert((await state()).size === 0.25, "laser triggers actual shrink");
+  await page.screenshot({ path: "artifacts/laser-dodge.png" });
+  await move(0, 55.8);
+  await waitFor((s) => s.pendingRestore, "wait under low ceiling");
+  assert((await state()).size === 0.25, "remain tiny under obstruction");
+  await page.screenshot({ path: "artifacts/safe-restore.png" });
+  await move(0, 58);
+  await waitFor((s) => !s.automatic, "restore after corridor");
+  assert((await state()).size === 1, "restore previous size");
+  // Stand in the arena and dodge three real beam cycles with the equipped ability.
+  await move(0, 62);
+  for (let hp = 3; hp > 0; hp--) {
+    await waitFor(
+      (s) => s.bossPhase === "weak" && !s.automatic,
+      "boss weakness " + hp,
+      30000,
+    );
+    await page.keyboard.press("Digit3");
+    await page.keyboard.press("KeyE");
+    await waitFor((s) => s.bossHP === hp - 1, "boss hit " + hp);
+    if (hp === 3) await page.screenshot({ path: "artifacts/boss-fight.png" });
+  }
+  await move(4.5, 65);
+  await move(4.5, 71.5);
+  await move(0, 72);
+  await move(0, 76);
+  await waitFor((s) => s.screen === "clear", "clear screen");
+  await page.screenshot({ path: "artifacts/clear-screen.png" });
+  console.log("PLAYTHROUGH PASS", JSON.stringify(await state()));
+  assert(errors.length === 0, "no browser errors");
+  fs.writeFileSync(
+    "artifacts/playthrough-result.json",
+    JSON.stringify({ passed: true, errors, state: await state() }, null, 2),
+  );
+  await page.getByRole("button", { name: "다시 탐험하기" }).click();
+  assert(
+    (await state()).screen === "start",
+    "restart returns to character selection",
+  );
+} catch (e) {
+  console.error(e);
+  await page.screenshot({ path: "artifacts/qa-failure.png" });
+  fs.writeFileSync(
+    "artifacts/playthrough-result.json",
+    JSON.stringify(
+      { passed: false, error: String(e), errors, state: await state() },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+} finally {
+  await browser.close();
+}

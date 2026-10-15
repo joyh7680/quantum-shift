@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "errors": [],
+  "state": {
+    "screen": "clear",
+    "character": "codmos_nova",
+    "panel": null,
+    "stage": 6,
+    "size": 2.5,
+    "pos": [
+      -0.15621082484722137,
+      0.014853239059448242,
+      75.26187133789062
+    ],
+    "yaw": 0,
+    "moving": true,
+    "airborne": false,
+    "prompt": "",
+    "battery": "installed",
+    "power": true,
+    "program": {
+      "trigger": "laser-near",
+      "action": "shrink",
+      "restore": "previous-safe",
+      "range": 2.4
+    },
+    "tested": true,
+    "equipped": true,
+    "ability": true,
+    "automatic": false,
+    "pendingRestore": false,
+    "bossHP": 0,
+    "bossPhase": "defeated",
+    "bossTime": 0,
+    "bossDodged": false,
+    "time": 70.44999999999729,
+    "deaths": 1,
+    "checkpoint": [
+      0,
+      0,
+      58
+    ],
+    "respawn": 1,
+    "toast": "수호자 정지! 탈출문이 열렸습니다.",
+    "toastId": 15,
+    "flash": 21,
+    "startedAt": 1792033980529,
+    "tutorial": 1,
+    "cameraCaptured": false
+  }
+}
