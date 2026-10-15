@@ -1,7 +1,7 @@
 {
   "passed": true,
   "production": true,
-  "url": "http://127.0.0.1:4176/",
+  "url": "http://127.0.0.1:4173/",
   "checks": [
     "main first visit and refresh",
     "menu input disabled",

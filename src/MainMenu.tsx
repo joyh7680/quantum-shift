@@ -256,7 +256,10 @@ export function MainMenu() {
               </button>
             ))}
           </div>
-          <section className="stage-details" aria-live="polite">
+          <section
+            className={`stage-details ${stage.number === 1 ? "stage-one-details" : ""}`}
+            aria-live="polite"
+          >
             <div>
               <span className="qc-overline">
                 MISSION BRIEF / {String(stage.number).padStart(2, "0")}
@@ -264,6 +267,13 @@ export function MainMenu() {
               <h3>{stage.name}</h3>
               <h4>{stage.learning ? "미션" : "목표"}</h4>
               <p>{stage.objective}</p>
+              {stage.codingTags && (
+                <div className="stage-coding-tags">
+                  {stage.codingTags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <h4>{stage.learning ? "학습 요소" : "주요 플레이"}</h4>
