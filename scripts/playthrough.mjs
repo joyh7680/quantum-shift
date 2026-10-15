@@ -53,9 +53,9 @@ async function move(x, z, tolerance = 0.3) {
   }
 }
 try {
-  await page.goto("http://127.0.0.1:5173/");
+  await page.goto(process.env.QC_QA_URL || "http://127.0.0.1:5173/");
   await page.waitForTimeout(6000);
-  await page.getByRole("button", { name: "연구실에 들어가기" }).click();
+  await page.getByRole("button", { name: /게임 시작/ }).click();
   await waitFor((s) => s.time > 0.5, "simulation ready");
   await page.evaluate(() => {
     const useGame = window.__quantumGame;
@@ -183,7 +183,7 @@ try {
     "artifacts/playthrough-result.json",
     JSON.stringify({ passed: true, errors, state: await state() }, null, 2),
   );
-  await page.getByRole("button", { name: "다시 탐험하기" }).click();
+  await page.getByRole("button", { name: /메인 메뉴로/ }).click();
   assert(
     (await state()).screen === "start",
     "restart returns to character selection",

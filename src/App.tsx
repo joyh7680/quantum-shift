@@ -4,7 +4,8 @@ import { Canvas } from "@react-three/fiber";
 import { useProgress } from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
-import { Character, CHARACTERS } from "./Character";
+import { MainMenu } from "./MainMenu";
+import "./menu.css";
 import { World } from "./World";
 import { Player } from "./Player";
 import { useGame } from "./store";
@@ -52,7 +53,7 @@ function Logo() {
         />
       </svg>
       <div>
-        QUANTUM SHIFT<small>A SMALL CHANGE. A BIG ESCAPE.</small>
+        QUANTUM CITY<small>A SMALL CHANGE. A BIG ESCAPE.</small>
       </div>
     </div>
   );
@@ -64,181 +65,6 @@ function Loading() {
       3D 리소스 로딩 {progress.toFixed(0)}%
     </div>
   ) : null;
-}
-function CharacterPreview({ id }: { id: string }) {
-  return (
-    <Canvas
-      camera={{ position: [2.8, 1.7, -4.5], fov: 32 }}
-      dpr={[1, 1.5]}
-      onCreated={({ camera }) => camera.lookAt(0, 0.75, 0)}
-    >
-      <ambientLight intensity={1.6} />
-      <directionalLight position={[3, 5, -3]} intensity={2.7} />
-      <directionalLight position={[-3, 2, 2]} color="#9ce4d7" intensity={2} />
-      <Suspense fallback={null}>
-        <group rotation={[0, Math.PI, 0]}>
-          <Character id={id} preview />
-        </group>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-          <circleGeometry args={[1.25, 64]} />
-          <meshStandardMaterial color="#2b4852" />
-        </mesh>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[1.1, 1.12, 64]} />
-          <meshBasicMaterial color="#80e8c2" />
-        </mesh>
-      </Suspense>
-    </Canvas>
-  );
-}
-function Start() {
-  const [id, setId] = useState("codmos_nova"),
-    [all, setAll] = useState(false);
-  const featured = [
-    "codmos_nova",
-    "codmos_jet",
-    "codmos_bora",
-    "codmos_poby",
-    "codmos_remy",
-    "codmos_teo",
-    "alien",
-    "armstrong",
-  ];
-  const asset = CHARACTERS.find((a) => a.id === id)!;
-  return (
-    <div className="start-screen">
-      <div className="start-tint" />
-      <header className="topbar">
-        <Logo />
-        <div className="top-label">
-          <span className="green-dot" /> EXPERIMENT 001 <b>STAGE 1</b>
-        </div>
-      </header>
-      <main className="start-content">
-        <section className="intro">
-          <span className="eyebrow mint">SIZE IS YOUR SUPERPOWER</span>
-          <h1>
-            작은 변화,
-            <br />
-            <span>거대한 탈출.</span>
-          </h1>
-          <div className="stage-title">
-            <span>01</span>
-            <div>
-              거인의 연구실<small>THE GIANT'S LABORATORY</small>
-            </div>
-          </div>
-          <p>
-            모든 것이 거대한 연구실에 갇혔습니다.
-            <br />
-            크기를 바꾸고, 나만의 능력을 코딩하고,
-            <br />
-            당신만의 방법으로 출구를 찾아보세요.
-          </p>
-          <div className="intro-tags">
-            <span>3D 어드벤처</span>
-            <span>크기 변환 퍼즐</span>
-            <span>코딩 미션</span>
-          </div>
-          <div className="experiment-note">
-            <span>↗</span>
-            <p>
-              몸이 작아지면, 가능성은 커집니다.
-              <small>7개의 미션 · 하나의 연구실 · 무한한 호기심</small>
-            </p>
-          </div>
-        </section>
-        <section className="character-card">
-          <div className="character-header">
-            <span className="eyebrow">SELECT YOUR EXPLORER</span>
-            <span>01 / 47</span>
-          </div>
-          <div className="avatar-preview" key={id}>
-            <AssetBoundary>
-              <CharacterPreview id={id} />
-            </AssetBoundary>
-            <span className="orbit-label">CODMOS ORIGINAL / 3D</span>
-            <span className="avatar-number">Q—01</span>
-          </div>
-          <div className="character-name">
-            <div>
-              <span>YOUR EXPLORER</span>
-              <h2>{asset.name}</h2>
-            </div>
-            <span className="pill">탐사 준비 완료</span>
-          </div>
-          <div className="character-options">
-            {CHARACTERS.filter((c) => featured.includes(c.id))
-              .sort((a, b) => featured.indexOf(a.id) - featured.indexOf(b.id))
-              .map((c, i) => (
-                <button
-                  key={c.id}
-                  className={id === c.id ? "selected" : ""}
-                  onClick={() => setId(c.id)}
-                  aria-label={`${c.name} 선택`}
-                >
-                  <span className={"char-dot dot-" + i} />
-                  {c.name}
-                </button>
-              ))}
-          </div>
-          <button className="all-characters" onClick={() => setAll(!all)}>
-            전체 캐릭터 47종 {all ? "−" : "＋"}
-          </button>
-          {all && (
-            <select
-              aria-label="전체 캐릭터 선택"
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-            >
-              {CHARACTERS.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          )}
-          <button
-            className="primary start-button"
-            onClick={() => useGame.getState().start(id)}
-          >
-            연구실에 들어가기 <span>→</span>
-          </button>
-          <p className="asset-note">
-            제공된 실제 GLB 캐릭터 · 동일한 조작과 충돌 규칙
-          </p>
-        </section>
-      </main>
-      <footer className="start-footer">
-        <div>
-          <kbd>W</kbd>
-          <kbd>A</kbd>
-          <kbd>S</kbd>
-          <kbd>D</kbd>
-          <span>이동</span>
-        </div>
-        <div>
-          <kbd>SPACE</kbd>
-          <span>점프</span>
-        </div>
-        <div>
-          <kbd>1</kbd>
-          <kbd>2</kbd>
-          <kbd>3</kbd>
-          <span>크기 변환</span>
-        </div>
-        <div>
-          <kbd>E</kbd>
-          <span>상호작용</span>
-        </div>
-        <div>
-          <span className="mouse-icon">↔</span>
-          <span>마우스 카메라</span>
-        </div>
-        <span className="footer-build">QUANTUM RESEARCH / 001</span>
-      </footer>
-    </div>
-  );
 }
 function HUD() {
   const stage = useGame((s) => s.stage),
@@ -448,9 +274,9 @@ function Clear() {
         </div>
       </div>
       <button className="primary" onClick={() => useGame.getState().reset()}>
-        다시 탐험하기 <span>↻</span>
+        메인 메뉴로 <span>↻</span>
       </button>
-      <span className="clear-foot">QUANTUM SHIFT / STAGE 1 CLEARED</span>
+      <span className="clear-foot">QUANTUM CITY / STAGE 1 CLEARED</span>
     </div>
   );
 }
@@ -461,32 +287,39 @@ export default function App() {
     <AssetBoundary>
       <div className="app">
         <Loading />
-        <div className="game-canvas">
-          <Canvas
-            shadows
-            dpr={[1, 1.5]}
-            camera={{ position: [15, 18, -20], near: 0.05, far: 150, fov: 52 }}
-            gl={{ antialias: true }}
-            onCreated={({ gl }) => {
-              gl.toneMapping = ACESFilmicToneMapping;
-              gl.outputColorSpace = SRGBColorSpace;
-              gl.toneMappingExposure = 1.12;
-            }}
-          >
-            <Suspense fallback={null}>
-              <Physics
-                paused={screen !== "game" || panel !== null}
-                timeStep={1 / 60}
-                gravity={[0, -18, 0]}
-              >
-                <World />
-                <Player />
-              </Physics>
-            </Suspense>
-          </Canvas>
-        </div>
+        {screen !== "start" && (
+          <div className="game-canvas">
+            <Canvas
+              shadows
+              dpr={[1, 1.5]}
+              camera={{
+                position: [15, 18, -20],
+                near: 0.05,
+                far: 150,
+                fov: 52,
+              }}
+              gl={{ antialias: true }}
+              onCreated={({ gl }) => {
+                gl.toneMapping = ACESFilmicToneMapping;
+                gl.outputColorSpace = SRGBColorSpace;
+                gl.toneMappingExposure = 1.12;
+              }}
+            >
+              <Suspense fallback={null}>
+                <Physics
+                  paused={screen !== "game" || panel !== null}
+                  timeStep={1 / 60}
+                  gravity={[0, -18, 0]}
+                >
+                  <World />
+                  <Player />
+                </Physics>
+              </Suspense>
+            </Canvas>
+          </div>
+        )}
         {screen === "start" ? (
-          <Start />
+          <MainMenu />
         ) : screen === "clear" ? (
           <Clear />
         ) : (

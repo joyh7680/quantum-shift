@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "production": false,
+  "url": "http://127.0.0.1:5175/",
+  "checks": [
+    "main first visit and refresh",
+    "menu input disabled",
+    "5 stage cards and unavailable entry blocked",
+    "close button / Escape / backdrop and focus return",
+    "47 characters and selection applied",
+    "Stage 1 launch / movement / scale / pointer lock",
+    "pause → main menu and selection retained",
+    "Stage 1 entry from stage modal",
+    "mobile menu and dialog"
+  ],
+  "errors": [],
+  "failedRequests": []
+}

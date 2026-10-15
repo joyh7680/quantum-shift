@@ -1,4 +1,4 @@
-# QUANTUM SHIFT — STAGE 1. 거인의 연구실
+# QUANTUM CITY — 퀀텀시티
 
 React + TypeScript + Vite / Three.js + React Three Fiber / Rapier로 구현한 실제 3D 웹 게임입니다. 코드모스 GLB는 플레이어에만 사용하며 연구실, 가구, 장치, 레이저, 로봇은 코드로 제작했습니다.
 
@@ -19,6 +19,16 @@ npm run build    # TypeScript 검사 + dist 프로덕션 빌드
 npm run preview  # 빌드 결과 실행
 npm run audit:assets
 ```
+
+## 메인 메뉴
+
+첫 접속과 새로고침 시에는 QUANTUM CITY 타이틀 화면이 표시됩니다. 선택한 코드모스 캐릭터, 절차적으로 제작한 미래 도시·연구 시설, 에너지 링·입자, 느린 카메라 이동을 보여줍니다. 모션 감소 설정에서는 카메라와 링의 이동을 멈춥니다.
+
+- 게임 시작: 선택한 캐릭터로 STAGE 1 거인의 연구실에 진입합니다.
+- 캐릭터 선택: 기존 47종을 선택하며 메인 화면과 플레이어에 동일하게 적용합니다.
+- 스테이지 안내: 5개 스테이지의 경로와 목표·주요 플레이를 확인합니다. STAGE 1만 플레이 가능하며, STAGE 2~4는 확인된 기획 데이터가 없어 미공개 구역으로, STAGE 5는 거대 로봇 보스로 표시합니다. 미구현 구역의 진입은 잠겨 있습니다.
+- 모달은 닫기 버튼, 배경 클릭, ESC로 닫히며 키보드 포커스가 열었던 버튼으로 복귀합니다.
+- 메인 메뉴에서는 게임 플레이어·물리·이동 입력·포인터 잠금이 연결되지 않습니다. 게임의 일시정지 화면과 클리어 화면에서 메인 메뉴로 돌아갈 수 있습니다. 복귀 시 선택한 캐릭터는 유지되며 진행은 초기화됩니다.
 
 ## 조작
 
@@ -67,7 +77,10 @@ npm run audit:assets
 | `src/rules.ts` | 지원 요청 판별, 허용 슈트 명령, 전원 알고리즘 |
 | `src/Panels.tsx` | 전원 퍼즐, 능력 생성·수정·테스트·장착 |
 | `src/store.ts` | 미션, 체크포인트, 전력, 능력, 보스 상태 |
-| `src/App.tsx` | 캐릭터 선택, HUD, 클리어, 오류 처리 |
+| `src/App.tsx` | 메인/게임 화면 전환, HUD, 클리어, 오류 처리 |
+| `src/MainMenu.tsx` | 타이틀 메뉴, 캐릭터 선택, 스테이지 모달 |
+| `src/TitleScene.tsx` | 절차적 도시·연구 시설, 에너지 링·입자, 타이틀 카메라 |
+| `src/stages.ts` | 도시의 5개 스테이지 정보·플레이 가능 상태 |
 
 슈트 개발은 **AI 시뮬레이션**입니다. 지원 조건과 명령만 구조화된 프로그램으로 변환합니다. 생성 코드 문자열을 실행하거나 `eval`하지 않습니다. 실제 LLM 연동과 임의의 능력 생성은 포함하지 않습니다.
 
@@ -76,7 +89,8 @@ npm run audit:assets
 개발 서버 실행 상태에서:
 
 ```powershell
-node scripts/playthrough.mjs
+node scripts/menu-smoke.mjs       # 기본 5173, QC_QA_URL로 실제 개발 서버 지정
+node scripts/playthrough.mjs      # QC_QA_URL로 실제 개발 서버 지정
 node scripts/asset-browser-qa.mjs
 ```
 

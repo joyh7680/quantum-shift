@@ -463,7 +463,7 @@ export function PausePanel() {
             useGame.getState().reset();
           }}
         >
-          캐릭터 선택으로
+          메인 메뉴로
         </button>
         <div className="pause-controls">
           WASD 이동 · SPACE 점프 · E 상호작용

@@ -8,9 +8,9 @@
     "stage": 6,
     "size": 2.5,
     "pos": [
-      -0.15621082484722137,
-      0.014853239059448242,
-      75.26187133789062
+      0.38848429918289185,
+      0.014364480972290039,
+      75.471435546875
     ],
     "yaw": 0,
     "moving": true,
@@ -33,7 +33,7 @@
     "bossPhase": "defeated",
     "bossTime": 0,
     "bossDodged": false,
-    "time": 70.44999999999729,
+    "time": 84.48333333332982,
     "deaths": 1,
     "checkpoint": [
       0,
@@ -43,8 +43,8 @@
     "respawn": 1,
     "toast": "수호자 정지! 탈출문이 열렸습니다.",
     "toastId": 15,
-    "flash": 21,
-    "startedAt": 1792033980529,
+    "flash": 19,
+    "startedAt": 1792040670685,
     "tutorial": 1,
     "cameraCaptured": false
   }

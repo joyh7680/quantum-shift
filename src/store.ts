@@ -88,7 +88,10 @@ export const useGame = create<GameState>((set, get) => ({
       toast: "실험 시작! 크기를 바꾸면 새로운 길이 보입니다.",
       toastId: get().toastId + 1,
     }),
-  reset: () => set({ ...initial }),
+  reset: () => {
+    if (document.pointerLockElement) document.exitPointerLock?.();
+    set({ ...initial, character: get().character });
+  },
   die: (reason) =>
     set((s) => ({
       deaths: s.deaths + 1,
