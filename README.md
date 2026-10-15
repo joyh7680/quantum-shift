@@ -97,6 +97,8 @@ node scripts/playthrough.mjs      # QC_QA_URL로 실제 개발 서버 지정
 node scripts/asset-browser-qa.mjs
 ```
 
+슈트 제작 화면만 검증하려면 `$env:QC_QA_SUIT_ONLY = '1'`을 설정한 뒤 `node scripts/playthrough.mjs`를 실행하세요. 빈 입력·공백 입력 잠금, 도움말, 코드 생성, 테스트, 수정 후 재생성·재테스트, 패널 재진입, 장착을 확인합니다.
+
 스크립트는 Windows에 설치된 Chrome을 사용합니다. 다른 환경은 `executablePath`를 변경하거나 Playwright 브라우저를 설치하세요. 플레이 검증은 진행을 건너뛰지 않고 키보드와 UI로 환풍구, 배터리, 잘못된/올바른 순서, 요청 거절, 패널 일시정지, 테스트 전 장착 잠금, 피격 재시작, 자동 축소/복귀 보류, 보스 3회 공격, 탈출, 다시 시작을 확인합니다. 결과와 화면은 `artifacts/`에 저장됩니다.
 
 기획서 공유 링크는 개발 환경에서 본문을 가져오지 못해 요청 메시지의 상세 요구사항을 기준으로 구현했습니다.

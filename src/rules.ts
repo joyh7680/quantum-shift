@@ -36,7 +36,7 @@ export function compileRequest(input: string): {
   )
     return {
       error:
-        "축소와 복귀를 수행하는 요청이 필요합니다. 예시 문장을 참고해 주세요.",
+        "축소와 복귀를 수행하는 요청이 필요합니다. 명령어를 수정하거나 도움말을 확인해 주세요.",
     };
   return {
     program: {

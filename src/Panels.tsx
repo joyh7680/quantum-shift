@@ -31,15 +31,13 @@ export function PowerPanel() {
       );
       return;
     }
-    useGame
-      .getState()
-      .patch({
-        power: true,
-        stage: 3,
-        checkpoint: [0, 0, 32],
-        flash: useGame.getState().flash + 1,
-        panel: null,
-      });
+    useGame.getState().patch({
+      power: true,
+      stage: 3,
+      checkpoint: [0, 0, 32],
+      flash: useGame.getState().flash + 1,
+      panel: null,
+    });
     useGame
       .getState()
       .notify("전력 복구 완료! 조명과 장치가 켜지고 문이 열렸습니다.");
@@ -230,44 +228,47 @@ function TestScene({ progress }: { progress: number }) {
 }
 export function SuitPanel() {
   const saved = useGame((s) => s.program),
+    savedInput = useGame((s) => s.suitRequest),
     alreadyTested = useGame((s) => s.tested),
     equipped = useGame((s) => s.equipped);
-  const [input, setInput] = useState(
-    "레이저가 접근하면 작아지고, 지나가면 이전 크기로 복귀해줘.",
-  );
+  const [input, setInput] = useState(savedInput);
   const [program, setProgram] = useState<SuitProgram | null>(saved),
     [error, setError] = useState(""),
     [running, setRunning] = useState(false),
-    [progress, setProgress] = useState(0),
+    [progress, setProgress] = useState(alreadyTested ? 5 : 0),
     [tested, setTested] = useState(alreadyTested);
-  const [revision, setRevision] = useState(false);
+  const [revision, setRevision] = useState(false),
+    [helpOpen, setHelpOpen] = useState(false);
   useEffect(() => {
     if (!running || !program) return;
-    const timer = setInterval(
-      () =>
-        setProgress((p) => {
-          if (p >= 4) {
-            const passed = testSuit(program).every(Boolean);
-            setRunning(false);
-            setTested(passed);
-            useGame.getState().patch({ tested: passed });
-            if (!passed)
-              setError(
-                "테스트에 실패했습니다. 지원되는 조건과 명령으로 수정하세요.",
-              );
-            return passed ? 5 : 0;
-          }
-          return p + 1;
-        }),
-      850,
-    );
-    return () => clearInterval(timer);
-  }, [running, program]);
-  const generate = () => {
-    const result = compileRequest(input);
+    const timer = setTimeout(() => {
+      if (progress >= 4) {
+        const passed = testSuit(program).every(Boolean);
+        setRunning(false);
+        setTested(passed);
+        setProgress(passed ? 5 : 0);
+        useGame.getState().patch({ tested: passed });
+        if (!passed)
+          setError(
+            "테스트에 실패했습니다. 지원되는 조건과 명령으로 수정하세요.",
+          );
+        return;
+      }
+      setProgress(progress + 1);
+    }, 850);
+    return () => clearTimeout(timer);
+  }, [running, program, progress]);
+  const invalidate = () => {
+    setProgram(null);
     setTested(false);
     setProgress(0);
+    setError("");
     useGame.getState().patch({ tested: false, program: null });
+  };
+  const generate = () => {
+    if (!input.trim() || running || equipped) return;
+    const result = compileRequest(input);
+    invalidate();
     if (result.error) {
       setError(result.error);
       setProgram(null);
@@ -279,19 +280,17 @@ export function SuitPanel() {
     setRevision(false);
   };
   const equip = () => {
-    if (!program || !tested) return;
-    useGame
-      .getState()
-      .patch({
-        program,
-        tested: true,
-        equipped: true,
-        ability: true,
-        stage: 4,
-        panel: null,
-        checkpoint: [0, 0, 38],
-        flash: useGame.getState().flash + 1,
-      });
+    if (!program || !tested || running || equipped) return;
+    useGame.getState().patch({
+      program,
+      tested: true,
+      equipped: true,
+      ability: true,
+      stage: 4,
+      panel: null,
+      checkpoint: [0, 0, 38],
+      flash: useGame.getState().flash + 1,
+    });
     useGame
       .getState()
       .notify("자동 축소 슈트 장착! Q로 ON/OFF · 레이저 구역이 열렸습니다.");
@@ -312,14 +311,11 @@ export function SuitPanel() {
           <div className="studio-input">
             <span className="pill purple">✦ AI 시뮬레이션 · API 키 불필요</span>
             <h3>
-              레이저보다
+              위험한 레이저 구역을
               <br />
-              한발 먼저 작아지세요.
+              안전하게 통과하세요.
             </h3>
-            <p>
-              레이저가 접근하면 초소형으로 변하고, 지나가면 이전 크기로 돌아오는
-              능력을 요청하세요.
-            </p>
+            <p>레이저 구역을 안전하게 통과할 슈트 기능을 만들어보세요.</p>
             <label htmlFor="ability-input">
               {revision
                 ? "수정할 능력을 다시 설명하세요"
@@ -328,17 +324,17 @@ export function SuitPanel() {
             <textarea
               id="ability-input"
               value={input}
+              placeholder="명령어를 입력해보세요"
               disabled={running || equipped}
               onChange={(e) => {
                 setInput(e.target.value);
-                setTested(false);
-                setProgram(null);
-                useGame.getState().patch({ tested: false, program: null });
+                useGame.getState().patch({ suitRequest: e.target.value });
+                invalidate();
               }}
             />
             <button
               className="primary"
-              disabled={running || equipped}
+              disabled={!input.trim() || running || equipped}
               onClick={generate}
             >
               ✦ {revision ? "능력 수정하기" : "능력 생성하기"} <span>↗</span>
@@ -349,24 +345,34 @@ export function SuitPanel() {
               </p>
             )}
             <div className="studio-note">
-              <b>지원되는 능력</b>
-              <p>
-                레이저 감지 · 초소형 변환 · 이전 크기 기억 · 공간 확인 후 복귀
-              </p>
-              <span>입력을 허용된 슈트 명령으로만 변환합니다.</span>
+              <button
+                className="secondary"
+                aria-expanded={helpOpen}
+                aria-controls="suit-help"
+                onClick={() => setHelpOpen(!helpOpen)}
+              >
+                도움말 <span aria-hidden="true">{helpOpen ? "−" : "+"}</span>
+              </button>
+              <div id="suit-help" className="studio-help" hidden={!helpOpen}>
+                <b>지원되는 능력</b>
+                <p>
+                  레이저 감지 · 초소형 변환 · 이전 크기 기억 · 공간 확인 후 복귀
+                </p>
+                <span>입력을 허용된 슈트 명령으로만 변환합니다.</span>
+              </div>
             </div>
           </div>
           <div className="studio-code">
             <div className="editor-label">
               <span>GENERATED / SUIT.LOGIC</span>
-              <span className="status-dot">
+              <span className="compile-status">
                 {program ? "COMPILED" : "WAITING"}
               </span>
             </div>
             <pre>
               {program
                 ? codeFor(program)
-                : "// 능력을 설명하면 여기에\n// 허용된 명령 코드가 생성됩니다.\n\n// 1. 레이저를 감지하기\n// 2. 초소형으로 변환하기\n// 3. 안전하게 복귀하기"}
+                : "명령어를 입력하면 생성된 코드가 여기에 표시됩니다."}
             </pre>
             <div className="code-footer">
               <span>READ ONLY · 직접 실행하지 않음</span>
@@ -374,7 +380,7 @@ export function SuitPanel() {
                 disabled={!program || running || equipped}
                 onClick={() => {
                   setRevision(true);
-                  setTested(false);
+                  invalidate();
                   document.getElementById("ability-input")?.focus();
                 }}
               >
@@ -401,15 +407,24 @@ export function SuitPanel() {
                   ? "TEST RUNNING"
                   : tested
                     ? "ALL CHECKS PASSED"
-                    : "READY TO TEST"}
+                    : program
+                      ? "READY TO TEST"
+                      : "WAITING FOR CODE"}
               </span>
             </div>
             <ol className="test-checks">
-              {[
-                "레이저 감지 → 0.25× 축소",
-                "공간 부족 → 복귀 보류",
-                "안전 확인 → 이전 크기 복귀",
-              ].map((t, i) => (
+              {(program
+                ? [
+                    "레이저 감지 → 0.25× 축소",
+                    "공간 부족 → 복귀 보류",
+                    "안전 확인 → 이전 크기 복귀",
+                  ]
+                : [
+                    "명령어 입력 및 코드 생성",
+                    "생성한 능력 테스트",
+                    "결과 확인 후 수정 또는 장착",
+                  ]
+              ).map((t, i) => (
                 <li
                   className={progress >= [2, 4, 5][i] ? "passed" : ""}
                   key={t}
@@ -426,6 +441,8 @@ export function SuitPanel() {
                 setProgress(0);
                 setRunning(true);
                 setTested(false);
+                setError("");
+                useGame.getState().patch({ tested: false });
               }}
             >
               ▷ {running ? "테스트 실행 중…" : "능력 테스트"}
@@ -438,7 +455,7 @@ export function SuitPanel() {
               {equipped ? "장착 완료" : "슈트에 장착"} <span>→</span>
             </button>
             <p className="muted">
-              생성 → 테스트 통과 → 장착 순서로 진행합니다.
+              명령어 입력 → 코드 생성 → 테스트 → 수정 → 능력 장착
             </p>
           </div>
         </div>

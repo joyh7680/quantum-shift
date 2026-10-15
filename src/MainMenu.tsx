@@ -104,7 +104,21 @@ export function MainMenu() {
       </header>
       <section className="city-intro">
         <div className="qc-overline">
-          <span /> A NEW DIMENSION OF ADVENTURE
+          <svg
+            className="intro-marker"
+            viewBox="0 0 56 16"
+            fill="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M2 1H54L42 15H0"
+              stroke="#7fb7d4"
+              strokeOpacity=".45"
+            />
+            <path d="M54 1L42 15" stroke="#a4ebff" strokeWidth="2" />
+          </svg>
+          A NEW DIMENSION OF ADVENTURE
         </div>
         <TitleLogo />
         <p className="city-tagline">

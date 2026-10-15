@@ -1104,7 +1104,13 @@ kbd {
   font-size: 10px;
   line-height: 1.8;
 }
-.studio-note > span {
+.studio-note > .secondary {
+  min-height: 34px;
+  padding: 8px 12px;
+  font-size: 10px;
+  margin-bottom: 12px;
+}
+.studio-help > span {
   font-size: 9px;
   color: #688b82;
 }
@@ -1118,7 +1124,7 @@ kbd {
   font-size: 7px;
   padding: 20px 16px;
 }
-.status-dot {
+.compile-status {
   color: #aeebc5;
 }
 .studio-code pre {

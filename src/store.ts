@@ -15,6 +15,7 @@ type GameState = {
   prompt: string;
   battery: "floor" | "carried" | "installed";
   power: boolean;
+  suitRequest: string;
   program: SuitProgram | null;
   tested: boolean;
   equipped: boolean;
@@ -54,6 +55,7 @@ const initial = {
   prompt: "",
   battery: "floor" as const,
   power: false,
+  suitRequest: "",
   program: null,
   tested: false,
   equipped: false,
