@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { CHARACTERS } from "./Character";
 import { TitleScene } from "./TitleScene";
+import { TitleLogo } from "./TitleLogo";
 import { useGame } from "./store";
 import { CITY_STAGES } from "./stages";
 
@@ -105,12 +106,7 @@ export function MainMenu() {
         <div className="qc-overline">
           <span /> A NEW DIMENSION OF ADVENTURE
         </div>
-        <h1>
-          QUANTUM
-          <br />
-          <span>CITY</span>
-          <i>퀀텀시티</i>
-        </h1>
+        <TitleLogo />
         <p className="city-tagline">
           크기의 경계를 넘는
           <br className="compact-break" /> 새로운 차원의 탐험

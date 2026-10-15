@@ -90,6 +90,7 @@
   position: absolute;
   top: 23%;
   left: 7%;
+  width: min(43vw, 640px);
   pointer-events: none;
 }
 .qc-overline {
@@ -107,31 +108,59 @@
   background: #70e0f7;
   box-shadow: 0 0 8px #70e0f7;
 }
-.city-intro h1 {
-  margin: 23px 0 20px;
-  font-size: clamp(54px, 6.8vw, 106px);
-  line-height: 0.9;
-  letter-spacing: -0.035em;
-  font-weight: 900;
-  color: #f0f5ff;
-  text-shadow: 0 5px 28px #060b20;
+.city-intro > .qc-overline {
+  color: #b8c7dc;
+  font-size: 8px;
+  letter-spacing: 3px;
 }
-.city-intro h1 > span {
-  letter-spacing: 0.1em;
-  background: linear-gradient(170deg, #f4faff 15%, #b7cdf4 55%, #5877a7);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.city-intro > .qc-overline > span {
+  width: 21px;
+  height: 13px;
+  background: #e4434b;
+  box-shadow: 0 0 18px #e4434b30;
+  clip-path: polygon(20% 0, 100% 0, 80% 100%, 0 100%);
 }
-.city-intro h1 i {
-  display: inline-block;
-  vertical-align: bottom;
-  margin: 0 0 5px 15px;
+.city-intro .cinematic-title {
+  position: relative;
+  isolation: isolate;
+  margin: 22px 0 27px -9px;
+  width: 100%;
+  line-height: 1;
+}
+.cinematic-title::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 12% -10% 4%;
+  background: radial-gradient(ellipse, #2778b822, transparent 68%);
+  pointer-events: none;
+}
+.title-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 4px 1px #020713) drop-shadow(0 0 18px #4089b51c);
+}
+.cinematic-title .title-localized {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+  margin: 12px 0 0;
+  padding-left: 0.45em;
+  color: #acc9df;
   font-size: 10px;
-  letter-spacing: 4px;
-  font-weight: 400;
-  font-style: normal;
-  color: #8eabc7;
+  font-weight: 500;
+  letter-spacing: 0.65em;
+}
+.title-localized > span {
+  width: 35px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #72b9d080);
+}
+.title-localized > span:last-child {
+  transform: rotate(180deg);
 }
 .city-tagline {
   font-size: clamp(14px, 1.4vw, 21px);
@@ -572,8 +601,8 @@
   .city-intro {
     top: 22%;
   }
-  .city-intro h1 {
-    font-size: min(6vw, 76px);
+  .city-intro .cinematic-title {
+    width: 88%;
     margin: 17px 0;
   }
   .city-description {
@@ -608,9 +637,9 @@
     min-width: 160px;
     padding: 18px;
   }
-  .city-intro h1 i {
-    display: block;
-    margin: 15px 0 0;
+  .city-intro > .qc-overline {
+    font-size: 7px;
+    letter-spacing: 1.7px;
   }
   .route-card > strong {
     font-size: 13px;
@@ -647,18 +676,20 @@
   .city-intro {
     top: 15%;
     left: 7%;
+    width: 86%;
   }
   .city-intro .qc-overline {
     font-size: 6px;
     letter-spacing: 1.2px;
   }
-  .city-intro h1 {
-    font-size: clamp(43px, 10vw, 66px);
-    margin: 15px 0 13px;
+  .city-intro .cinematic-title {
+    width: min(100%, 440px);
+    margin: 18px 0 20px -5px;
   }
-  .city-intro h1 i {
+  .cinematic-title .title-localized {
     font-size: 8px;
     margin-top: 9px;
+    gap: 12px;
   }
   .city-tagline {
     font-size: 12px;
@@ -816,11 +847,11 @@
   .city-intro {
     top: 22%;
   }
-  .city-intro h1 {
-    font-size: 42px;
+  .city-intro .cinematic-title {
+    width: min(100%, 320px);
     margin: 10px 0;
   }
-  .city-intro h1 i,
+  .cinematic-title .title-localized,
   .city-description,
   .city-genres {
     display: none;
