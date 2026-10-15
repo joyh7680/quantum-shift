@@ -248,16 +248,20 @@ export function MainMenu() {
                 MISSION BRIEF / {String(stage.number).padStart(2, "0")}
               </span>
               <h3>{stage.name}</h3>
-              <h4>목표</h4>
+              <h4>{stage.learning ? "미션" : "목표"}</h4>
               <p>{stage.objective}</p>
             </div>
             <div>
-              <h4>주요 플레이</h4>
-              <ul>
-                {stage.play.map((p) => (
-                  <li key={p}>{p}</li>
-                ))}
-              </ul>
+              <h4>{stage.learning ? "학습 요소" : "주요 플레이"}</h4>
+              {stage.learning ? (
+                <p>{stage.learning}</p>
+              ) : (
+                <ul>
+                  {stage.play?.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </section>
           <footer className="dialog-footer">

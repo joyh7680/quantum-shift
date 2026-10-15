@@ -64,20 +64,63 @@ try {
   await menu().click();
   await dialog().waitFor();
   assert.equal(await page.locator(".route-card").count(), 5);
-  assert.match(await page.locator(".route-card").nth(4).innerText(), /거대 로봇 보스/);
+  assert.match(
+    await page.locator(".route-card").nth(4).innerText(),
+    /거대 로봇 보스/,
+  );
   assert.match(
     await page.locator(".route-card").nth(0).innerText(),
     /플레이 가능/,
   );
   for (let i = 1; i < 5; i++) {
-    await page.locator(".route-card").nth(i).click();
+    const card = page.locator(".route-card").nth(i);
+    assert.equal(await card.isEnabled(), true);
+    assert.match(await card.innerText(), /준비 중/);
+    await card.click();
+    assert.equal(await card.getAttribute("aria-pressed"), "true");
     assert.equal(
       await page
         .getByRole("button", { name: /준비 중 · 진입 불가/ })
         .isDisabled(),
       true,
     );
-    assert.match(await page.locator(".stage-details").innerText(), /추후 공개/);
+    const details = await page.locator(".stage-details").innerText();
+    if (i < 4) {
+      const expected = [
+        [
+          "마이크로 회로",
+          "초소형으로 변신해 컴퓨터 내부를 탐험하고 회로를 복구.",
+          "슈트에 자동 장애물 회피 기능 제작",
+          "바이브 코딩 · 조건문",
+        ],
+        [
+          "폭주한 공장",
+          "움직이는 컨베이어와 거대한 기계 사이를 통과.",
+          "잘못된 자동 크기 변환 코드를 수정",
+          "디버깅 · 조건문",
+        ],
+        [
+          "퀀텀 월드",
+          "크기와 중력의 규칙이 달라지는 공간에서 탈출.",
+          "변수로 크기를 조절하고 이동 경로 설계",
+          "변수 · 비교 연산자",
+        ],
+      ][i - 1];
+      assert.ok((await card.innerText()).includes(expected[0]));
+      assert.ok((await card.innerText()).includes(expected[1]));
+      for (const text of [
+        expected[0],
+        "미션",
+        expected[2],
+        "학습 요소",
+        expected[3],
+      ])
+        assert.ok(details.includes(text), text);
+    } else {
+      assert.match(details, /추후 공개/);
+      assert.match(details, /목표/);
+      assert.match(details, /주요 플레이/);
+    }
   }
   await page.screenshot({ path: "artifacts/quantum-city-stages.png" });
   await page.getByRole("button", { name: "닫기", exact: true }).click();
