@@ -116,6 +116,29 @@
   color: #8ca6bf;
   font-size: 11px;
 }
+.escape-objective {
+  margin-top: 15px;
+  padding: 12px 14px;
+  border: 1px solid #62cce830;
+  border-left: 3px solid #77ddff;
+  border-radius: 5px;
+  background: linear-gradient(110deg, #16435b66, #10263b66);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.escape-objective > strong {
+  display: block;
+  color: #dcf6ff;
+  font-size: 14px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+.escape-editor .escape-objective > p {
+  margin-top: 5px;
+  color: #a6c5d8;
+  font-size: 12px;
+  line-height: 1.7;
+}
 .editor-scroll {
   overflow: auto;
   flex: 1;
@@ -237,10 +260,34 @@
   border-bottom: 1px solid #497c9b55;
 }
 .observation-help {
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.8;
   color: #a6d4e2;
   padding: 12px 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.observation-help dl {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0;
+}
+.observation-help dl > div {
+  border: 1px solid #497c9b55;
+  background: #142d43;
+  border-radius: 6px;
+  padding: 12px;
+}
+.observation-help dt {
+  color: #e0f3ff;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.observation-help dd {
+  margin: 0;
+}
+.observation-help strong {
+  color: #93e9ff;
 }
 .escape-editor footer {
   border-top: 1px solid #71abc630;
@@ -295,6 +342,16 @@
   }
 }
 @media (max-width: 900px) {
+  .escape-objective {
+    margin-top: 12px;
+    padding: 10px;
+  }
+  .escape-objective > strong {
+    font-size: 12px;
+  }
+  .escape-editor .escape-objective > p {
+    font-size: 11px;
+  }
   .escape-editor > header {
     padding: 15px 12px;
   }
@@ -421,5 +478,95 @@
   }
   .chip-hud {
     top: 310px;
+  }
+}
+
+.device-guide {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  z-index: 12;
+  display: grid;
+  gap: 8px;
+  width: 146px;
+}
+.device-guide-row {
+  position: relative;
+}
+.device-guide-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid #65cde54d;
+  border-radius: 6px;
+  background: #0b1b30ee;
+  color: #c2dae8;
+  font-size: 12px;
+  text-align: left;
+  box-shadow: 0 4px 18px #02091840;
+}
+.device-guide-card > span {
+  width: 20px;
+  color: #77ddff;
+  font-size: 20px;
+  text-align: center;
+}
+.device-guide-card:hover,
+.device-guide-card.inspecting,
+.device-guide-card:focus-visible {
+  border-color: #77ddff;
+  background: #153d53f5;
+  color: #ecfbff;
+  box-shadow: 0 0 16px #59dcff25;
+}
+.device-guide-tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  bottom: 0;
+  z-index: 1;
+  width: 224px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #77ddff99;
+  border-radius: 6px;
+  background: #0d263bee;
+  color: #dcf4ff;
+  font-size: 12px;
+  line-height: 1.8;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  box-shadow: 0 5px 24px #02091866;
+  pointer-events: none;
+}
+.device-guide-tooltip::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  bottom: 14px;
+  width: 8px;
+  height: 8px;
+  background: #0d263b;
+  border-left: 1px solid #77ddff99;
+  border-bottom: 1px solid #77ddff99;
+  transform: rotate(45deg);
+}
+@media (max-width: 700px) {
+  .device-guide {
+    left: 12px;
+    bottom: 12px;
+    width: 136px;
+  }
+  .device-guide-tooltip {
+    left: 0;
+    bottom: calc(100% + 8px);
+    width: min(224px, calc(60vw - 24px));
+  }
+  .device-guide-tooltip::before {
+    left: 18px;
+    bottom: -5px;
+    transform: rotate(-45deg);
   }
 }

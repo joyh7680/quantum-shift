@@ -3,6 +3,7 @@ import { useGame } from "../../store";
 import { COMMANDS, PALETTE } from "./state";
 import type { Command } from "./state";
 import { editCode, resetPuzzle, startProgram } from "./gameplay";
+import { DeviceGuide } from "./DeviceGuide.tsx";
 export function PowerPanel() {
   const lab = useGame((s) => s.lab);
   const [help, setHelp] = useState(false);
@@ -10,7 +11,10 @@ export function PowerPanel() {
   const running = lab.run === "running";
   useEffect(() => {
     if ((lab.run === "running" || lab.run === "failed") && lab.index >= 0)
-      codeList.current?.children[lab.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      codeList.current?.children[lab.index]?.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
   }, [lab.index, lab.run]);
   function drop(event: React.DragEvent, index: number) {
     event.preventDefault();
@@ -44,22 +48,20 @@ export function PowerPanel() {
       <div className="lab-live-caption">
         <span>LIVE / 실제 3D 실행</span>
         <b>거인의 연구실</b>
-        <p>
-          배터리{" "}
-          {lab.battery === "installed"
-            ? "연결됨"
-            : lab.battery === "carried"
-              ? "운반 중"
-              : "미연결"}{" "}
-          · 정비 전원 {lab.power ? "ON" : "OFF"} · 팬{" "}
-          {lab.fan === 0 ? "정지" : lab.fan < 1 ? "감속 중" : "회전 중"}
-        </p>
+        <div className="stage-coding-tags">
+          <span>알고리즘</span>
+          <span>순차 실행</span>
+        </div>
       </div>
+      <DeviceGuide />
       <section className="escape-editor" aria-label="탈출 블록 코딩">
         <header>
           <span>ESCAPE PROGRAM / 블록 코딩</span>
           <h2>탈출 프로그램</h2>
-          <p>알고리즘 · 순차 실행</p>
+          <div className="escape-objective">
+            <strong>팬을 멈추고, 작은 환풍구로 탈출하세요.</strong>
+            <p>블록으로 캐릭터의 크기와 행동 순서를 정해보세요.</p>
+          </div>
         </header>
         <div className="editor-scroll">
           <div className="lab-section-label">
@@ -106,7 +108,7 @@ export function PowerPanel() {
             클릭·드래그로 추가 · 드래그 또는 ↑↓로 순서 변경
           </p>
           <ol
-          ref={codeList}
+            ref={codeList}
             className="escape-code"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
@@ -181,15 +183,48 @@ export function PowerPanel() {
           <button
             className="lab-help"
             aria-expanded={help}
+            aria-controls="escape-hints"
             onClick={() => setHelp(!help)}
           >
-            관찰 도움말 {help ? "−" : "+"}
+            탈출 힌트 {help ? "−" : "+"}
           </button>
           {help && (
-            <p className="observation-help">
-              배터리는 얼마나 무거울까요? 정밀 조작대의 높이는 어떤가요? 팬과
-              정비 전원은 어떻게 연결되어 있을까요?
-            </p>
+            <div className="observation-help" id="escape-hints">
+              <p>
+                행동 블록마다 필요한 조건이 있어요. 내 코드에서 크기와 장치
+                상태를 확인해보세요.
+              </p>
+              <dl>
+                <div>
+                  <dt>환풍구에 들어가려면?</dt>
+                  <dd>
+                    <strong>팬이 멈춰 있어야</strong> 하고, 캐릭터는{" "}
+                    <strong>초소형</strong>이어야 해요. 두 조건이 모두 맞을 때
+                    ‘환풍구 이동’을 사용할 수 있어요.
+                  </dd>
+                </div>
+                <div>
+                  <dt>배터리가 너무 무거워요</dt>
+                  <dd>
+                    배터리는 <strong>거대 크기</strong>일 때만 들 수 있어요.
+                    ‘배터리 연결’ 블록을 실행할 때 캐릭터의 크기를 확인하세요.
+                  </dd>
+                </div>
+                <div>
+                  <dt>전원 버튼과 팬은 어떤 관계일까요?</dt>
+                  <dd>
+                    <strong>배터리가 연결된 상태</strong>에서{" "}
+                    <strong>일반 크기</strong>로 ‘전원 작동’을 실행하면 정비
+                    모드가 켜져요. 팬이 천천히 돌다가 완전히 멈출 때까지
+                    프로그램이 자동으로 기다려요.
+                  </dd>
+                </div>
+              </dl>
+              <p>
+                실패하면 이유를 읽고, 필요한 조건을 준비하는 블록이 있는지
+                살펴본 뒤 다시 실행해보세요.
+              </p>
+            </div>
           )}
         </div>
         <footer>

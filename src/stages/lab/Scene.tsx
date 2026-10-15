@@ -6,6 +6,8 @@ import { Box, Ball, Ring, Sign, Console } from "../WorldParts";
 import { CHIPS, COMMANDS } from "./state";
 import type { Chip } from "./state";
 import { electricPhase } from "./gameplay";
+import { useDeviceGuide } from "./guideState";
+import { DeviceMarker } from "./DeviceMarker";
 const cyan = "#59dcff",
   metal = "#26394e",
   dark = "#0b172b";
@@ -78,6 +80,7 @@ function ElectricTile({ lane }: { lane: number }) {
 }
 function Battery() {
   const state = useGame((s) => s.lab.battery);
+  const highlighted = useDeviceGuide((s) => s.active === "battery");
   const ref = useRef<Group>(null);
   useFrame(() => {
     if (!ref.current) return;
@@ -93,7 +96,19 @@ function Battery() {
   });
   return (
     <group ref={ref}>
-      <Box p={[0, 0.65, 0]} s={[1.5, 1.3, 1.1]} c="#6d829b" />
+      <Box
+        p={[0, 0.65, 0]}
+        s={[1.5, 1.3, 1.1]}
+        c={highlighted ? cyan : "#6d829b"}
+        glow={highlighted}
+      />
+      {highlighted && (
+        <DeviceMarker
+          device="battery"
+          position={[0, 0.75, 0]}
+          size={[1.85, 1.8, 1.45]}
+        />
+      )}
       <Box p={[0, 1.37, 0]} s={[0.65, 0.15, 0.6]} c="#ffcb80" />
       {[-0.45, 0, 0.45].map((x) => (
         <Box
@@ -114,6 +129,7 @@ function Battery() {
   );
 }
 function Fan() {
+  const highlighted = useDeviceGuide((s) => s.active === "vent");
   const ref = useRef<Group>(null);
   useFrame((_, dt) => {
     if (ref.current)
@@ -134,10 +150,22 @@ function Fan() {
       <Box p={[0, 4.35, 27]} s={[2, 7.3, 0.8]} c={metal} solid />
       {!open && <Box p={[0, 0.34, 27]} s={[2, 0.68, 0.18]} c="#1e3f55" solid />}
       <Ring p={[0, 0.34, 26.5]} r={0.45} c={cyan} rotation={[0, 0, 0]} />
+      {highlighted && (
+        <DeviceMarker
+          device="vent"
+          position={[0, 0.4, 26.55]}
+          size={[2.15, 0.95, 0.55]}
+        />
+      )}
       <group ref={ref} position={[0, 0.34, 26.6]}>
         {[0, 1, 2, 3].map((i) => (
           <group key={i} rotation={[0, 0, (i * Math.PI) / 2]}>
-            <Box p={[0.19, 0.07, 0]} s={[0.39, 0.16, 0.08]} c="#6f9bb4" />
+            <Box
+              p={[0.19, 0.07, 0]}
+              s={[0.39, 0.16, 0.08]}
+              c={highlighted ? cyan : "#6f9bb4"}
+              glow={highlighted}
+            />
           </group>
         ))}
       </group>
@@ -147,6 +175,7 @@ function Fan() {
   );
 }
 function PrecisionLever() {
+  const highlighted = useDeviceGuide((s) => s.active === "power");
   const ref = useRef<Group>(null);
   useFrame(() => {
     if (!ref.current) return;
@@ -164,12 +193,20 @@ function PrecisionLever() {
   return (
     <group ref={ref} position={[5, 1.65, 23.35]}>
       <Box p={[0, 0.15, 0]} s={[0.1, 0.4, 0.1]} c="#afc3d5" />
-      <Ball p={[0, 0.4, 0]} r={0.16} c="#bca5ff" glow />
+      <Ball p={[0, 0.4, 0]} r={0.16} c={highlighted ? cyan : "#bca5ff"} glow />
+      {highlighted && (
+        <DeviceMarker
+          device="power"
+          position={[0, 0.4, 0]}
+          size={[0.65, 0.65, 0.65]}
+        />
+      )}
     </group>
   );
 }
 export function LabScene() {
   const power = useGame((s) => s.lab.power);
+  const batteryHighlighted = useDeviceGuide((s) => s.active === "battery");
   return (
     <>
       <color attach="background" args={["#071222"]} />
@@ -350,8 +387,24 @@ export function LabScene() {
       <Console p={[0, 0, 10]} title="ESCAPE / BLOCK CODE" color={cyan} />
       <Sign p={[0, 3.2, 10]} text="탈출 콘솔 / E" w={3.8} color={cyan} />
       <Battery />
-      <Box p={[4.8, 0.1, 19]} s={[2.3, 0.2, 2.1]} c={metal} />
-      <Ring p={[4.8, 0.23, 19]} r={1.2} c={power ? cyan : "#ffcb80"} />
+      <Box
+        p={[4.8, 0.1, 19]}
+        s={[2.3, 0.2, 2.1]}
+        c={batteryHighlighted ? cyan : metal}
+        glow={batteryHighlighted}
+      />
+      <Ring
+        p={[4.8, 0.23, 19]}
+        r={1.2}
+        c={batteryHighlighted || power ? cyan : "#ffcb80"}
+      />
+      {batteryHighlighted && (
+        <DeviceMarker
+          device="battery"
+          position={[4.8, 0.4, 19]}
+          size={[2.75, 0.85, 2.55]}
+        />
+      )}
       <Sign p={[5.2, 2.8, 19.5]} text="CELL SOCKET" w={3} color="#ffcb80" />
       <Console
         p={[5, 0, 24]}

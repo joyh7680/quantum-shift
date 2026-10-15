@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "id": "battery",
+      "markers": [
+        {
+          "device": "battery",
+          "x": -4,
+          "y": 0.85,
+          "z": 18
+        },
+        {
+          "device": "battery",
+          "x": 4.8,
+          "y": 0.4,
+          "z": 19
+        }
+      ]
+    },
+    {
+      "id": "power",
+      "markers": [
+        {
+          "device": "power",
+          "x": 5,
+          "y": 2.032134595650242,
+          "z": 23.46820808266454
+        }
+      ]
+    },
+    {
+      "id": "vent",
+      "markers": [
+        {
+          "device": "vent",
+          "x": 0,
+          "y": 0.4,
+          "z": 26.55
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "verified": [
+    "three compact default cards",
+    "exact hover explanations",
+    "actual Three.js target positions and material changes",
+    "hover leave restores materials",
+    "keyboard focus and Escape",
+    "mobile tap and tooltip bounds",
+    "unmount clears highlights",
+    "puzzle/inventory/code unchanged"
+  ]
+}
