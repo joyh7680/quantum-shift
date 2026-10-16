@@ -610,10 +610,14 @@ kbd {
   text-shadow: 0 1px 5px #16333a;
 }
 .capture-hint {
-  position: absolute;
-  top: 65px;
+  position: fixed;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  text-align: center;
   font-size: 10px;
   background: #16303bd9;
   border: 1px solid #c8e2c833;
@@ -1503,7 +1507,6 @@ kbd {
   }
   .capture-hint {
     font-size: 8px;
-    top: 50px;
   }
   .interaction-prompt {
     font-size: 11px;
@@ -1636,11 +1639,6 @@ kbd {
     min-width: 160px;
     top: 280px;
     font-size: 9px;
-  }
-  .capture-hint {
-    top: auto;
-    bottom: 152px;
-    white-space: nowrap;
   }
 }
 
