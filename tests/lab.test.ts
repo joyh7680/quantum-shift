@@ -121,7 +121,7 @@ test("chips unlock only commands, persist on death, and can be collected in any 
   for (const [id, pos, size] of [
     ["power", [8, 0, 8], 1],
     ["vent", [-8, 0, 22], 0.25],
-    ["battery", [-8, 2.8, 7], 1],
+    ["battery", [-8, 2.8, 7], 2.5],
   ] as const) {
     updateLab({ ...base, pos: [...pos], size });
     assert(game().lab.chips.includes(id));
@@ -131,4 +131,27 @@ test("chips unlock only commands, persist on death, and can be collected in any 
   game().die("test");
   assert.equal(game().lab.chips.length, 3);
   assert.equal(game().lab.code.length, 0);
+});
+
+test("the stair battery awards its block only at giant size", () => {
+  const base = actionFrame();
+  for (const size of [0.25, 1] as const) {
+    // Include positions that met the old centre-based pickup condition.
+    for (const foot of [3.5 - 0.75 * size, 2.8])
+      updateLab({ ...base, pos: [-8, foot, 7], size });
+    assert.deepEqual(game().lab.chips, []);
+    assert.equal(game().lab.collectedAt, 0);
+    assert.equal(game().lab.mission, 0);
+    assert.equal(game().toast, "");
+  }
+  updateLab({ ...base, pos: [-8, 2.8, 10], size: 2.5 });
+  updateLab({ ...base, pos: [-8, 5, 7], size: 2.5 });
+  assert.deepEqual(game().lab.chips, []);
+  updateLab({ ...base, pos: [-8, 2.8, 7], size: 2.5 });
+  assert.deepEqual(game().lab.chips, ["battery"]);
+  assert.match(game().toast, /명령 블록 획득! 배터리 연결/);
+  const collectedAt = game().lab.collectedAt;
+  updateLab({ ...base, pos: [-8, 2.8, 7], size: 2.5 });
+  assert.deepEqual(game().lab.chips, ["battery"]);
+  assert.equal(game().lab.collectedAt, collectedAt);
 });

@@ -39,7 +39,7 @@ export const CHIPS: { id: Chip; pos: Vec; checkpoint: Vec; hint: string }[] = [
     id: "battery",
     pos: [-8, 3.5, 7],
     checkpoint: [-8, 0, -4],
-    hint: "책과 연필 발판 위",
+    hint: "책과 연필 발판 위 · 3번 거대 크기로 획득",
   },
   {
     id: "power",

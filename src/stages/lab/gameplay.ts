@@ -28,14 +28,12 @@ export function startProgram() {
   if (s.lab.run === "running" || s.lab.chips.length !== 3 || !s.lab.code.length)
     return;
   resetPuzzle();
-  useGame
-    .getState()
-    .patchLab({
-      run: "running",
-      index: 0,
-      mission: 2,
-      feedback: "프로그램 실행 중",
-    });
+  useGame.getState().patchLab({
+    run: "running",
+    index: 0,
+    mission: 2,
+    feedback: "프로그램 실행 중",
+  });
 }
 export function editCode(code: Command[]) {
   if (useGame.getState().lab.run !== "running")
@@ -144,12 +142,21 @@ export function updateLab({ pos, size, dt, die }: StageFrame) {
     return false;
   }
   for (const chip of CHIPS) {
-    if (s.lab.chips.includes(chip.id) || (chip.id === "vent" && size !== 0.25))
+    if (
+      s.lab.chips.includes(chip.id) ||
+      (chip.id === "battery" && size !== 2.5) ||
+      (chip.id === "vent" && size !== 0.25)
+    )
       continue;
+    // A giant's body reaches the battery on the book even when its centre
+    // is above the item. Measure reach along its height, not just its centre.
+    const verticalDistance =
+      chip.id === "battery"
+        ? Math.max(pos[1] - chip.pos[1], chip.pos[1] - (pos[1] + 1.5 * size), 0)
+        : Math.abs(pos[1] + 0.75 * size - chip.pos[1]);
     if (
       Math.hypot(pos[0] - chip.pos[0], pos[2] - chip.pos[2]) < 0.85 &&
-      Math.abs(pos[1] + 0.75 * size - chip.pos[1]) <
-        (chip.id === "battery" ? 0.55 : 0.85)
+      verticalDistance < (chip.id === "battery" ? 0.55 : 0.85)
     ) {
       const chips = [...useGame.getState().lab.chips, chip.id] as Chip[];
       s.patchLab({
