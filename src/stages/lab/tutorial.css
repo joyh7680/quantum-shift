@@ -1,6 +1,6 @@
 .lab-tutorial {
   position: absolute;
-  top: 78px;
+  top: 38px;
   left: 50%;
   z-index: 8;
   width: min(370px, calc(100vw - 24px));
