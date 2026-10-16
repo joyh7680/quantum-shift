@@ -114,11 +114,13 @@ export function PowerPanel() {
                   onClick={() => editCode([...lab.code, id])}
                   style={commandBlockStyle(id)}
                 >
-                  <span>
+                  <span className="palette-icon" aria-hidden="true">
                     <CommandIcon id={id} />
                   </span>
-                  {COMMANDS[id].label}
-                  {!available && <small>미수집</small>}
+                  <span className="palette-label">
+                    {COMMANDS[id].label}
+                    {!available && <small>미수집</small>}
+                  </span>
                 </button>
               );
             })}
