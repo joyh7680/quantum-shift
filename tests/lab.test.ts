@@ -160,11 +160,15 @@ test("vent guidance appears near the low passage sign instead of the chip", () =
 
 test("power guidance appears near the emergency sign and disappears after collection", () => {
   const message = "·비상 전기 바닥 건너편에 전원 작동 블록이 있는 것 같다!";
+  // Show the sign guidance on approach, before a giant enters the corridor.
+  assert.equal(labPrompt([8, 0, -6.5]), message);
+  assert.equal(labPrompt([8, 0, -5.5]), message);
+  assert.equal(labPrompt([6.5, 0, -5.5]), message);
   assert.equal(labPrompt([8, 0, -4.5]), message);
   assert.equal(labPrompt([6, 0, -2]), message);
   assert.equal(labPrompt([8, 0, 0.5]), message);
-  assert.equal(labPrompt([8, 0, -5]), "");
-  assert.equal(labPrompt([8, 0, 1]), "");
+  assert.equal(labPrompt([8, 0, -7]), "");
+  assert.equal(labPrompt([8, 0, 3]), "");
   assert.equal(labPrompt([8, 0, 8]), "");
 
   const frame = { ...actionFrame(), pos: [8, 0, -2] as Vec, size: 1 as const };

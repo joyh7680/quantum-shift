@@ -251,7 +251,7 @@ function HUD() {
       )}
       <div className="reticle">+</div>
       {!tutorialRunning && <CaptureHint />}
-      {prompt && !tutorialRunning && (
+      {prompt && (!tutorialRunning || discoveryPrompt) && (
         <div
           className={`interaction-prompt${discoveryPrompt ? " discovery-prompt" : ""}`}
           role="status"
