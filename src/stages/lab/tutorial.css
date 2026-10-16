@@ -53,6 +53,8 @@
   align-items: flex-start;
   gap: 11px;
   min-height: 53px;
+  transition: opacity 0.2s ease;
+  animation: tutorialContentEnter 0.25s ease-out;
 }
 .tutorial-symbol {
   display: grid;
@@ -107,7 +109,6 @@
 .lab-tutorial.is-complete {
   border-color: #78ecc288;
 }
-.is-success .tutorial-symbol,
 .is-complete .tutorial-symbol {
   color: #78ecc2;
   border-color: #78ecc270;
@@ -120,22 +121,19 @@
 .is-success .tutorial-body {
   align-items: center;
 }
-.tutorial-mission {
-  display: grid;
-  gap: 5px;
-  margin-top: 11px;
-  padding-top: 10px;
-  border-top: 1px solid #77ddff25;
-  font-size: 12px;
+.is-transitioning .tutorial-body {
+  opacity: 0;
 }
-.tutorial-mission b {
-  color: #ffe087;
-  font-weight: 500;
+.is-complete .tutorial-symbol {
+  animation: tutorialCheck 0.45s ease-out both;
 }
-.tutorial-mission span {
-  color: #b9cddb;
-  font-size: 11px;
-  line-height: 1.6;
+.is-handoff .tutorial-body {
+  align-items: center;
+  min-height: 30px;
+}
+.is-handoff h2 {
+  margin-bottom: 0;
+  font-size: 14px;
 }
 .lab-tutorial.is-leaving {
   animation: tutorialLeave 0.35s ease-in both;
@@ -200,7 +198,8 @@
   color: #d2f7ff;
   animation: tutorialPulse 1s ease-in-out infinite;
 }
-.lab-game .tutorial-scale-pulse > div {
+.lab-game .tutorial-scale-pulse > div,
+.lab-game .tutorial-giant-pulse > div:nth-child(3) {
   border-color: #8be5ff;
   color: #d2f7ff;
   animation: tutorialPulse 1s ease-in-out infinite;
@@ -286,6 +285,25 @@
     transform: translateY(-16px) scale(1.2);
   }
 }
+@keyframes tutorialContentEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes tutorialCheck {
+  from {
+    transform: scale(0.8);
+  }
+  65% {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
 @media (max-width: 1100px) and (min-width: 901px) {
   .lab-tutorial {
     width: 330px;
@@ -304,9 +322,6 @@
   .tutorial-running .lab-sidebar {
     top: 240px;
   }
-  .tutorial-running:has(.is-complete) .lab-sidebar {
-    top: 285px;
-  }
 }
 @media (max-width: 580px) {
   .lab-tutorial {
@@ -319,23 +334,27 @@
   .tutorial-running .lab-sidebar {
     top: 218px;
   }
-  .tutorial-running:has(.is-complete) .lab-sidebar {
-    top: 274px;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .lab-tutorial,
   .lab-tutorial.is-leaving,
   .tutorial-battery-beacon,
   .lab-game .game-controls .tutorial-key-pulse,
-  .lab-game .tutorial-scale-pulse > div {
+  .lab-game .tutorial-scale-pulse > div,
+  .lab-game .tutorial-giant-pulse > div:nth-child(3),
+  .tutorial-body,
+  .is-complete .tutorial-symbol {
     animation: none;
   }
   .tutorial-sparkles {
     display: none;
   }
+  .is-transitioning .tutorial-body {
+    opacity: 1;
+  }
   .lab-sidebar,
   .lab-game .mission-card,
+  .tutorial-body,
   .tutorial-progress span {
     transition: none;
   }

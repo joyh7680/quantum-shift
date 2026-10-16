@@ -7,22 +7,22 @@ import "./tutorial.css";
 
 const STEPS = [
   {
-    title: "캐릭터를 움직여 봐요!",
-    help: "WASD 키를 눌러 이동해 보세요.",
+    title: "STEP 1. 캐릭터 이동",
+    help: "WASD 키를 눌러 캐릭터를 이동해 보세요.",
     success: "짝짝짝! 캐릭터 이동 성공이에요! 👏",
     target: "movement",
     icon: "M12 3v18M3 12h18m-12-6 3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3",
   },
   {
-    title: "이번엔 몸의 크기를 바꿔볼까요?",
-    help: "숫자키 1, 2, 3을 눌러보세요!",
+    title: "STEP 2. 크기 변환",
+    help: "숫자키 1, 2, 3을 눌러 몸의 크기를 바꿔 보세요!",
     success: "와! 크기 변환에 성공했어요! ✨",
     target: "scale",
     icon: "m12 3 8 4.5v9L12 21l-8-4.5v-9Z",
   },
   {
-    title: "저기 반짝이는 배터리가 보여요!",
-    help: "배터리 가까이 이동해 보세요.",
+    title: "STEP 3. 첫 번째 미션 도전",
+    help: "거대 크기로 변신하고 배터리로 이동하세요.",
     success: "배터리를 찾았어요! 잘했어요! 🎉",
     target: "battery",
   },
@@ -83,36 +83,51 @@ export function LabTutorialCard() {
   const phase = useGame((s) => s.labTutorial.phase);
   const step = useGame((s) => s.labTutorial.step);
   const panel = useGame((s) => s.panel);
+  const fading = useGame(
+    (s) =>
+      (s.labTutorial.phase === "success" && s.labTutorial.elapsed >= 1.25) ||
+      (s.labTutorial.phase === "complete" && s.labTutorial.elapsed >= 1.75),
+  );
   const { active: loading } = useProgress();
   if (loading || panel || phase === "waiting" || phase === "done") return null;
   const copy = STEPS[step - 1];
-  const complete = phase === "complete" || phase === "leaving";
+  const complete = phase === "complete";
+  const handoff = phase === "handoff" || phase === "leaving";
+  const finished = complete || handoff;
   const success = phase === "success";
   return (
     <>
       {phase === "active" && <TutorialLink target={copy.target} />}
       <section
-        key={`${step}-${complete}`}
-        className={`lab-tutorial ${success ? "is-success" : ""} ${complete ? "is-complete" : ""} ${phase === "leaving" ? "is-leaving" : ""}`}
+        key={`${step}-${phase}`}
+        className={`lab-tutorial ${success ? "is-success" : ""} ${complete ? "is-complete" : ""} ${handoff ? "is-handoff" : ""} ${fading ? "is-transitioning" : ""} ${phase === "leaving" ? "is-leaving" : ""}`}
         aria-label="STAGE 1 튜토리얼"
       >
-        <header>
-          <span className="tutorial-eyebrow">
-            TUTORIAL {String(step).padStart(2, "0")}
-          </span>
-          <span className="tutorial-count">{step}/3</span>
-          <button
-            type="button"
-            onClick={() => {
-              const s = useGame.getState();
-              s.patch({
-                labTutorial: { ...s.labTutorial, phase: "done", elapsed: 0 },
-              });
-            }}
-          >
-            건너뛰기 <span aria-hidden="true">›</span>
-          </button>
-        </header>
+        {!handoff && (
+          <header>
+            <span className="tutorial-eyebrow">
+              TUTORIAL {String(step).padStart(2, "0")}
+            </span>
+            {!finished && <span className="tutorial-count">{step}/3</span>}
+            {!finished && (
+              <button
+                type="button"
+                onClick={() => {
+                  const s = useGame.getState();
+                  s.patch({
+                    labTutorial: {
+                      ...s.labTutorial,
+                      phase: "done",
+                      elapsed: 0,
+                    },
+                  });
+                }}
+              >
+                건너뛰기 <span aria-hidden="true">›</span>
+              </button>
+            )}
+          </header>
+        )}
         <div
           className="tutorial-body"
           role="status"
@@ -122,13 +137,13 @@ export function LabTutorialCard() {
           <span
             className="tutorial-symbol"
             data-device={
-              !success && !complete && copy.target === "battery"
+              !success && !finished && copy.target === "battery"
                 ? "battery"
                 : undefined
             }
             aria-hidden="true"
           >
-            {success || complete ? (
+            {complete ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path
                   d="m5 12 5 5L19 7"
@@ -138,6 +153,8 @@ export function LabTutorialCard() {
                   strokeLinejoin="round"
                 />
               </svg>
+            ) : handoff ? (
+              "›"
             ) : copy.target === "battery" ? (
               <CommandBlockIcon id="battery" />
             ) : (
@@ -159,26 +176,24 @@ export function LabTutorialCard() {
             <h2>
               {complete
                 ? "🎉 튜토리얼 완료!"
-                : success
-                  ? copy.success
-                  : copy.title}
+                : handoff
+                  ? "이제 다음 명령어 블록을 수집해 봐요!"
+                  : success
+                    ? copy.success
+                    : copy.title}
             </h2>
-            <p>
-              {complete
-                ? "이제 첫 번째 미션을 시작해 볼까요?"
-                : success
-                  ? ""
-                  : copy.help}
-            </p>
-            {complete && (
-              <div className="tutorial-mission">
-                <b>무거운 배터리를 연결해 주세요!</b>
-                <span>3번 키를 눌러 거대 크기로 변신하세요.</span>
-              </div>
+            {!handoff && (
+              <p>
+                {complete
+                  ? "첫 번째 미션 성공! 잘했어요!"
+                  : success
+                    ? ""
+                    : copy.help}
+              </p>
             )}
           </div>
         </div>
-        {(success || complete) && (
+        {complete && (
           <div
             key={`${step}-${phase}`}
             className="tutorial-sparkles"
@@ -189,20 +204,22 @@ export function LabTutorialCard() {
             <i>✦</i>
           </div>
         )}
-        <div className="tutorial-progress" aria-hidden="true">
-          {[1, 2, 3].map((n) => (
-            <span
-              key={n}
-              className={
-                n < step || (n === step && (success || complete))
-                  ? "done"
-                  : n === step
-                    ? "current"
-                    : ""
-              }
-            />
-          ))}
-        </div>
+        {!finished && (
+          <div className="tutorial-progress" aria-hidden="true">
+            {[1, 2, 3].map((n) => (
+              <span
+                key={n}
+                className={
+                  n < step || (n === step && success)
+                    ? "done"
+                    : n === step
+                      ? "current"
+                      : ""
+                }
+              />
+            ))}
+          </div>
+        )}
       </section>
     </>
   );

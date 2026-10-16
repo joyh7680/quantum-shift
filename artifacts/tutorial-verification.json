@@ -5,7 +5,10 @@
     "pause freezes timer",
     "same-size rejection",
     "real transformation",
-    "real battery arrival",
+    "giant battery arrival and real inventory completion",
+    "tiny arrival rejection",
+    "two second completion and three second next block toast",
+    "no duplicate notices or power-block animation",
     "completion handoff",
     "session persistence",
     "mobile layout",
@@ -18,6 +21,38 @@
     "bottom": 189,
     "missionTop": 218,
     "width": 390
+  },
+  "sequence": {
+    "phases": {
+      "complete": 18.23333333333358,
+      "handoff": 20.25000000000013,
+      "leaving": 23.266666666666627,
+      "done": 23.616666666666607
+    },
+    "cards": {
+      "complete": {
+        "text": "TUTORIAL 03🎉 튜토리얼 완료!첫 번째 미션 성공! 잘했어요!✦✧✦",
+        "size": 2.5,
+        "chips": [
+          "battery"
+        ],
+        "mission": 0,
+        "hiddenControls": 0,
+        "check": true,
+        "sparkles": true
+      },
+      "handoff": {
+        "text": "›이제 다음 명령어 블록을 수집해 봐요!",
+        "size": 2.5,
+        "chips": [
+          "battery"
+        ],
+        "mission": 0,
+        "hiddenControls": 0,
+        "check": false,
+        "sparkles": false
+      }
+    }
   },
   "errors": []
 }

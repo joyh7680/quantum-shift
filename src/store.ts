@@ -5,7 +5,10 @@ import type { LabState } from "./stages/lab/state.ts";
 import { createCircuitState } from "./stages/circuit/state.ts";
 import type { CircuitState } from "./stages/circuit/state.ts";
 import type { StageId, Vec } from "./stages/shared.ts";
-import { createLabTutorial } from "./stages/lab/tutorialState.ts";
+import {
+  createLabTutorial,
+  tickLabTutorial,
+} from "./stages/lab/tutorialState.ts";
 import type { LabTutorial } from "./stages/lab/tutorialState.ts";
 export type { Vec } from "./stages/shared.ts";
 export type Panel = "power" | "suit" | "pause" | null;
@@ -31,6 +34,7 @@ export type GameState = {
   patch: (v: Partial<GameState>) => void;
   patchLab: (v: Partial<LabState>) => void;
   patchCircuit: (v: Partial<CircuitState>) => void;
+  advanceLabTutorial: (dt: number, pos: Vec, size: Scale) => void;
   completeLab: () => void;
   completeCircuit: () => void;
   nextStage: () => void;
@@ -71,6 +75,33 @@ export const useGame = create<GameState>((set, get) => ({
   patch: (v) => set(v),
   patchLab: (v) => set((s) => ({ lab: { ...s.lab, ...v } })),
   patchCircuit: (v) => set((s) => ({ circuit: { ...s.circuit, ...v } })),
+  advanceLabTutorial: (dt, pos, size) => {
+    const s = get();
+    if (s.activeStage !== 1 || s.screen !== "game" || s.panel) return;
+    // Normal pickup already proves a successful giant arrival. If the player
+    // collected it during an earlier step, never ask them to repeat that task.
+    const labTutorial =
+      s.labTutorial.phase === "active" &&
+      s.labTutorial.step === 3 &&
+      s.lab.chips.includes("battery")
+        ? { ...s.labTutorial, phase: "complete" as const, elapsed: 0 }
+        : tickLabTutorial(s.labTutorial, dt, pos, size);
+    if (labTutorial === s.labTutorial) return;
+    // Arrival completes the first collection task in the same update as the
+    // tutorial. Keep the remaining collection and program missions unchanged.
+    if (labTutorial.phase === "complete" && !s.lab.chips.includes("battery")) {
+      const chips: LabState["chips"] = [...s.lab.chips, "battery"];
+      set({
+        labTutorial,
+        lab: {
+          ...s.lab,
+          chips,
+          mission: chips.length === 3 ? 1 : s.lab.mission,
+          collectedAt: Date.now(),
+        },
+      });
+    } else set({ labTutorial });
+  },
   notify: (toast) => set((s) => ({ toast, toastId: s.toastId + 1 })),
   start: (character, activeStage = 1) => {
     const s = get();
@@ -92,7 +123,9 @@ export const useGame = create<GameState>((set, get) => ({
           ? { ...s.labTutorial, phase: "active" }
           : activeStage === 1 &&
               s.labTutorial.step === 3 &&
-              ["success", "complete", "leaving"].includes(s.labTutorial.phase)
+              ["success", "complete", "handoff", "leaving"].includes(
+                s.labTutorial.phase,
+              )
             ? { ...s.labTutorial, phase: "done", elapsed: 0 }
             : s.labTutorial,
       pos: [...progress.checkpoint],

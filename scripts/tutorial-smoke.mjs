@@ -20,6 +20,8 @@ const state = () =>
       size: s.size,
       panel: s.panel,
       time: s.lab.time,
+      chips: s.lab.chips,
+      mission: s.lab.mission,
     };
   });
 async function waitFor(fn, label, timeout = 30000) {
@@ -57,7 +59,8 @@ async function move(x, z, stopOnArrival = false) {
   }
 }
 async function screenshot(name) {
-  if (!name.includes("success")) await page.waitForTimeout(450);
+  if (!["01-success", "complete", "handoff"].includes(name))
+    await page.waitForTimeout(450);
   await page.screenshot({ path: `artifacts/tutorial-${name}.png` });
 }
 try {
@@ -68,6 +71,14 @@ try {
   );
   await waitFor((s) => s.time > 0.3, "assets and physics ready");
   await page.locator(".lab-tutorial").waitFor();
+  assert.equal(
+    await page.locator(".lab-tutorial h2").innerText(),
+    "STEP 1. 캐릭터 이동",
+  );
+  assert.equal(
+    await page.locator(".lab-tutorial p").innerText(),
+    "WASD 키를 눌러 캐릭터를 이동해 보세요.",
+  );
   await screenshot("01");
   await page.keyboard.press("KeyE");
   assert.equal((await state()).tutorial.phase, "active");
@@ -87,6 +98,10 @@ try {
     "step 2",
   );
   await screenshot("02");
+  assert.equal(
+    await page.locator(".lab-tutorial h2").innerText(),
+    "STEP 2. 크기 변환",
+  );
   await page.keyboard.press("Digit2");
   await page.waitForTimeout(150);
   assert.equal(
@@ -104,6 +119,17 @@ try {
     "step 3",
   );
   await page.locator(".tutorial-battery-beacon").waitFor();
+  assert.equal(
+    await page.locator(".lab-tutorial h2").innerText(),
+    "STEP 3. 첫 번째 미션 도전",
+  );
+  assert.equal(await page.locator(".tutorial-giant-pulse").count(), 1);
+  assert.equal(
+    await page
+      .locator(".chip-hud [data-command=power]")
+      .evaluate((el) => getComputedStyle(el).animationName),
+    "none",
+  );
   await screenshot("03");
   await move(-3, 8);
   await move(-3, 14);
@@ -122,25 +148,91 @@ try {
   // From the fourth book, use actual keyboard movement to approach the item.
   await page.evaluate(() => {
     const s = window.__quantumGame.getState();
-    s.patchLab({ checkpoint: [-8, 2.6, 4] });
+    s.patchLab({ checkpoint: [-8, 2.65, 4.7] });
     s.patch({ respawn: s.respawn + 1 });
   });
   await waitFor(
-    (s) => s.pos[1] > 2.4 && s.pos[0] < -7.5,
+    (s) => s.pos[1] > 2.4 && s.pos[0] < -7.5 && s.pos[2] > 4.5,
     "stair fixture ready",
   );
+  await page.keyboard.press("Digit1");
   assert.equal((await state()).tutorial.phase, "active");
-  await move(-8, 4.6, true);
-  await waitFor((s) => s.tutorial.phase === "success", "real battery arrival");
+  await move(-8, 4.35, true);
+  assert.equal(
+    (await state()).tutorial.phase,
+    "active",
+    "tiny arrival must not complete step 3",
+  );
+  // Observe transitions in the browser so slow screenshot/IPC calls cannot
+  // miss the short completion card or distort the physics-clock durations.
+  await page.evaluate(() => {
+    window.__tutorialPhases = {};
+    window.__tutorialCards = {};
+    window.__quantumGame.subscribe((s, previous) => {
+      if (s.labTutorial.phase !== previous.labTutorial.phase)
+        window.__tutorialPhases[s.labTutorial.phase] = s.lab.time;
+    });
+    new MutationObserver(() => {
+      const s = window.__quantumGame.getState();
+      const card = document.querySelector(".lab-tutorial");
+      const phase = s.labTutorial.phase;
+      const title = card?.querySelector("h2")?.textContent;
+      if (
+        (phase === "complete" && title === "🎉 튜토리얼 완료!") ||
+        (phase === "handoff" &&
+          title === "이제 다음 명령어 블록을 수집해 봐요!")
+      ) {
+        window.__tutorialCards[phase] = {
+          text: card.textContent,
+          size: s.size,
+          chips: s.lab.chips,
+          mission: s.lab.mission,
+          hiddenControls: document.querySelectorAll(
+            ".tutorial-count, .tutorial-progress, .lab-tutorial button, .tutorial-battery-beacon, .tutorial-giant-pulse, .toast",
+          ).length,
+          check: card.classList.contains("is-complete"),
+          sparkles: !!card.querySelector(".tutorial-sparkles"),
+        };
+      }
+    }).observe(document.querySelector(".hud"), {
+      subtree: true,
+      childList: true,
+      attributes: true,
+    });
+  });
+  await page.keyboard.press("Digit3");
   await waitFor((s) => s.tutorial.phase === "complete", "completion message");
   await screenshot("complete");
-  assert.equal(
-    await page
-      .getByText("무거운 배터리를 연결해 주세요!", { exact: true })
-      .count(),
-    1,
+  await waitFor(
+    (s) => ["handoff", "leaving", "done"].includes(s.tutorial.phase),
+    "next block toast",
   );
+  if ((await state()).tutorial.phase === "handoff") await screenshot("handoff");
   await waitFor((s) => s.tutorial.phase === "done", "automatic handoff");
+  const sequence = await page.evaluate(() => ({
+    phases: window.__tutorialPhases,
+    cards: window.__tutorialCards,
+  }));
+  const { complete, handoff } = sequence.cards;
+  assert.ok(complete.text.includes("첫 번째 미션 성공! 잘했어요!"));
+  assert.ok(
+    !complete.text.includes("거대 크기로 변신하고 배터리로 이동하세요."),
+  );
+  assert.equal(complete.size, 2.5);
+  assert.deepEqual(complete.chips, ["battery"]);
+  assert.equal(complete.mission, 0);
+  assert.equal(complete.hiddenControls, 0);
+  assert.equal(complete.check, true);
+  assert.equal(complete.sparkles, true);
+  assert.equal(handoff.hiddenControls, 0);
+  assert.equal(handoff.check, false);
+  assert.equal(handoff.sparkles, false);
+  assert.ok(
+    Math.abs(sequence.phases.handoff - sequence.phases.complete - 2) < 0.05,
+  );
+  assert.ok(
+    Math.abs(sequence.phases.leaving - sequence.phases.handoff - 3) < 0.05,
+  );
   assert.equal(
     await page
       .locator(".lab-tutorial, .tutorial-link, .tutorial-battery-beacon")
@@ -234,7 +326,10 @@ try {
           "pause freezes timer",
           "same-size rejection",
           "real transformation",
-          "real battery arrival",
+          "giant battery arrival and real inventory completion",
+          "tiny arrival rejection",
+          "two second completion and three second next block toast",
+          "no duplicate notices or power-block animation",
           "completion handoff",
           "session persistence",
           "mobile layout",
@@ -242,6 +337,7 @@ try {
           "stage 2 isolation",
         ],
         layout,
+        sequence,
         errors,
       },
       null,

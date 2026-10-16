@@ -245,7 +245,9 @@ function HUD() {
       )}
       <div className="reticle">+</div>
       {!tutorialRunning && <CaptureHint />}
-      {prompt && <div className="interaction-prompt">{prompt}</div>}
+      {prompt && !tutorialRunning && (
+        <div className="interaction-prompt">{prompt}</div>
+      )}
       <div className="game-controls">
         <span>
           <kbd
@@ -274,7 +276,7 @@ function HUD() {
           </span>
         </div>
         <div
-          className={`size-buttons${tutorialStep === 2 ? " tutorial-scale-pulse" : ""}`}
+          className={`size-buttons${tutorialStep === 2 ? " tutorial-scale-pulse" : tutorialStep === 3 ? " tutorial-giant-pulse" : ""}`}
           data-tutorial-target="scale"
         >
           {([0.25, 1, 2.5] as const).map((scale, i) => (
@@ -326,6 +328,9 @@ function Toast() {
     id = useGame((s) => s.toastId),
     [show, setShow] = useState(false);
   const activeStage = useGame((s) => s.activeStage);
+  const tutorialRunning = useGame(
+    (s) => s.activeStage === 1 && tutorialVisible(s.labTutorial),
+  );
   const chips = useGame((s) => s.lab.chips);
   const acquired =
     activeStage === 1 && toast.startsWith("명령 블록 획득!")
@@ -334,11 +339,14 @@ function Toast() {
   const complete = !!acquired && chips.length === 3;
   const duration = acquired ? (complete ? 3000 : 2700) : 4500;
   useEffect(() => {
-    setShow(true);
+    // Suppressed tutorial/collection notices must not reappear after the
+    // handoff or after skipping. The top card owns this guidance sequence.
+    const s = useGame.getState();
+    setShow(!(s.activeStage === 1 && tutorialVisible(s.labTutorial)));
     const t = setTimeout(() => setShow(false), duration);
     return () => clearTimeout(t);
   }, [id, duration]);
-  const message = show ? toast : "";
+  const message = show && !tutorialRunning ? toast : "";
   return message ? (
     <div
       key={id}
