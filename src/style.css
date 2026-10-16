@@ -659,11 +659,11 @@ kbd {
   white-space: normal;
 }
 .discovery-prompt-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 42px;
   flex-shrink: 0;
-  color: #ffda75;
-  filter: drop-shadow(0 0 5px #ffda754d);
+  color: #d8bf81;
+  filter: drop-shadow(0 0 3px #d8bf8133);
 }
 .game-controls {
   position: absolute;
