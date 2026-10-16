@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { useGame } from "../src/store.ts";
 import { updateLab } from "../src/stages/lab/gameplay.ts";
 import {
-  crossesLiveElectricFloor,
+  crossesUnsafeElectricFloor,
   electricPhase,
   ELECTRIC_TILES,
 } from "../src/stages/lab/electricFloor.ts";
@@ -46,34 +46,34 @@ test("every purple tile rejects walking, jumping and a full swept crossing", () 
     for (const z of ELECTRIC_TILES)
       for (const height of [0, 0.3, 1.2]) {
         const pos: Vec = [8, height, z];
-        assert(crossesLiveElectricFloor(pos, pos, size, 4));
+        assert(crossesUnsafeElectricFloor(pos, pos, size, 4));
         assert(
-          crossesLiveElectricFloor([8, height, -2], [8, height, 7], size, 4),
+          crossesUnsafeElectricFloor([8, height, -2], [8, height, 7], size, 4),
         );
         assert(
-          crossesLiveElectricFloor([8, height, 7], [8, height, -2], size, 4),
+          crossesUnsafeElectricFloor([8, height, 7], [8, height, -2], size, 4),
         );
       }
 });
 
-test("mint and yellow waiting tiles allow crossing for all sizes", () => {
+test("mint and yellow tiles allow crossing for all sizes", () => {
   for (const size of [0.25, 1, 2.5] as const) {
     assert.equal(
-      crossesLiveElectricFloor([8, 0, -2], [8, 1, 7], size, 0),
+      crossesUnsafeElectricFloor([8, 0, -2], [8, 1, 7], size, 0),
       false,
     );
     for (const [lane, z] of ELECTRIC_TILES.entries()) {
       const time = 2.7 - lane * 0.6;
       assert.equal(electricPhase(time, lane), "waiting");
       assert.equal(
-        crossesLiveElectricFloor([8, 1, z], [8, 1, z], 0.25, time),
+        crossesUnsafeElectricFloor([8, 1, z], [8, 1, z], size, time),
         false,
       );
     }
   }
 });
 
-test("yellow waiting allows standing and walking in either direction at every size", () => {
+test("yellow allows standing and crossing in either direction at every size", () => {
   for (const size of [0.25, 1, 2.5] as const) {
     // The last tile is yellow; earlier tiles are mint, so no purple overlaps.
     assert.equal(electricPhase(1.5, 2), "waiting");
@@ -91,8 +91,10 @@ test("yellow waiting allows standing and walking in either direction at every si
         [8, 0, 3.2],
       ],
     ] as [Vec, Vec][])
-      assert.equal(crossesLiveElectricFloor(from, to, size, 1.5), false);
+      assert.equal(crossesUnsafeElectricFloor(from, to, size, 1.5), false);
     const deaths = game().lab.deaths;
+    const respawn = game().respawn;
+    game().patch({ size });
     game().patchLab({ time: 1.5 });
     assert.notEqual(
       updateLab({
@@ -107,12 +109,15 @@ test("yellow waiting allows standing and walking in either direction at every si
       false,
     );
     assert.equal(game().lab.deaths, deaths);
+    assert.equal(game().respawn, respawn);
+    assert.equal(game().size, size);
+    assert.deepEqual(game().lab.checkpoint, [8, 0, -3]);
   }
 });
 
 test("body edges trigger before the centre enters; adjacent gaps and workbench remain safe", () => {
-  assert(crossesLiveElectricFloor([8, 0, -0.8], [8, 0, -0.8], 2.5, 4));
-  assert(crossesLiveElectricFloor([6, 0, 0.5], [6, 0, 0.5], 1, 4));
+  assert(crossesUnsafeElectricFloor([8, 0, -0.8], [8, 0, -0.8], 2.5, 4));
+  assert(crossesUnsafeElectricFloor([6, 0, 0.5], [6, 0, 0.5], 1, 4));
   for (const pos of [
     [8, 0, -3],
     [8, 0, 8],
@@ -120,7 +125,7 @@ test("body edges trigger before the centre enters; adjacent gaps and workbench r
     [0, 0, 0.5],
     [8, 8, 0.5],
   ] as Vec[])
-    assert.equal(crossesLiveElectricFloor(pos, pos, 0.25, 4), false);
+    assert.equal(crossesUnsafeElectricFloor(pos, pos, 0.25, 4), false);
 });
 
 test("turning purple ejects an airborne player in the same simulation tick", () => {

@@ -10,7 +10,7 @@ import {
 } from "./state.ts";
 import type { Chip, Command, LabState } from "./state.ts";
 import type { Scale } from "../../rules.ts";
-import { crossesLiveElectricFloor } from "./electricFloor.ts";
+import { crossesUnsafeElectricFloor } from "./electricFloor.ts";
 import {
   POWER_FAN_STOP,
   POWER_PUSH_END,
@@ -147,7 +147,7 @@ export function updateLab({ pos, size, dt, die }: StageFrame) {
   else if (pos[0] < -5 && pos[2] >= 11) checkpoint = [-8, 0, 13];
   if (checkpoint && checkpoint.some((n, i) => n !== s.lab.checkpoint[i]))
     s.patchLab({ checkpoint });
-  if (crossesLiveElectricFloor(pos, pos, size, time)) {
+  if (crossesUnsafeElectricFloor(pos, pos, size, time)) {
     die("비상 전기 바닥에 닿았어요");
     return false;
   }

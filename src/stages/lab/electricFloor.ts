@@ -12,7 +12,7 @@ export function electricPhase(time: number, lane = 0) {
 
 // Test the whole move and the character's footprint, including jumps. The
 // discharge fills the corridor up to its walls, but leaves the workbench above safe.
-export function crossesLiveElectricFloor(
+export function crossesUnsafeElectricFloor(
   from: Vec,
   to: Vec,
   size: Scale,
@@ -21,8 +21,8 @@ export function crossesLiveElectricFloor(
   const radius = 0.34 * size;
   return ELECTRIC_TILES.some((z, lane) => {
     const phase = electricPhase(time, lane);
-    // Mint and yellow waiting tiles both allow passage. Only purple discharges.
-    if (phase === "safe" || phase === "waiting") return false;
+    // Mint and yellow allow passage. Only purple returns to the checkpoint.
+    if (phase !== "live") return false;
     const lower = [
       8 - ELECTRIC_TILE_WIDTH / 2 - radius,
       0.0025 - 1.5 * size,

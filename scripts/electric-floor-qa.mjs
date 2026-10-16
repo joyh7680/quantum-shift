@@ -118,7 +118,7 @@ try {
     assert(safeEnd.pos[2] > 1.2, `mint actually crossed at size ${size}`);
     results.push({ case: "mint crossing", size, ...safeEnd });
 
-    // Hold the last tile yellow to isolate waiting-state collision behavior.
+    // Keep the last tile yellow while measuring a complete crossing.
     await place(6.5, 1.5);
     const waitingStart = await sample();
     await page.keyboard.down("s");
@@ -131,14 +131,14 @@ try {
       `yellow allows size ${size}`,
     );
     assert(waitingEnd.pos[2] < 3.3, `yellow actually crossed at size ${size}`);
-    results.push({ case: "yellow waiting crossing", size, ...waitingEnd });
+    results.push({ case: "yellow crossing", size, ...waitingEnd });
 
-    for (const [label, startZ, key, jump] of [
-      ["purple walking", -1.5, "w", false],
-      ["purple jumping", -1.5, "w", true],
-      ["purple return from item", 6.5, "s", false],
+    for (const [label, startZ, key, jump, time] of [
+      ["purple walking", -1.5, "w", false, 3.5],
+      ["purple jumping", -1.5, "w", true, 3.5],
+      ["purple return from item", 6.5, "s", false, 3.5],
     ]) {
-      await place(startZ, 3.5);
+      await place(startZ, time);
       const before = await sample();
       if (jump) await page.keyboard.press("Space");
       await page.keyboard.down(key);

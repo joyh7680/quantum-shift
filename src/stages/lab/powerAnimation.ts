@@ -1,9 +1,9 @@
 import type { LabState } from "./state.ts";
 
-export const POWER_STAND: [number, number, number] = [5, 0, 22.75];
-export const POWER_REACH_END = 0.45;
-export const POWER_PUSH_END = 1.65;
-export const POWER_RELEASE_END = 2.15;
+export const POWER_STAND: [number, number, number] = [5, 0, 22.6];
+export const POWER_REACH_END = 0.85;
+export const POWER_PUSH_END = 2.75;
+export const POWER_RELEASE_END = 3.6;
 export const POWER_FAN_STOP = POWER_PUSH_END + 2.5;
 
 const smooth = (value: number) => {

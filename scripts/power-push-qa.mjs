@@ -36,13 +36,29 @@ const sample = () =>
   page.evaluate(() => {
     const s = window.__quantumGame.getState();
     const scene = window.__powerRoot.getState().scene;
+    const root = window.__powerRoot.getState();
     const model = scene.getObjectByName("character-model");
+    const { Box3, Vector3 } = window.__powerMath;
+    const bounds = new Box3().setFromObject(model);
+    const center = bounds.getCenter(new Vector3());
+    const top = new Vector3(center.x, bounds.max.y, center.z).project(
+      root.camera,
+    );
+    const bottom = new Vector3(center.x, bounds.min.y, center.z).project(
+      root.camera,
+    );
     return {
       screen: s.screen,
       lab: JSON.parse(JSON.stringify(s.lab)),
       pos: s.pos,
       facing: model.parent.parent.rotation.y,
       lean: model.rotation.x,
+      forward: model.position.z,
+      cameraDistance: root.controls
+        ? root.camera.position.distanceTo(root.controls.target)
+        : null,
+      cameraEnabled: root.controls?.enabled ?? false,
+      characterPixels: (Math.abs(top.y - bottom.y) * root.size.height) / 2,
       arms: ["left-arm", "right-arm"].map(
         (name) => model.getObjectByName(name).rotation.x,
       ),
@@ -65,12 +81,14 @@ try {
     () => window.__quantumGame?.getState().lab.time > 0.1,
   );
   assert(rendererUrl);
-  await page.evaluate(async (url) => {
+  const timing = await page.evaluate(async (url) => {
     const { _roots } = await import(url);
     window.__powerRoot = _roots.get(
       document.querySelector(".game-canvas canvas"),
     ).store;
     const root = window.__powerRoot.getState();
+    window.__powerMath =
+      await import("/node_modules/three/build/three.module.js");
     root.setDpr(1);
     root.gl.shadowMap.enabled = false;
     root.setFrameloop("never");
@@ -80,6 +98,14 @@ try {
       code: ["giant", "battery", "normal", "power", "tiny", "vent"],
     });
     s.patch({ panel: "power" });
+    const { POWER_STAND, POWER_REACH_END, POWER_PUSH_END, POWER_RELEASE_END } =
+      await import("/src/stages/lab/powerAnimation.ts");
+    return {
+      stand: POWER_STAND,
+      reach: POWER_REACH_END,
+      push: POWER_PUSH_END,
+      release: POWER_RELEASE_END,
+    };
   }, rendererUrl);
   await page.locator(".run-actions .primary").click();
   await until(
@@ -89,9 +115,13 @@ try {
   await tick(3);
   const before = await sample();
   assert(
-    Math.abs(before.pos[0] - 5) < 0.1 && Math.abs(before.pos[2] - 22.75) < 0.1,
+    Math.abs(before.pos[0] - timing.stand[0]) < 0.1 &&
+      Math.abs(before.pos[2] - timing.stand[2]) < 0.1,
   );
-  await until((s) => s.lab.elapsed >= 1.35, "sustained push");
+  await until((s) => s.lab.elapsed >= timing.reach, "reaches for handle");
+  const reaching = await sample();
+  await page.screenshot({ path: "artifacts/power-push-reaching.png" });
+  await until((s) => s.lab.elapsed >= timing.push - 0.35, "sustained push");
   const pushing = await sample();
   assert(
     pushing.arms.every((angle) => angle < -1.4),
@@ -104,13 +134,25 @@ try {
   );
   assert(pushing.breaker > before.breaker + 0.8, "lever moves with hands");
   assert.equal(pushing.lab.power, false, "power remains on until full push");
+  assert(
+    pushing.forward - reaching.forward > 0.18,
+    "body follows the lever through a visible push",
+  );
+  assert(
+    pushing.cameraDistance < 4.2,
+    "game camera automatically shows the action close up",
+  );
+  assert(
+    pushing.characterPixels > 120,
+    "character is large enough to see the hands in the default viewport",
+  );
   // Use the camera the player actually sees; never reposition it in QA.
-  await page.screenshot({ path: "artifacts/power-push-default-before.png" });
+  await page.screenshot({ path: "artifacts/power-push.png" });
   await until((s) => s.lab.power, "power cuts at end of push");
   const cut = await sample();
   assert(Math.abs(cut.breaker - 0.65) < 0.001);
   assert(cut.lab.fan > 0 && cut.lab.fan < 1);
-  await until((s) => s.lab.elapsed >= 2.6, "releases handle");
+  await until((s) => s.lab.elapsed >= timing.release + 0.5, "releases handle");
   const released = await sample();
   assert(released.arms.every((angle) => Math.abs(angle) < 0.02));
   assert.equal(
@@ -118,12 +160,28 @@ try {
     cut.breaker,
     "breaker stays off after release",
   );
+  await until((s) => s.lab.index === 4, "returns to program overview");
+  const restored = await sample();
+  assert(restored.cameraEnabled, "camera controls resume after close-up");
+  assert(
+    restored.cameraDistance > 15,
+    "overview restored before the next block",
+  );
   await until((s) => s.screen === "clear", "remaining program clears Stage 1");
   assert.deepEqual(errors, []);
   fs.writeFileSync(
     "artifacts/power-push-result.json",
     JSON.stringify(
-      { passed: true, before, pushing, cut, released, errors },
+      {
+        passed: true,
+        before,
+        reaching,
+        pushing,
+        cut,
+        released,
+        restored,
+        errors,
+      },
       null,
       2,
     ),

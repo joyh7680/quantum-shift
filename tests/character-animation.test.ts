@@ -7,6 +7,7 @@ import {
   animateCharacter,
   createCharacterRig,
 } from "../src/characterAnimation.ts";
+import { POWER_PUSH_END } from "../src/stages/lab/powerAnimation.ts";
 
 const catalog = JSON.parse(fs.readFileSync("src/characters.json", "utf8"));
 async function load(id: string) {
@@ -122,7 +123,7 @@ test("breaker push reaches with both arms, leans forward, freezes and returns to
   for (const id of ["basic", "lucy", "codmos_nova"]) {
     const rig = createCharacterRig(await load(id), id);
     const idle = { speed: 0, airborne: false, paused: false };
-    for (let i = 0; i < 90; i++)
+    for (let i = 0; i < Math.floor((POWER_PUSH_END - 0.1) * 60); i++)
       animateCharacter(rig, { ...idle, powerPush: i / 60 }, 1 / 60);
     assert(
       rig.limbs.slice(2).every((arm) => arm.rotation.x < -1.4),

@@ -464,6 +464,8 @@ export default function App() {
                       !(activeStage === 1 && panel === "power"))
                   }
                   timeStep={1 / 60}
+                  interpolate
+                  updatePriority={-2}
                   gravity={[0, -18, 0]}
                 >
                   <World />

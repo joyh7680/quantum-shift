@@ -169,8 +169,8 @@ function PrecisionLever() {
       ))}
       <Box
         p={[0, 0.32, 0]}
-        s={[0.8, 0.13, 0.16]}
-        c={highlighted ? cyan : "#bca5ff"}
+        s={[0.85, 0.18, 0.2]}
+        c={highlighted ? cyan : "#ffcb80"}
         glow
       />
       {highlighted && (
@@ -325,7 +325,7 @@ export function LabScene() {
       ))}
       <Sign
         p={EMERGENCY_POWER_SIGN}
-        text="민트·노랑 통과 / 보라 방전"
+        text="민트·노랑 통과 / 보라 복귀"
         w={4.2}
         color="#bca5ff"
       />

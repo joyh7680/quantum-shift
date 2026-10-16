@@ -119,7 +119,7 @@ export function animateCharacter(
         : -0.6
       : swing * (index < 2 ? 0.72 : -0.48);
     if (pushing) {
-      const pose = index < 2 ? side * 0.12 : -1.3 - pushing.push * 0.3;
+      const pose = index < 2 ? side * 0.2 : -1.65 - pushing.push * 0.3;
       target = MathUtils.lerp(target, pose, pushing.reach);
     }
     limb.rotation.x = MathUtils.lerp(limb.rotation.x, target, settle);
@@ -131,12 +131,12 @@ export function animateCharacter(
   });
   rig.model.rotation.x = MathUtils.lerp(
     rig.model.rotation.x,
-    pushing ? (0.08 + pushing.push * 0.12) * pushing.reach : 0,
+    pushing ? (0.08 + pushing.push * 0.2) * pushing.reach : 0,
     settle,
   );
   rig.model.position.z = MathUtils.lerp(
     rig.model.position.z,
-    pushing ? pushing.push * pushing.reach * 0.12 : 0,
+    pushing ? pushing.push * pushing.reach * 0.26 : 0,
     settle,
   );
   // Keep the supporting shoe on the floor instead of bouncing the whole model.

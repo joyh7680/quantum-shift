@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import {
   CapsuleCollider,
@@ -7,11 +7,12 @@ import {
   useRapier,
 } from "@react-three/rapier";
 import type { RapierCollider, RapierRigidBody } from "@react-three/rapier";
-import { Group, MathUtils, Raycaster, Vector3 } from "three";
+import { Group, MathUtils, Vector3 } from "three";
 import { Character } from "./Character";
+import { createCameraCollision } from "./cameraCollision";
 import type { CharacterMotion } from "./characterAnimation";
 import { powerActionElapsed } from "./stages/lab/powerAnimation";
-import { crossesLiveElectricFloor } from "./stages/lab/electricFloor";
+import { crossesUnsafeElectricFloor } from "./stages/lab/electricFloor";
 import {
   interactLab,
   labPrompt,
@@ -63,9 +64,18 @@ export function Player() {
   const selected = useGame((s) => s.character),
     screen = useGame((s) => s.screen),
     respawn = useGame((s) => s.respawn);
-  const ray = useRef(new Raycaster()),
-    desired = new Vector3(),
-    target = new Vector3();
+  const cameraCollision = useMemo(createCameraCollision, []);
+  const { desired, target, destination, cameraDirection, scaleTarget } =
+    useMemo(
+      () => ({
+        desired: new Vector3(),
+        target: new Vector3(),
+        destination: new Vector3(),
+        cameraDirection: new Vector3(),
+        scaleTarget: new Vector3(),
+      }),
+      [],
+    );
   useEffect(() => {
     const c = world.createCharacterController(0.015);
     c.enableAutostep(0.22, 0.18, true);
@@ -409,7 +419,7 @@ export function Player() {
     const delta = cc.computedMovement();
     if (
       s.activeStage === 1 &&
-      crossesLiveElectricFloor(
+      crossesUnsafeElectricFloor(
         frame.pos,
         [p.x + delta.x, foot + delta.y, p.z + delta.z],
         size,
@@ -473,25 +483,25 @@ export function Player() {
       return;
     }
     if (!b) return;
-    const p = b.translation();
     if (model.current) {
-      model.current.position.set(p.x, p.y - H * localSize.current, p.z);
+      // Inherit Rapier's interpolated render position, rather than copying
+      // the discrete 60 Hz physics position into a separate scene object.
+      model.current.position.y = -H * localSize.current;
       model.current.scale.lerp(
-        new Vector3().setScalar(localSize.current),
+        scaleTarget.setScalar(localSize.current),
         1 - Math.exp(-dt * 18),
       );
-      model.current.rotation.y = MathUtils.lerp(
-        model.current.rotation.y,
-        facing.current,
-        1 - Math.exp(-dt * 15),
-      );
+      const turn = facing.current - model.current.rotation.y;
+      model.current.rotation.y +=
+        Math.atan2(Math.sin(turn), Math.cos(turn)) * (1 - Math.exp(-dt * 15));
+      model.current.getWorldPosition(target);
+      target.y += H * localSize.current * 1.2;
     }
     if (s.activeStage === 1 && s.panel === "power") {
       // The coding camera follows independently and remains mouse-controllable
       // while the program owns character movement.
       return;
     }
-    target.set(p.x, p.y + H * localSize.current * 0.2, p.z);
     distance.current = MathUtils.lerp(
       distance.current,
       localSize.current === 0.25 ? 3.5 : localSize.current === 2.5 ? 10.5 : 6,
@@ -502,17 +512,28 @@ export function Player() {
       Math.sin(pitch.current),
       -Math.cos(yaw.current) * Math.cos(pitch.current),
     );
-    ray.current.set(target, desired);
-    ray.current.far = distance.current;
-    const hit = ray.current
-      .intersectObjects(scene.children, true)
-      .find((h) => h.object.userData.cameraSolid && h.distance > 0.1);
-    const dist = hit ? Math.max(0.23, hit.distance - 0.23) : distance.current;
-    const destination = target.clone().addScaledVector(desired, dist);
-    // Snap inward immediately; ease outward to keep the camera out of walls.
-    if (camera.position.distanceTo(target) > dist + 0.25)
-      camera.position.copy(destination);
-    else camera.position.lerp(destination, 1 - Math.exp(-dt * 9));
+    const hit = cameraCollision(scene, target, desired, distance.current);
+    const dist =
+      hit === undefined ? distance.current : Math.max(0.23, hit - 0.23);
+    destination.copy(target).addScaledVector(desired, dist);
+    camera.position.lerp(destination, 1 - Math.exp(-dt * 9));
+    // Clamp the actual smoothed camera arm only when a wall blocks it.
+    // Moving away from the camera must not trigger periodic distance snaps.
+    cameraDirection.subVectors(camera.position, target);
+    const cameraDistance = cameraDirection.length();
+    if (cameraDistance > 0) {
+      cameraDirection.divideScalar(cameraDistance);
+      const obstruction = cameraCollision(
+        scene,
+        target,
+        cameraDirection,
+        cameraDistance,
+      );
+      if (obstruction !== undefined)
+        camera.position
+          .copy(target)
+          .addScaledVector(cameraDirection, Math.max(0.23, obstruction - 0.23));
+    }
     camera.lookAt(target);
   }, -1);
   return (
@@ -525,10 +546,10 @@ export function Player() {
         enabledRotations={[false, false, false]}
       >
         <CapsuleCollider ref={collider} args={[HALF, R]} friction={0} />
+        <group name="player-visual" ref={model} visible={screen !== "start"}>
+          <Character id={selected} motion={motion} />
+        </group>
       </RigidBody>
-      <group ref={model} visible={screen !== "start"}>
-        <Character id={selected} motion={motion} />
-      </group>
     </>
   );
 }
