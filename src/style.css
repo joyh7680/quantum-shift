@@ -459,6 +459,15 @@ kbd {
 .game-top .brand {
   font-size: 12px;
 }
+.game-top .brand-home {
+  padding: 0;
+  border-radius: 4px;
+  background: transparent;
+  text-align: left;
+}
+.game-top .brand-home:hover {
+  color: var(--mint);
+}
 .game-top .brand small {
   font-size: 6px;
 }

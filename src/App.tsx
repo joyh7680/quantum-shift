@@ -53,7 +53,17 @@ class AssetBoundary extends Component<
 }
 function Logo() {
   return (
-    <div className="brand">
+    <button
+      type="button"
+      className="brand brand-home"
+      aria-label="메인페이지로 돌아가기"
+      title="메인페이지로 돌아가기"
+      onClick={() => useGame.getState().reset()}
+      onKeyDown={(event) => {
+        if (event.code === "Space" || event.code === "Enter")
+          event.stopPropagation();
+      }}
+    >
       <svg viewBox="0 0 36 36" width="35" height="35">
         <path
           d="M18 3 32 11v15l-14 8L4 26V11Z"
@@ -71,7 +81,7 @@ function Logo() {
       <div>
         QUANTUM CITY<small>A SMALL CHANGE. A BIG ESCAPE.</small>
       </div>
-    </div>
+    </button>
   );
 }
 function Loading() {
