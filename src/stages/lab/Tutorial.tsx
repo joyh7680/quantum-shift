@@ -11,14 +11,14 @@ const STEPS = [
     help: "WASD 키를 눌러 이동해 보세요.",
     success: "짝짝짝! 캐릭터 이동 성공이에요! 👏",
     target: "movement",
-    icon: "✥",
+    icon: "M12 3v18M3 12h18m-12-6 3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3",
   },
   {
     title: "이번엔 몸의 크기를 바꿔볼까요?",
     help: "숫자키 1, 2, 3을 눌러보세요!",
     success: "와! 크기 변환에 성공했어요! ✨",
     target: "scale",
-    icon: "⬡",
+    icon: "m12 3 8 4.5v9L12 21l-8-4.5v-9Z",
   },
   {
     title: "저기 반짝이는 배터리가 보여요!",
@@ -141,7 +141,18 @@ export function LabTutorialCard() {
             ) : copy.target === "battery" ? (
               <CommandBlockIcon id="battery" />
             ) : (
-              copy.icon
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d={copy.icon} />
+              </svg>
             )}
           </span>
           <div>
