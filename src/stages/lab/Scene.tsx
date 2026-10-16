@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Group, Mesh, MeshStandardMaterial } from "three";
 import { useGame } from "../../store";
 import { Box, Ball, Ring, Sign, Console } from "../WorldParts";
-import { CHIPS, LOW_PASSAGE_SIGN } from "./state";
+import { CHIPS, EMERGENCY_POWER_SIGN, LOW_PASSAGE_SIGN } from "./state";
 import { CommandChip } from "./CommandChip";
 import { electricPhase } from "./gameplay";
 import { useDeviceGuide } from "./guideState";
@@ -312,7 +312,7 @@ export function LabScene() {
         <ElectricTile key={i} lane={i} />
       ))}
       <Sign
-        p={[8, 1.8, -2]}
+        p={EMERGENCY_POWER_SIGN}
         text="비상 전기 / 청록 안전 · 보라 방전"
         w={4.2}
         color="#bca5ff"

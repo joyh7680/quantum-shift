@@ -145,10 +145,6 @@ test("vent guidance appears near the low passage sign instead of the chip", () =
     labPrompt([-8, 0, 7]),
     "ϟ 배터리 연결 블록 · 책과 연필 발판 위 · 3번 거대 크기로 획득",
   );
-  assert.equal(
-    labPrompt([8, 0, 8]),
-    "⏻ 전원 작동 블록 · 비상 전기 바닥 건너편 · 2번 일반 크기로 획득",
-  );
 
   const frame = {
     ...actionFrame(),
@@ -160,6 +156,24 @@ test("vent guidance appears near the low passage sign instead of the chip", () =
   updateLab({ ...frame, pos: [-8, 0, 22] });
   assert.deepEqual(game().lab.chips, ["vent"]);
   assert.equal(labPrompt([-8, 0, 13]), "");
+});
+
+test("power guidance appears near the emergency sign and disappears after collection", () => {
+  const message =
+    "⏻ 전원 작동 블록 · 비상 전기 바닥 건너편 · 2번 일반 크기로 획득";
+  assert.equal(labPrompt([8, 0, -4.5]), message);
+  assert.equal(labPrompt([6, 0, -2]), message);
+  assert.equal(labPrompt([8, 0, 0.5]), message);
+  assert.equal(labPrompt([8, 0, -5]), "");
+  assert.equal(labPrompt([8, 0, 1]), "");
+  assert.equal(labPrompt([8, 0, 8]), "");
+
+  const frame = { ...actionFrame(), pos: [8, 0, -2] as Vec, size: 1 as const };
+  updateLab(frame);
+  assert.deepEqual(game().lab.chips, []);
+  updateLab({ ...frame, pos: [8, 0, 8] });
+  assert.deepEqual(game().lab.chips, ["power"]);
+  assert.equal(labPrompt([8, 0, -2]), "");
 });
 
 test("the stair battery awards its block only at giant size", () => {

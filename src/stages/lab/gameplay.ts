@@ -107,7 +107,7 @@ export function labPrompt(pos: Vec) {
     return !s.lab.chips.includes(c.id) && near(pos, hintPos[0], hintPos[2], 3);
   });
   if (chip)
-    return `${COMMANDS[chip.id].icon} ${COMMANDS[chip.id].label} 칩 · ${chip.hint}`;
+    return `${COMMANDS[chip.id].icon} ${COMMANDS[chip.id].label} 블록 · ${chip.hint}`;
   if (near(pos, -4, 18) || near(pos, 5, 24) || near(pos, 0, 26))
     return "E  장치 관찰 · 프로그램 전용";
   return "";

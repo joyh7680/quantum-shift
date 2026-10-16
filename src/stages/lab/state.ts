@@ -35,6 +35,7 @@ export const PALETTE: Command[] = [
   "power",
 ];
 export const LOW_PASSAGE_SIGN: Vec = [-8, 1.6, 13.95];
+export const EMERGENCY_POWER_SIGN: Vec = [8, 1.8, -2];
 export const CHIPS: {
   id: Chip;
   pos: Vec;
@@ -51,6 +52,7 @@ export const CHIPS: {
   {
     id: "power",
     pos: [8, 0.7, 8],
+    hintPos: EMERGENCY_POWER_SIGN,
     checkpoint: [8, 0, -3],
     hint: "비상 전기 바닥 건너편 · 2번 일반 크기로 획득",
   },
