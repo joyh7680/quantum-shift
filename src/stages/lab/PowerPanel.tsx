@@ -82,10 +82,12 @@ export function PowerPanel() {
       <section className="escape-editor" aria-label="탈출 블록 코딩">
         <header>
           <span>ESCAPE PROGRAM / 블록 코딩</span>
-          <h2>탈출 프로그램</h2>
+          <h2>탈출 프로그램 만들기</h2>
           <div className="escape-objective">
-            <strong>팬을 멈추고, 작은 환풍구로 탈출하세요.</strong>
-            <p>블록으로 캐릭터의 크기와 행동 순서를 정해보세요.</p>
+            <strong>배터리를 연결하고 전원을 작동시켜 환풍기를 멈추세요!</strong>
+            <p>
+              수집한 명령 블록을 올바른 순서로 배치하고 실행해 연구실을 탈출하세요.
+            </p>
           </div>
         </header>
         <div className="editor-scroll">
