@@ -3,47 +3,14 @@ import { useFrame } from "@react-three/fiber";
 import { Group, Mesh, MeshStandardMaterial } from "three";
 import { useGame } from "../../store";
 import { Box, Ball, Ring, Sign, Console } from "../WorldParts";
-import { CHIPS, COMMANDS } from "./state";
-import type { Chip } from "./state";
+import { CHIPS } from "./state";
+import { CommandChip } from "./CommandChip";
 import { electricPhase } from "./gameplay";
 import { useDeviceGuide } from "./guideState";
 import { DeviceMarker } from "./DeviceMarker";
 const cyan = "#59dcff",
   metal = "#26394e",
   dark = "#0b172b";
-function CommandChip({ id, pos }: { id: Chip; pos: [number, number, number] }) {
-  const ref = useRef<Group>(null);
-  const collected = useGame((s) => s.lab.chips.includes(id));
-  const at = useRef(0);
-  useFrame(({ clock }, dt) => {
-    if (!ref.current) return;
-    if (collected) {
-      at.current += dt;
-      ref.current.position.y += dt * 5;
-      ref.current.scale.setScalar(Math.max(0, 1 - at.current * 2));
-      ref.current.visible = at.current < 0.5;
-    } else {
-      ref.current.position.y = pos[1] + Math.sin(clock.elapsedTime * 2) * 0.09;
-      ref.current.rotation.y += dt * 0.8;
-    }
-  });
-  return (
-    <group ref={ref} position={pos}>
-      <Box p={[0, 0, 0]} s={[0.55, 0.4, 0.15]} c={COMMANDS[id].color} glow />
-      <Box p={[0, 0, -0.09]} s={[0.3, 0.22, 0.025]} c={dark} />
-      {[-0.2, 0, 0.2].map((x) => (
-        <Box key={x} p={[x, -0.24, 0]} s={[0.06, 0.12, 0.07]} c={cyan} glow />
-      ))}
-      <Ring
-        p={[0, 0, 0]}
-        r={0.47}
-        c={COMMANDS[id].color}
-        rotation={[0, 0, 0]}
-      />
-      <pointLight color={COMMANDS[id].color} intensity={2} distance={2} />
-    </group>
-  );
-}
 function ElectricTile({ lane }: { lane: number }) {
   const mesh = useRef<Mesh>(null);
   useFrame(() => {

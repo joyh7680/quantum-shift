@@ -28,8 +28,11 @@
 }
 .lab-objective-copy {
   display: flow-root;
-  min-height: 86px;
+  min-height: 74px;
   animation: objectiveReveal 0.32s ease-out;
+}
+.lab-game .mission-track {
+  margin-top: 14px;
 }
 .lab-game .mission-track span {
   transition:
@@ -107,7 +110,7 @@
     font-size: 10px;
   }
   .lab-objective-copy {
-    min-height: 78px;
+    min-height: 70px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
