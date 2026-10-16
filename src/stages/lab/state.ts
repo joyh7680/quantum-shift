@@ -34,7 +34,14 @@ export const PALETTE: Command[] = [
   "battery",
   "power",
 ];
-export const CHIPS: { id: Chip; pos: Vec; checkpoint: Vec; hint: string }[] = [
+export const LOW_PASSAGE_SIGN: Vec = [-8, 1.6, 13.95];
+export const CHIPS: {
+  id: Chip;
+  pos: Vec;
+  hintPos?: Vec;
+  checkpoint: Vec;
+  hint: string;
+}[] = [
   {
     id: "battery",
     pos: [-8, 3.5, 7],
@@ -50,6 +57,7 @@ export const CHIPS: { id: Chip; pos: Vec; checkpoint: Vec; hint: string }[] = [
   {
     id: "vent",
     pos: [-8, 0.26, 22],
+    hintPos: LOW_PASSAGE_SIGN,
     checkpoint: [-8, 0, 13],
     hint: "장비 아래 좁은 통로",
   },

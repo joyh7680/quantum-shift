@@ -102,9 +102,10 @@ export function interactLab() {
 export function labPrompt(pos: Vec) {
   const s = useGame.getState();
   if (near(pos, 0, 10, 3)) return "E  탈출 콘솔 · 블록 코딩";
-  const chip = CHIPS.find(
-    (c) => !s.lab.chips.includes(c.id) && near(pos, c.pos[0], c.pos[2], 3),
-  );
+  const chip = CHIPS.find((c) => {
+    const hintPos = c.hintPos ?? c.pos;
+    return !s.lab.chips.includes(c.id) && near(pos, hintPos[0], hintPos[2], 3);
+  });
   if (chip)
     return `${COMMANDS[chip.id].icon} ${COMMANDS[chip.id].label} 칩 · ${chip.hint}`;
   if (near(pos, -4, 18) || near(pos, 5, 24) || near(pos, 0, 26))

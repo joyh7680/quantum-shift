@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Group, Mesh, MeshStandardMaterial } from "three";
 import { useGame } from "../../store";
 import { Box, Ball, Ring, Sign, Console } from "../WorldParts";
-import { CHIPS } from "./state";
+import { CHIPS, LOW_PASSAGE_SIGN } from "./state";
 import { CommandChip } from "./CommandChip";
 import { electricPhase } from "./gameplay";
 import { useDeviceGuide } from "./guideState";
@@ -334,7 +334,7 @@ export function LabScene() {
       <Box p={[-8, 0.32, 23.4]} s={[4.5, 0.64, 0.3]} c={metal} solid />
       <Box p={[-8, 0.02, 18.7]} s={[1.7, 0.025, 9.4]} c="#246575" glow />
       <Sign
-        p={[-8, 1.6, 13.95]}
+        p={LOW_PASSAGE_SIGN}
         text="분석 장비 / 낮은 통로"
         w={4.2}
         color="#70f2cd"

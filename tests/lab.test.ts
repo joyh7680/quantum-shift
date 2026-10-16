@@ -4,6 +4,7 @@ import { useGame } from "../src/store.ts";
 import {
   commandFailure,
   editCode,
+  labPrompt,
   resetPuzzle,
   startProgram,
   tickProgram,
@@ -131,6 +132,34 @@ test("chips unlock only commands, persist on death, and can be collected in any 
   game().die("test");
   assert.equal(game().lab.chips.length, 3);
   assert.equal(game().lab.code.length, 0);
+});
+
+test("vent guidance appears near the low passage sign instead of the chip", () => {
+  const message = "✣ 환풍구 이동 블록 · 장비 아래 좁은 통로";
+  assert.equal(labPrompt([-8, 0, 11.5]), message);
+  assert.equal(labPrompt([-6, 0, 13]), message);
+  assert.equal(labPrompt([-8, 0, 10]), "");
+  assert.equal(labPrompt([-8, 0, 18]), "");
+  assert.equal(labPrompt([-8, 0, 22]), "");
+  assert.equal(
+    labPrompt([-8, 0, 7]),
+    "ϟ 배터리 연결 블록 · 책과 연필 발판 위 · 3번 거대 크기로 획득",
+  );
+  assert.equal(
+    labPrompt([8, 0, 8]),
+    "⏻ 전원 작동 블록 · 비상 전기 바닥 건너편 · 2번 일반 크기로 획득",
+  );
+
+  const frame = {
+    ...actionFrame(),
+    pos: [-8, 0, 13] as Vec,
+    size: 0.25 as const,
+  };
+  updateLab(frame);
+  assert.deepEqual(game().lab.chips, []);
+  updateLab({ ...frame, pos: [-8, 0, 22] });
+  assert.deepEqual(game().lab.chips, ["vent"]);
+  assert.equal(labPrompt([-8, 0, 13]), "");
 });
 
 test("the stair battery awards its block only at giant size", () => {
