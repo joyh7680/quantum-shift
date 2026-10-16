@@ -47,20 +47,6 @@
   background: #77ddff;
   box-shadow: 0 0 8px #69dfff55;
 }
-.lab-game .lab-tutorial-toast {
-  top: 20px;
-  width: max-content;
-  min-width: 0;
-  max-width: min(560px, calc(100% - 32px));
-  color: #e0f3ff;
-  background: linear-gradient(130deg, #10233bf5, #091629f5);
-  border-color: #5bcfee80;
-  box-shadow: 0 8px 30px #020a1b66;
-  pointer-events: none;
-  line-height: 1.6;
-  word-break: keep-all;
-  animation: tutorialToast 5.2s ease both;
-}
 @keyframes objectiveReveal {
   from {
     opacity: 0;
@@ -71,37 +57,7 @@
     transform: translateY(0);
   }
 }
-@keyframes tutorialToast {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -6px);
-  }
-  6%,
-  92% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -4px);
-  }
-}
-@media (max-width: 800px) {
-  .lab-game .lab-tutorial-toast {
-    top: 16px;
-    max-width: calc(100% - 160px);
-    padding: 10px 12px;
-  }
-}
 @media (max-width: 580px) {
-  .lab-game .lab-tutorial-toast {
-    top: auto;
-    bottom: calc(100% - 72px);
-    max-width: calc(100% - 100px);
-    font-size: 10px;
-    padding: 8px 10px;
-    gap: 7px;
-  }
   .lab-game .mission-label {
     font-size: 7px;
     letter-spacing: 0;
@@ -114,50 +70,166 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lab-objective-copy,
-  .lab-game .lab-tutorial-toast {
+  .lab-objective-copy {
     animation: none;
   }
   .lab-game .mission-track span {
     transition: none;
   }
 }
-.chip-hud {
+.lab-sidebar {
   position: absolute;
-  top: 350px;
-  left: 30px;
+  top: 106px;
+  left: 28px;
   width: 320px;
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+.lab-sidebar .mission-card {
+  position: static;
+  width: 100%;
+}
+.chip-hud {
+  width: 248px;
   border-radius: 9px;
-  padding: 16px 19px;
+  padding: 14px;
   pointer-events: none;
-  animation: chipPulse 0.6s ease-out;
+}
+.lab-game .game-controls {
+  left: auto;
+  right: 28px;
+  top: 28px;
+  bottom: auto;
+  display: flex;
+  max-width: none;
+}
+.chip-hud[hidden] {
+  display: none;
 }
 .chip-hud > span {
   display: block;
-  font: 9px monospace;
+  font: 8px monospace;
   color: #6eabc1;
-  letter-spacing: 2px;
+  letter-spacing: 1.2px;
 }
 .chip-hud > b {
   display: block;
-  margin: 8px 0 12px;
-  font-size: 18px;
+  margin: 7px 0 10px;
+  font-size: 15px;
 }
-.chip-hud > div {
+.chip-hud ul {
   display: grid;
-  gap: 7px;
-  font-size: 11px;
-  color: #71869b;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.chip-hud li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border: 1px solid #77818c30;
+  border-radius: 5px;
+  background: #939aa609;
+  color: #9098a2;
+  font-size: 12px;
+}
+.chip-hud li > span {
+  flex: 1;
+}
+.command-block-icon {
+  display: block;
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+}
+.chip-status-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 .chip-hud .found {
-  color: #93e9ff;
+  color: var(--block-color);
+  border-color: color-mix(in srgb, var(--block-color) 35%, transparent);
+  background: color-mix(in srgb, var(--block-color) 8%, #0b1a2d);
+  animation: chipActivate 0.7s ease-out;
 }
-@keyframes chipPulse {
+@keyframes chipActivate {
+  0%,
+  35% {
+    background: color-mix(in srgb, var(--block-color) 35%, #0b1a2d);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--block-color) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 transparent;
+  }
+}
+.toast.command-acquisition {
+  width: max-content;
+  max-width: calc(100% - 32px);
+  min-width: 280px;
+  padding: 15px 20px;
+  border: 1px solid color-mix(in srgb, var(--block-color) 55%, transparent);
+  background: linear-gradient(130deg, #142c43f5, #091629f5);
+  box-shadow:
+    0 8px 32px #020a1b88,
+    0 0 22px color-mix(in srgb, var(--block-color) 15%, transparent);
+  pointer-events: none;
+}
+.command-acquisition .acquisition-icon {
+  padding: 10px;
+  border-radius: 8px;
+  color: var(--block-color);
+  background: color-mix(in srgb, var(--block-color) 12%, transparent);
+}
+.acquisition-copy {
+  display: grid;
+  gap: 5px;
+}
+.acquisition-copy > span {
+  color: #b7cede;
+  font-size: 11px;
+}
+.acquisition-copy > strong {
+  color: var(--block-color);
+  font-size: 17px;
+}
+.acquisition-copy small {
+  font: 12px monospace;
+  margin-left: 5px;
+}
+.toast.collection-complete {
+  border-color: #77ddff;
+  box-shadow:
+    0 0 30px #77ddff40,
+    inset 0 1px 0 #ddf9ff25;
+  animation: collectionComplete 0.5s ease-out;
+}
+.acquisition-complete {
+  padding-top: 9px;
+  margin-top: 4px;
+  border-top: 1px solid #77ddff40;
+  color: #d7f7ff;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+@keyframes collectionComplete {
   from {
-    box-shadow: 0 0 35px #59dcff66;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.95);
   }
   to {
-    box-shadow: 0 8px 35px #020a1b55;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chip-hud .found,
+  .toast.command-acquisition {
+    animation: none;
   }
 }
 .coding-open .game-canvas {
@@ -450,9 +522,6 @@
   .escape-editor footer {
     padding: 10px 18px;
   }
-  .chip-hud {
-    top: 275px;
-  }
 }
 @media (max-width: 900px) {
   .escape-objective {
@@ -503,21 +572,39 @@
   .lab-live-caption b {
     font-size: 16px;
   }
-  .chip-hud {
-    left: 15px;
-    top: 270px;
+  .lab-sidebar {
     width: 255px;
+  }
+}
+@media (max-width: 800px) {
+  .lab-sidebar {
+    left: 15px;
+    top: 90px;
+  }
+  .lab-game .game-controls {
+    right: 15px;
+    top: 20px;
+    max-width: 176px;
+    gap: 7px;
   }
 }
 @media (max-width: 580px) {
   .lab-game .mission-card {
     width: 235px;
   }
-  .chip-hud {
-    top: 240px;
+  .lab-sidebar {
     left: 12px;
+    top: 75px;
+    width: 235px;
+    gap: 12px;
+  }
+  .chip-hud {
     width: 235px;
     padding: 12px;
+  }
+  .lab-game .game-controls {
+    right: 12px;
+    top: 16px;
   }
   .chip-hud > b {
     font-size: 15px;
@@ -553,44 +640,22 @@
     font-size: 10px;
   }
 }
-.chip-transfer {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  color: #a0f0ff;
-  font-size: 36px;
-  z-index: 14;
-  pointer-events: none;
-  opacity: 0;
-  text-shadow: 0 0 20px #60dfff;
-  animation: chipTransfer 0.8s ease-in forwards;
-}
-@keyframes chipTransfer {
-  0% {
-    opacity: 1;
-    transform: scale(1.5);
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    left: 100px;
-    top: 390px;
-    transform: scale(0.3);
-    opacity: 0;
-  }
-}
-@media (max-height: 760px) and (min-width: 901px) {
+@media (max-height: 650px) {
   .chip-hud {
-    top: 335px;
+    padding: 10px;
+  }
+  .chip-hud li {
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+  .chip-hud .command-block-icon {
+    width: 19px;
+    height: 19px;
   }
 }
 @media (max-width: 900px) and (min-width: 581px) {
   .lab-game .mission-card {
     width: 255px;
-  }
-  .chip-hud {
-    top: 310px;
   }
 }
 

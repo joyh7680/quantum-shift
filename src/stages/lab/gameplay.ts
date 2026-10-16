@@ -158,7 +158,7 @@ export function updateLab({ pos, size, dt, die }: StageFrame) {
         collectedAt: Date.now(),
       });
       s.notify(
-        `${COMMANDS[chip.id].label} 블록 획득 · 명령 칩 ${chips.length}/3`,
+        `명령 블록 획득! ${COMMANDS[chip.id].label} (${chips.length}/3)`,
       );
       chipSound();
     }

@@ -18,9 +18,12 @@ import { PausePanel } from "./Panels";
 import { PowerPanel } from "./stages/lab/PowerPanel";
 import { LabCamera } from "./stages/lab/LabCamera";
 import { SuitPanel } from "./stages/circuit/SuitPanel";
-import { COMMANDS } from "./stages/lab/state";
+import {
+  CommandInventory,
+  CommandAcquisition,
+  commandBlockStyle,
+} from "./stages/lab/CommandInventory";
 import { labObjectiveStep } from "./stages/lab/objective";
-import { useLabTutorial } from "./stages/lab/useLabTutorial";
 import "./stages/lab/lab.css";
 class AssetBoundary extends Component<
   { children: ReactNode },
@@ -77,6 +80,27 @@ function Loading() {
     </div>
   ) : null;
 }
+function CaptureHint() {
+  const captured = useGame((s) => s.cameraCaptured);
+  const panel = useGame((s) => s.panel);
+  const activeStage = useGame((s) => s.activeStage);
+  const { active: loading } = useProgress();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setVisible(false);
+    if (captured || panel || loading) return;
+    setVisible(true);
+    const timer = setTimeout(() => setVisible(false), 2500);
+    return () => clearTimeout(timer);
+  }, [captured, panel, loading, activeStage]);
+
+  return visible && !captured && !panel && !loading ? (
+    <div className="capture-hint" role="status">
+      화면을 클릭하면 마우스로 둘러볼 수 있습니다
+    </div>
+  ) : null;
+}
 function HUD() {
   const lab = useGame((s) => s.lab);
   const activeStage = useGame((s) => s.activeStage),
@@ -89,7 +113,6 @@ function HUD() {
     prompt = useGame((s) => s.prompt),
     hp = useGame((s) => s.circuit.bossHP),
     phase = useGame((s) => s.circuit.bossPhase),
-    captured = useGame((s) => s.cameraCaptured),
     deaths = progress.deaths;
   const stage = progress.mission;
   const objectiveStep = activeStage === 1 ? labObjectiveStep(lab) : stage;
@@ -100,92 +123,82 @@ function HUD() {
     <div className="hud">
       <header className="game-top">
         <Logo />
-        <button
-          onClick={() => {
-            useGame.getState().patch({ panel: "pause" });
-            document.exitPointerLock?.();
-          }}
-          className="pause-button"
-          aria-label="일시정지"
-          aria-haspopup="dialog"
-        >
-          <svg
-            className="pause-button-icon"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-            focusable="false"
+        {activeStage !== 1 && (
+          <button
+            onClick={() => {
+              useGame.getState().patch({ panel: "pause" });
+              document.exitPointerLock?.();
+            }}
+            className="pause-button"
+            aria-label="일시정지"
+            aria-haspopup="dialog"
           >
-            <rect x="5" y="4" width="5" height="16" rx="1" />
-            <rect x="14" y="4" width="5" height="16" rx="1" />
-          </svg>
-        </button>
+            <svg
+              className="pause-button-icon"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <rect x="5" y="4" width="5" height="16" rx="1" />
+              <rect x="14" y="4" width="5" height="16" rx="1" />
+            </svg>
+          </button>
+        )}
       </header>
-      {activeStage === 1 && (
-        <div className="chip-hud" key={lab.collectedAt}>
-          <span>COMMAND INVENTORY</span>
-          <b>명령 칩 {lab.chips.length}/3</b>
-          <div>
-            {(["battery", "power", "vent"] as const).map((id) => (
-              <span key={id} className={lab.chips.includes(id) ? "found" : ""}>
-                {COMMANDS[id].icon} {COMMANDS[id].label}
-                {lab.chips.includes(id) ? " ✓" : ""}
-              </span>
+      <div className={activeStage === 1 ? "lab-sidebar" : undefined}>
+        <aside className="mission-card">
+          <div className="mission-label">
+            <span className="mission-location">
+              <span className="green-dot" aria-hidden="true" />
+              {brief.name}
+            </span>
+            <span>
+              {activeStage === 1 ? "STEP " : ""}
+              {String(objectiveStep + 1).padStart(2, "0")} /{" "}
+              {String(missions.length).padStart(2, "0")}
+            </span>
+          </div>
+          <div
+            key={objectiveStep}
+            className={activeStage === 1 ? "lab-objective-copy" : undefined}
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <h2>
+              STAGE {String(activeStage).padStart(2, "0")}.{" "}
+              {missions[objectiveStep][0]}
+            </h2>
+            <p>{missions[objectiveStep][1]}</p>
+          </div>
+          <div className="mission-track">
+            {missions.map((_, i) => (
+              <span
+                key={i}
+                className={
+                  i < objectiveStep
+                    ? "done"
+                    : i === objectiveStep
+                      ? "active"
+                      : ""
+                }
+                aria-label={
+                  `${i + 1}단계 ` +
+                  (i < objectiveStep
+                    ? "완료"
+                    : i === objectiveStep
+                      ? "진행 중"
+                      : "대기")
+                }
+              />
             ))}
           </div>
-        </div>
-      )}
-      {activeStage === 1 && lab.collectedAt > 0 && (
-        <div className="chip-transfer" key={"chip-" + lab.collectedAt}>
-          {COMMANDS[lab.chips[lab.chips.length - 1]].icon}
-        </div>
-      )}
-      <aside className="mission-card">
-        <div className="mission-label">
-          <span className="mission-location">
-            <span className="green-dot" aria-hidden="true" />
-            {brief.name}
+          <span className="checkpoint">
+            ↻ 체크포인트 자동 저장 · 재시작 {deaths}회
           </span>
-          <span>
-            {activeStage === 1 ? "STEP " : ""}
-            {String(objectiveStep + 1).padStart(2, "0")} /{" "}
-            {String(missions.length).padStart(2, "0")}
-          </span>
-        </div>
-        <div
-          key={objectiveStep}
-          className={activeStage === 1 ? "lab-objective-copy" : undefined}
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <h2>
-            STAGE {String(activeStage).padStart(2, "0")}.{" "}
-            {missions[objectiveStep][0]}
-          </h2>
-          <p>{missions[objectiveStep][1]}</p>
-        </div>
-        <div className="mission-track">
-          {missions.map((_, i) => (
-            <span
-              key={i}
-              className={
-                i < objectiveStep ? "done" : i === objectiveStep ? "active" : ""
-              }
-              aria-label={
-                `${i + 1}단계 ` +
-                (i < objectiveStep
-                  ? "완료"
-                  : i === objectiveStep
-                    ? "진행 중"
-                    : "대기")
-              }
-            />
-          ))}
-        </div>
-        <span className="checkpoint">
-          ↻ 체크포인트 자동 저장 · 재시작 {deaths}회
-        </span>
-      </aside>
+        </aside>
+        {activeStage === 1 && <CommandInventory />}
+      </div>
       <div className="zone-index">
         <b>{activeStage === 1 ? "LAB — 001" : "CIRCUIT — 002"}</b>
         <span>{zones[stage]}</span>
@@ -210,11 +223,7 @@ function HUD() {
         </div>
       )}
       <div className="reticle">+</div>
-      {!captured && (
-        <div className="capture-hint">
-          화면을 클릭하면 마우스로 둘러볼 수 있습니다
-        </div>
-      )}
+      <CaptureHint />
       {prompt && <div className="interaction-prompt">{prompt}</div>}
       <div className="game-controls">
         <span>
@@ -283,25 +292,43 @@ function HUD() {
   );
 }
 function Toast() {
-  const tutorial = useLabTutorial();
   const toast = useGame((s) => s.toast),
     id = useGame((s) => s.toastId),
     [show, setShow] = useState(false);
+  const activeStage = useGame((s) => s.activeStage);
+  const chips = useGame((s) => s.lab.chips);
+  const acquired =
+    activeStage === 1 && toast.startsWith("명령 블록 획득!")
+      ? chips[chips.length - 1]
+      : undefined;
+  const complete = !!acquired && chips.length === 3;
+  const duration = acquired ? (complete ? 3000 : 2700) : 4500;
   useEffect(() => {
     setShow(true);
-    const t = setTimeout(() => setShow(false), 4500);
+    const t = setTimeout(() => setShow(false), duration);
     return () => clearTimeout(t);
-  }, [id]);
-  const message = tutorial || (show ? toast : "");
+  }, [id, duration]);
+  const message = show ? toast : "";
   return message ? (
     <div
-      key={tutorial || id}
-      className={"toast" + (tutorial ? " lab-tutorial-toast" : "")}
+      key={id}
+      className={
+        "toast" +
+        (acquired ? " command-acquisition" : "") +
+        (complete ? " collection-complete" : "")
+      }
+      style={acquired ? commandBlockStyle(acquired) : undefined}
       role="status"
       aria-atomic="true"
     >
-      <span aria-hidden="true">✦</span>
-      {message}
+      {acquired ? (
+        <CommandAcquisition id={acquired} count={chips.length} />
+      ) : (
+        <>
+          <span aria-hidden="true">✦</span>
+          {message}
+        </>
+      )}
     </div>
   ) : null;
 }

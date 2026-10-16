@@ -602,7 +602,7 @@ kbd {
 }
 .capture-hint {
   position: absolute;
-  top: 85px;
+  top: 65px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 10px;
@@ -611,6 +611,17 @@ kbd {
   padding: 10px 17px;
   border-radius: 20px;
   color: #c5e4d3;
+  animation: captureHintToast 2.5s ease-in-out both;
+}
+@keyframes captureHintToast {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8%,
+  88% {
+    opacity: 1;
+  }
 }
 .interaction-prompt {
   position: absolute;
@@ -1483,7 +1494,7 @@ kbd {
   }
   .capture-hint {
     font-size: 8px;
-    top: 70px;
+    top: 50px;
   }
   .interaction-prompt {
     font-size: 11px;
@@ -1619,7 +1630,7 @@ kbd {
   }
   .capture-hint {
     top: auto;
-    bottom: 132px;
+    bottom: 152px;
     white-space: nowrap;
   }
 }
