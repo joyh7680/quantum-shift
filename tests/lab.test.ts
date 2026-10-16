@@ -160,7 +160,7 @@ test("vent guidance appears near the low passage sign instead of the chip", () =
 
 test("power guidance appears near the emergency sign and disappears after collection", () => {
   const message =
-    "⏻ 전원 작동 블록 · 비상 전기 바닥 건너편 · 2번 일반 크기로 획득";
+    "❕ ·비상 전기 바닥 건너편에 전원 작동 블록이 있는 것 같다!";
   assert.equal(labPrompt([8, 0, -4.5]), message);
   assert.equal(labPrompt([6, 0, -2]), message);
   assert.equal(labPrompt([8, 0, 0.5]), message);

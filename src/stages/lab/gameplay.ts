@@ -106,6 +106,8 @@ export function labPrompt(pos: Vec) {
     const hintPos = c.hintPos ?? c.pos;
     return !s.lab.chips.includes(c.id) && near(pos, hintPos[0], hintPos[2], 3);
   });
+  if (chip?.id === "power")
+    return "❕ ·비상 전기 바닥 건너편에 전원 작동 블록이 있는 것 같다!";
   if (chip)
     return `${COMMANDS[chip.id].icon} ${COMMANDS[chip.id].label} 블록 · ${chip.hint}`;
   if (near(pos, -4, 18) || near(pos, 5, 24) || near(pos, 0, 26))
