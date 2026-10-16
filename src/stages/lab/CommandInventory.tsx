@@ -16,9 +16,9 @@ const BLOCK_COLORS: Record<Command, string> = {
 };
 const BLOCK_ORDER: Chip[] = ["battery", "power", "vent"];
 const BLOCK_HINTS: Record<Chip, string> = {
-  battery: "무거운 배터리를 옮기려면 어떤 크기가 필요할까요?",
-  power: "전원 버튼은 어떤 크기에서 누르기 쉬울까요?",
-  vent: "좁은 환풍구를 지나가려면 어떻게 해야 할까요?",
+  battery: "무거운 배터리를 정지 장치에 연결하려면 어떤 크기가 필요할까요?",
+  power: "정지 장치의 전원 차단 버튼은 어떤 크기에서 누르기 쉬울까요?",
+  vent: "전원이 차단되어 팬이 멈추면 어떤 크기로 환풍구를 통과할까요?",
 };
 export function commandBlockStyle(id: Command): CSSProperties {
   return { "--block-color": BLOCK_COLORS[id] } as CSSProperties;

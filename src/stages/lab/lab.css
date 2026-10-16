@@ -290,14 +290,17 @@
     animation: none;
   }
 }
+.coding-open {
+  --escape-editor-width: 28%;
+}
 .coding-open .game-canvas {
-  right: 40%;
+  right: var(--escape-editor-width);
 }
 .coding-open .hud > :not(.game-top):not(.lab-sidebar) {
   display: none;
 }
 .coding-open .lab-sidebar {
-  max-width: calc(60% - 40px);
+  max-width: calc(100% - var(--escape-editor-width) - 40px);
   grid-template-columns: minmax(0, 1fr);
   z-index: 12;
 }
@@ -315,7 +318,8 @@
 }
 .escape-editor {
   position: absolute;
-  inset: 0 0 0 60%;
+  inset: 0 0 0 auto;
+  width: var(--escape-editor-width);
   background: linear-gradient(150deg, #11233a, #091322);
   border-left: 1px solid #62cce85c;
   display: flex;
@@ -576,6 +580,9 @@
   }
 }
 @media (max-width: 900px) {
+  .coding-open {
+    --escape-editor-width: 40%;
+  }
   .escape-objective {
     margin-top: 12px;
     padding: 10px;

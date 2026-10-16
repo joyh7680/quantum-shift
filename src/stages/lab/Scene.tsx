@@ -375,7 +375,7 @@ export function LabScene() {
       <Sign p={[5.2, 2.8, 19.5]} text="CELL SOCKET" w={3} color="#ffcb80" />
       <Console
         p={[5, 0, 24]}
-        title={power ? "MAINTENANCE / ON" : "PRECISION / OFF"}
+        title={power ? "FAN POWER / OFF" : "FAN POWER / ON"}
         color={power ? cyan : "#bca5ff"}
       />
       <PrecisionLever />

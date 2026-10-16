@@ -221,7 +221,7 @@ test("the power item awards its block only at normal size", () => {
   assert.deepEqual(game().lab.chips, ["battery", "vent", "power"]);
   assert.equal(game().lab.mission, 1);
   assert.equal(game().lab.power, false);
-  assert.match(game().toast, /명령 블록 획득! 전원 작동/);
+  assert.match(game().toast, /명령 블록 획득! 전원 차단/);
   const collectedAt = game().lab.collectedAt;
   updateLab({ ...base, pos: [8, 0, 8], size: 1 });
   assert.deepEqual(game().lab.chips, ["battery", "vent", "power"]);

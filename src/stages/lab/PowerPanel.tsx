@@ -84,9 +84,10 @@ export function PowerPanel() {
           <span>ESCAPE PROGRAM / 블록 코딩</span>
           <h2>탈출 프로그램 만들기</h2>
           <div className="escape-objective">
-            <strong>배터리를 연결하고 전원을 작동시켜 환풍기를 멈추세요!</strong>
+            <strong>배터리 연결 → 전원 차단 → 환풍기 멈춤!</strong>
             <p>
-              수집한 명령 블록을 올바른 순서로 배치하고 실행해 연구실을 탈출하세요.
+              거대 크기로 정지 장치에 배터리를 연결하고, 일반 크기로 버튼을 눌러
+              환풍기 전원을 차단하세요. 팬이 멈추면 초소형으로 환풍구를 통과하세요.
             </p>
           </div>
         </header>

@@ -53,8 +53,10 @@ export function commandFailure(
   if (command === "battery" && size !== 2.5) return "배터리가 너무 무거워요.";
   if (command === "power") {
     if (lab.battery !== "installed") return "배터리가 연결되지 않았어요.";
-    if (size === 2.5) return "손이 너무 커서 정밀 조작대를 누를 수 없어요.";
-    if (size === 0.25) return "너무 작아서 조작대에 손이 닿지 않아요.";
+    if (size === 2.5)
+      return "손이 너무 커서 정지 장치의 버튼을 누를 수 없어요.";
+    if (size === 0.25)
+      return "너무 작아서 정지 장치의 버튼에 손이 닿지 않아요.";
   }
   if (command === "vent") {
     if (!lab.power || lab.fan > 0)
@@ -100,14 +102,16 @@ export function interactLab() {
     document.exitPointerLock?.();
   } else if (near(s.pos, -4, 18))
     s.notify(
-      "고밀도 배터리 · 매우 무거움. 탈출 콘솔의 프로그램으로 운반하는 장치입니다.",
+      "고밀도 배터리 · 거대 크기로 정지 장치에 연결해 전력을 공급하세요.",
     );
   else if (near(s.pos, 5, 24))
     s.notify(
-      "정밀 조작대 · 정비 전원 OFF. 배터리 소켓과 팬에 연결되어 있습니다.",
+      "정지 장치 · 배터리를 연결한 뒤 일반 크기로 버튼을 눌러 환풍기 전원을 차단하세요.",
     );
   else if (near(s.pos, 0, 26))
-    s.notify("회전 중인 정비 팬. 탈출 프로그램으로만 진입할 수 있습니다.");
+    s.notify(
+      "환풍기 · 전원이 차단되어 팬이 멈추면 초소형으로 환풍구를 통과하세요.",
+    );
 }
 export function labPrompt(pos: Vec) {
   const s = useGame.getState();
@@ -286,7 +290,7 @@ export function tickProgram(frame: ProgramFrame) {
     } else
       s.patchLab({
         elapsed: lab.elapsed + frame.dt,
-        feedback: "배터리를 소켓에 연결하고 있어요.",
+        feedback: "배터리 연결 · 정지 장치의 전원 소켓에 연결하고 있어요.",
       });
   } else if (command === "power") {
     const elapsed = lab.elapsed + frame.dt;
@@ -296,15 +300,18 @@ export function tickProgram(frame: ProgramFrame) {
       fan: Math.max(0, 1 - Math.max(0, elapsed - 0.7) / 2.5),
       feedback:
         elapsed < 0.7
-          ? "정밀 조작대를 누르고 있어요."
-          : "정비 모드 · 팬이 감속하고 있어요.",
+          ? "전원 차단 · 정지 장치의 버튼을 누르고 있어요."
+          : "전원 차단 완료 · 환풍기 팬이 감속하고 있어요.",
     });
     if (elapsed >= 3.2) {
       s.patchLab({ fan: 0 });
       next();
     }
   } else {
-    s.patchLab({ run: "success", feedback: "환풍구 탈출 성공!" });
+    s.patchLab({
+      run: "success",
+      feedback: "환풍기 멈춤 완료 · 환풍구 탈출 성공!",
+    });
     s.completeLab();
   }
 }

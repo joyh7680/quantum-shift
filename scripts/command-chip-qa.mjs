@@ -128,8 +128,8 @@ try {
       .chip-review section{width:300px;text-align:center}.chip-review b{font-size:19px}.chip-review section p{font-size:11px;letter-spacing:2px;color:#7c97ae}
     </style><div class="chip-review"><header><small>QUANTUM / COMMAND ARTIFACTS</small><h1>기능이 보이는 명령 아이템</h1><p>메탈 프레임 · 발광 코어 · 고유한 실루엣</p></header><footer>
       <section style="color:#ffcb80"><b>ϟ 배터리 연결</b><p>ENERGY CELL</p></section>
-      <section style="color:#bca5ff"><b>⏻ 전원 작동</b><p>POWER CORE</p></section>
-      <section style="color:#70f2cd"><b>✣ 환풍구 이동</b><p>VENT TURBINE</p></section>
+      <section style="color:#bca5ff"><b>⏻ 전원 차단</b><p>POWER CORE</p></section>
+      <section style="color:#70f2cd"><b>✣ 환풍기 멈춤</b><p>VENT TURBINE</p></section>
     </footer></div>`;
     document.body.appendChild(overlay);
   });

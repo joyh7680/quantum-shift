@@ -5,7 +5,7 @@ export type LabState = Progress & {
   chips: Chip[];
   code: Command[];
   battery: "floor" | "carried" | "installed";
-  power: boolean;
+  power: boolean; // Stop device activated: true means the fan's power is cut.
   fan: number;
   run: "idle" | "running" | "failed" | "success";
   index: number;
@@ -22,8 +22,8 @@ export const COMMANDS: Record<
   normal: { label: "일반 크기로 변환", icon: "◉", color: "#77ddff" },
   giant: { label: "거대화", icon: "⬡", color: "#77ddff" },
   battery: { label: "배터리 연결", icon: "ϟ", color: "#ffcb80" },
-  power: { label: "전원 작동", icon: "⏻", color: "#bca5ff" },
-  vent: { label: "환풍구 이동", icon: "✣", color: "#70f2cd" },
+  power: { label: "전원 차단", icon: "⏻", color: "#bca5ff" },
+  vent: { label: "환풍기 멈춤", icon: "✣", color: "#70f2cd" },
 };
 // Inventory order has no relationship to a program's execution order.
 export const PALETTE: Command[] = [
@@ -79,7 +79,7 @@ export const LAB_MISSIONS = [
   ],
   [
     "실행하고 탈출하기",
-    "프로그램을 실행해 장치를 작동시키고 환풍구로 탈출하세요.",
+    "배터리 연결 → 전원 차단 → 환풍기 멈춤! 초소형으로 환풍구를 통과하세요.",
   ],
 ] as const;
 export const LAB_ZONES = [

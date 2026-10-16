@@ -86,7 +86,7 @@ try {
     interactLab();
   });
   assert.match(await tutorial.innerText(), /블록을 드래그해 순서대로 배치/);
-  for (const label of ["전원 작동", "배터리 연결", "환풍구 이동"])
+  for (const label of ["전원 차단", "배터리 연결", "환풍기 멈춤"])
     await page
       .locator(".escape-palette")
       .getByRole("button", { name: label })

@@ -167,7 +167,7 @@ export async function runLab(page, { extended = true } = {}) {
   await move(8, -5.5);
   await move(3, -5.5);
   await open();
-  await add("전원 작동");
+  await add("전원 차단");
   await run();
   await wait((s) => s.lab.run === "failed", "wrong order");
   assert.equal((await state()).lab.index, 0);
@@ -207,9 +207,9 @@ export async function runLab(page, { extended = true } = {}) {
     "거대화",
     "배터리 연결",
     "일반 크기로 변환",
-    "전원 작동",
+    "전원 차단",
     "초소형으로 변환",
-    "환풍구 이동",
+    "환풍기 멈춤",
   ])
     await add(label);
   // Reordering via accessible controls and actual drag/drop.

@@ -8,15 +8,16 @@ const browser = await chromium.launch({
   args: ["--enable-webgl", "--use-angle=swiftshader"],
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+page.setDefaultTimeout(15000);
 const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 const inventory = page.locator(".chip-hud");
 const notice = page.locator(".command-acquisition");
 const tooltip = page.getByRole("tooltip");
 const hints = {
-  battery: "무거운 배터리를 옮기려면 어떤 크기가 필요할까요?",
-  power: "전원 버튼은 어떤 크기에서 누르기 쉬울까요?",
-  vent: "좁은 환풍구를 지나가려면 어떻게 해야 할까요?",
+  battery: "무거운 배터리를 정지 장치에 연결하려면 어떤 크기가 필요할까요?",
+  power: "정지 장치의 전원 차단 버튼은 어떤 크기에서 누르기 쉬울까요?",
+  vent: "전원이 차단되어 팬이 멈추면 어떤 크기로 환풍구를 통과할까요?",
 };
 fs.mkdirSync("artifacts/command-inventory", { recursive: true });
 
@@ -57,7 +58,7 @@ async function collect(id) {
   await page.evaluate(async (id) => {
     const { updateLab } = await import("/src/stages/lab/gameplay.ts");
     const locations = {
-      battery: { pos: [-8, 2.8, 7], size: 1 },
+      battery: { pos: [-8, 2.8, 7], size: 2.5 },
       power: { pos: [8, 0, 8], size: 1 },
       vent: { pos: [-8, 0, 22], size: 0.25 },
     };
@@ -117,9 +118,13 @@ try {
     () => window.__quantumGame?.getState().lab.time > 0.1,
   );
   // Stop world updates so layout and notification timings are deterministic.
-  await page.evaluate(() =>
-    window.__quantumGame.getState().patch({ panel: "pause" }),
-  );
+  await page.evaluate(() => {
+    const s = window.__quantumGame.getState();
+    s.patch({
+      panel: "pause",
+      labTutorial: { ...s.labTutorial, phase: "done" },
+    });
+  });
   await page
     .locator(".pause-scrim")
     .evaluate((el) => (el.style.display = "none"));
@@ -143,13 +148,15 @@ try {
     .evaluateAll((elements) => elements.forEach((el) => el.blur()));
   await checkLayout();
   await page.screenshot({ path: "artifacts/command-inventory/empty.png" });
+  console.log("PASS: empty inventory, hover hints and layout");
 
   await collect("power");
+  console.log("PASS: power block collection");
   await notice.waitFor();
-  assert.match(await notice.innerText(), /명령 블록 획득!\n전원 작동 \(1\/3\)/);
+  assert.match(await notice.innerText(), /명령 블록 획득!\n전원 차단 \(1\/3\)/);
   const power = inventory.locator('[data-command="power"]');
   assert.equal(await power.getAttribute("class"), "found");
-  assert.equal(await power.getAttribute("aria-label"), "전원 작동: 수집 완료");
+  assert.equal(await power.getAttribute("aria-label"), "전원 차단: 수집 완료");
   assert.equal(
     await power.evaluate((el) => getComputedStyle(el).color),
     "rgb(255, 148, 199)",
@@ -168,20 +175,20 @@ try {
     window.__quantumGame.getState().patch({ panel: null, pos: [0, 0, 10] });
     interactLab();
   });
-  await expect(inventory).toBeHidden();
-  assert.equal(
-    await page.getByRole("heading", { name: "블록 보관함" }).isVisible(),
-    true,
-  );
-  assert.equal(
-    await page
-      .locator(".escape-palette")
-      .getByRole("button", { name: "전원 작동" })
-      .isEnabled(),
-    true,
-  );
-  await page.getByRole("button", { name: /탐험으로 돌아가기/ }).click();
   await expect(inventory).toBeVisible();
+  await expect(page.locator(".escape-editor")).toHaveCount(0);
+  assert.equal(
+    await page.evaluate(() => window.__quantumGame.getState().panel),
+    null,
+    "console requires all three blocks",
+  );
+  // Pause the world again while checking collection and notifications.
+  await page.evaluate(() =>
+    window.__quantumGame.getState().patch({ panel: "pause" }),
+  );
+  await page
+    .locator(".pause-scrim")
+    .evaluate((el) => (el.style.display = "none"));
   assert.match(await inventory.innerText(), /명령 블록 수집함 1\/3/);
   assert.equal(
     await notice.count(),
@@ -198,7 +205,8 @@ try {
     "rgb(255, 218, 117)",
   );
   await collect("vent");
-  assert.match(await notice.innerText(), /환풍구 이동 \(3\/3\)/);
+  console.log("PASS: all three blocks collected");
+  assert.match(await notice.innerText(), /환풍기 멈춤 \(3\/3\)/);
   assert.match(await notice.innerText(), /3\/3 완료! 탈출 콘솔로 이동하세요\./);
   assert.equal(await page.locator(".collection-complete").count(), 1);
   assert.equal(await inventory.locator(".found").count(), 3);
@@ -208,7 +216,9 @@ try {
       await inventory
         .locator(`[data-command="${id}"] .chip-status-icon`)
         .evaluate((el) => getComputedStyle(el).color),
-      "rgb(112, 242, 205)",
+      await inventory
+        .locator(`[data-command="${id}"]`)
+        .evaluate((el) => getComputedStyle(el).color),
     );
   }
   assert.equal(
@@ -225,21 +235,127 @@ try {
   await page.waitForTimeout(3100);
   await expect(notice).toHaveCount(0);
 
-  await page.evaluate(() =>
-    window.__quantumGame.getState().patch({ panel: "power" }),
-  );
-  await expect(inventory).toBeHidden();
+  await page.evaluate(async () => {
+    const { interactLab } = await import("/src/stages/lab/gameplay.ts");
+    window.__quantumGame.getState().patch({ panel: null, pos: [0, 0, 10] });
+    interactLab();
+  });
+  await expect(inventory).toBeVisible();
   await expect(tooltip).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "블록 보관함" }),
+  ).toBeVisible();
+  const palette = page.locator(".escape-palette");
+  const labels = ["배터리 연결", "전원 차단", "환풍기 멈춤"];
+  for (const label of labels) {
+    const block = palette.getByRole("button", { name: label, exact: true });
+    await expect(block).toBeEnabled();
+    // Exercise native palette drag/drop and click insertion with the same IDs.
+    if (label === "배터리 연결") await block.dragTo(page.locator(".code-drop"));
+    else await block.click();
+  }
+  await expect(page.locator(".escape-code li b")).toHaveText(labels);
+  console.log("PASS: renamed palette and code labels, original drag/drop IDs");
+  assert.deepEqual(
+    await page.evaluate(() => window.__quantumGame.getState().lab.code),
+    ["battery", "power", "vent"],
+  );
+  const codeBlocks = page.locator(".command-code-block");
+  // Dispatch the code drag events explicitly: native headless dragging can
+  // lose its drop target when this scrollable list moves during the gesture.
+  const transfer = await page.evaluateHandle(() => new DataTransfer());
+  await codeBlocks
+    .nth(0)
+    .dispatchEvent("dragstart", { dataTransfer: transfer });
+  await page
+    .locator(".code-drop")
+    .dispatchEvent("dragover", { dataTransfer: transfer });
+  await page
+    .locator(".code-drop")
+    .dispatchEvent("drop", { dataTransfer: transfer });
+  await codeBlocks.nth(2).dispatchEvent("dragend", { dataTransfer: transfer });
+  await transfer.dispose();
+  await expect(page.locator(".escape-code li b")).toHaveText([
+    "전원 차단",
+    "환풍기 멈춤",
+    "배터리 연결",
+  ]);
+  await page.locator(".run-actions .primary").click();
+  await expect(page.locator(".run-feedback")).toHaveText(
+    "배터리가 연결되지 않았어요.",
+  );
+  await page.getByRole("button", { name: "초기화", exact: true }).click();
+  for (const label of [
+    "거대화",
+    "배터리 연결",
+    "일반 크기로 변환",
+    "전원 차단",
+    "초소형으로 변환",
+    "환풍기 멈춤",
+  ])
+    await palette.getByRole("button", { name: label }).click();
+  await expect(page.locator(".escape-objective")).toContainText(
+    "환풍기 전원을 차단",
+  );
   await page.screenshot({ path: "artifacts/command-inventory/coding.png" });
+  console.log("PASS: code reorder, failed sequence and mission guidance");
   await page.getByRole("button", { name: /탐험으로 돌아가기/ }).click();
   assert.equal(await inventory.locator(".found").count(), 3);
   assert.equal(await notice.count(), 0);
+
+  // Execute the same IDs through real movement, fan deceleration and vent exit.
+  await page.evaluate(() =>
+    window.__quantumGame.getState().patch({ panel: "power" }),
+  );
+  await page.locator(".run-actions .primary").click();
+  await page.waitForFunction(
+    () => {
+      const { lab } = window.__quantumGame.getState();
+      return lab.power && lab.fan > 0 && lab.fan < 1;
+    },
+    null,
+    { timeout: 90000 },
+  );
+  await expect(page.locator(".run-feedback")).toHaveText(
+    "전원 차단 완료 · 환풍기 팬이 감속하고 있어요.",
+  );
+  await page.waitForFunction(
+    () => window.__quantumGame.getState().lab.run === "success",
+    null,
+    { timeout: 90000 },
+  );
+  const escaped = await page.evaluate(() => {
+    const s = window.__quantumGame.getState();
+    return {
+      battery: s.lab.battery,
+      power: s.lab.power,
+      fan: s.lab.fan,
+      size: s.size,
+      z: s.pos[2],
+    };
+  });
+  assert.equal(escaped.battery, "installed");
+  assert.equal(escaped.power, true);
+  assert.equal(escaped.fan, 0);
+  assert.equal(escaped.size, 0.25);
+  assert(escaped.z > 28);
+  await page.screenshot({ path: "artifacts/command-inventory/escaped.png" });
+  console.log("PASS: real program execution and tiny vent escape");
+  // Restore only the UI for responsive inventory checks after the successful run.
+  await page.evaluate(() =>
+    window.__quantumGame.getState().patch({ screen: "game", panel: "pause" }),
+  );
+  await page
+    .locator(".pause-scrim")
+    .evaluate((el) => (el.style.display = "none"));
+  await page.waitForTimeout(500);
 
   for (const viewport of [
     { width: 390, height: 844 },
     { width: 900, height: 600 },
   ]) {
     await page.setViewportSize(viewport);
+    await page.waitForTimeout(500);
     await checkLayout();
     for (const id of Object.keys(hints)) await checkHint(id);
     await inventory.locator('[data-command="vent"]').hover();
