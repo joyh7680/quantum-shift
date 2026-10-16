@@ -1,0 +1,69 @@
+import type { Vec } from "../shared.ts";
+
+export type LabTutorial = {
+  step: 1 | 2 | 3;
+  phase: "waiting" | "active" | "success" | "complete" | "leaving" | "done";
+  elapsed: number;
+  distance: number;
+};
+
+export const BATTERY_POSITION: Vec = [-4, 0.1, 18];
+export const TUTORIAL_SUCCESS_SECONDS = 1.5;
+export const TUTORIAL_COMPLETE_SECONDS = 4.5;
+export const createLabTutorial = (): LabTutorial => ({
+  step: 1,
+  phase: "waiting",
+  elapsed: 0,
+  distance: 0,
+});
+
+export function tutorialVisible(tutorial: LabTutorial) {
+  return !["waiting", "done"].includes(tutorial.phase);
+}
+
+export function tutorialMovement(
+  t: LabTutorial,
+  distance: number,
+): LabTutorial {
+  if (t.phase !== "active" || t.step !== 1 || distance <= 0) return t;
+  const travelled = t.distance + distance;
+  return travelled >= 0.25
+    ? { ...t, phase: "success", elapsed: 0, distance: travelled }
+    : { ...t, distance: travelled };
+}
+
+export function tutorialSizeChanged(t: LabTutorial): LabTutorial {
+  return t.phase === "active" && t.step === 2
+    ? { ...t, phase: "success", elapsed: 0 }
+    : t;
+}
+
+// Called by the playable physics loop, so pause, loading and coding never
+// consume tutorial time or count program-driven actions as player practice.
+export function tickLabTutorial(
+  t: LabTutorial,
+  dt: number,
+  pos: Vec,
+): LabTutorial {
+  if (t.phase === "active") {
+    if (
+      t.step === 3 &&
+      Math.hypot(pos[0] - BATTERY_POSITION[0], pos[2] - BATTERY_POSITION[2]) <
+        2.8 &&
+      Math.abs(pos[1] - BATTERY_POSITION[1]) < 2
+    )
+      return { ...t, phase: "success", elapsed: 0 };
+    return t;
+  }
+  if (!["success", "complete", "leaving"].includes(t.phase)) return t;
+  const elapsed = t.elapsed + dt;
+  if (t.phase === "success" && elapsed >= TUTORIAL_SUCCESS_SECONDS)
+    return t.step === 3
+      ? { ...t, phase: "complete", elapsed: 0 }
+      : { ...t, step: (t.step + 1) as 2 | 3, phase: "active", elapsed: 0 };
+  if (t.phase === "complete" && elapsed >= TUTORIAL_COMPLETE_SECONDS)
+    return { ...t, phase: "leaving", elapsed: 0 };
+  if (t.phase === "leaving" && elapsed >= 0.35)
+    return { ...t, phase: "done", elapsed: 0 };
+  return { ...t, elapsed };
+}

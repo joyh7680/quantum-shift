@@ -24,6 +24,8 @@ import {
   commandBlockStyle,
 } from "./stages/lab/CommandInventory";
 import { labObjectiveStep } from "./stages/lab/objective";
+import { LabTutorialCard } from "./stages/lab/Tutorial";
+import { tutorialVisible } from "./stages/lab/tutorialState";
 import "./stages/lab/lab.css";
 class AssetBoundary extends Component<
   { children: ReactNode },
@@ -102,6 +104,14 @@ function CaptureHint() {
   ) : null;
 }
 function HUD() {
+  const tutorialStep = useGame((s) =>
+    s.activeStage === 1 && !s.panel && s.labTutorial.phase === "active"
+      ? s.labTutorial.step
+      : 0,
+  );
+  const tutorialRunning = useGame(
+    (s) => s.activeStage === 1 && !s.panel && tutorialVisible(s.labTutorial),
+  );
   const lab = useGame((s) => s.lab);
   const activeStage = useGame((s) => s.activeStage),
     progress = useGame((s) => (s.activeStage === 1 ? s.lab : s.circuit)),
@@ -120,7 +130,7 @@ function HUD() {
   const zones = activeStage === 1 ? LAB_ZONES : CIRCUIT_ZONES;
   const brief = CITY_STAGES[activeStage - 1];
   return (
-    <div className="hud">
+    <div className={`hud${tutorialRunning ? " tutorial-running" : ""}`}>
       <header className="game-top">
         <Logo />
         {activeStage !== 1 && (
@@ -146,6 +156,7 @@ function HUD() {
           </button>
         )}
       </header>
+      {activeStage === 1 && <LabTutorialCard />}
       <div className={activeStage === 1 ? "lab-sidebar" : undefined}>
         <aside className="mission-card">
           <div className="mission-label">
@@ -223,11 +234,17 @@ function HUD() {
         </div>
       )}
       <div className="reticle">+</div>
-      <CaptureHint />
+      {!tutorialRunning && <CaptureHint />}
       {prompt && <div className="interaction-prompt">{prompt}</div>}
       <div className="game-controls">
         <span>
-          <kbd>WASD</kbd> 이동
+          <kbd
+            data-tutorial-target="movement"
+            className={tutorialStep === 1 ? "tutorial-key-pulse" : undefined}
+          >
+            WASD
+          </kbd>{" "}
+          이동
         </span>
         <span>
           <kbd>SPACE</kbd> 점프
@@ -246,7 +263,10 @@ function HUD() {
             {activeStage === 2 && automatic ? "AUTO SHIFT" : "MANUAL SHIFT"}
           </span>
         </div>
-        <div className="size-buttons">
+        <div
+          className={`size-buttons${tutorialStep === 2 ? " tutorial-scale-pulse" : ""}`}
+          data-tutorial-target="scale"
+        >
           {([0.25, 1, 2.5] as const).map((scale, i) => (
             <div key={scale} className={size === scale ? "active" : ""}>
               <kbd>{i + 1}</kbd>

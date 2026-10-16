@@ -8,10 +8,14 @@ export function DeviceMarker({
   device,
   position,
   size,
+  color = "#a2f4ff",
+  period = (Math.PI * 2) / 3,
 }: {
   device: Chip;
   position: Vec;
   size: Vec;
+  color?: string;
+  period?: number;
 }) {
   const pulse = useRef<Group>(null);
   const [x, y, z] = size;
@@ -23,7 +27,9 @@ export function DeviceMarker({
   }, [x, y, z]);
   useEffect(() => () => edges.dispose(), [edges]);
   useFrame(({ clock }) =>
-    pulse.current?.scale.setScalar(1 + Math.sin(clock.elapsedTime * 3) * 0.025),
+    pulse.current?.scale.setScalar(
+      1 + Math.sin((clock.elapsedTime * Math.PI * 2) / period) * 0.025,
+    ),
   );
   return (
     <group
@@ -33,7 +39,7 @@ export function DeviceMarker({
     >
       <lineSegments geometry={edges} renderOrder={20}>
         <lineBasicMaterial
-          color="#a2f4ff"
+          color={color}
           transparent
           opacity={0.95}
           depthTest={false}

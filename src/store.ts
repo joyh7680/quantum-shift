@@ -5,6 +5,8 @@ import type { LabState } from "./stages/lab/state.ts";
 import { createCircuitState } from "./stages/circuit/state.ts";
 import type { CircuitState } from "./stages/circuit/state.ts";
 import type { StageId, Vec } from "./stages/shared.ts";
+import { createLabTutorial } from "./stages/lab/tutorialState.ts";
+import type { LabTutorial } from "./stages/lab/tutorialState.ts";
 export type { Vec } from "./stages/shared.ts";
 export type Panel = "power" | "suit" | "pause" | null;
 export type GameState = {
@@ -24,7 +26,7 @@ export type GameState = {
   toast: string;
   toastId: number;
   flash: number;
-  tutorial: number;
+  labTutorial: LabTutorial;
   cameraCaptured: boolean;
   patch: (v: Partial<GameState>) => void;
   patchLab: (v: Partial<LabState>) => void;
@@ -44,7 +46,6 @@ const transient = () => ({
   moving: false,
   airborne: false,
   prompt: "",
-  tutorial: 0,
   cameraCaptured: false,
 });
 const initial = () => ({
@@ -54,6 +55,7 @@ const initial = () => ({
   character: "codmos_nova",
   lab: createLabState(),
   circuit: createCircuitState(),
+  labTutorial: createLabTutorial(),
   pos: [0, 0, -2] as Vec,
   respawn: 0,
   toast: "",
@@ -85,11 +87,19 @@ export const useGame = create<GameState>((set, get) => ({
       lab,
       circuit,
       screen: "game",
+      labTutorial:
+        activeStage === 1 && s.labTutorial.phase === "waiting"
+          ? { ...s.labTutorial, phase: "active" }
+          : activeStage === 1 &&
+              s.labTutorial.step === 3 &&
+              ["success", "complete", "leaving"].includes(s.labTutorial.phase)
+            ? { ...s.labTutorial, phase: "done", elapsed: 0 }
+            : s.labTutorial,
       pos: [...progress.checkpoint],
       respawn: s.respawn + 1,
       toast:
         activeStage === 1
-          ? "실험 시작! 크기를 바꾸면 새로운 길이 보입니다."
+          ? ""
           : "STAGE 2 · 슈트 콘솔에서 자동 축소 능력을 개발하세요.",
       toastId: s.toastId + 1,
     });

@@ -1,0 +1,332 @@
+.lab-tutorial {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  z-index: 8;
+  width: min(370px, calc(100vw - 24px));
+  padding: 13px 16px 11px;
+  transform: translateX(-50%);
+  border: 1px solid #77ddff65;
+  border-radius: 10px;
+  background: linear-gradient(125deg, #122d43db, #081728d9);
+  box-shadow:
+    0 8px 28px #020a1b45,
+    inset 0 1px #c6f4ff14;
+  backdrop-filter: blur(12px);
+  color: #e0f3ff;
+  pointer-events: none;
+  animation: tutorialEnter 0.4s ease-out both;
+}
+.lab-tutorial header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+.tutorial-eyebrow {
+  color: #8be5ff;
+  font: 10px monospace;
+  letter-spacing: 1.5px;
+}
+.tutorial-count {
+  color: #b0d2e3;
+  font: 10px monospace;
+}
+.lab-tutorial header button {
+  margin-left: auto;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: #8bdfff0a;
+  color: #a2bdcc;
+  font-size: 10px;
+  cursor: pointer;
+}
+.lab-tutorial header button:hover,
+.lab-tutorial header button:focus-visible {
+  background: #8bdfff22;
+  color: #effaff;
+  outline: 1px solid #77ddff;
+}
+.tutorial-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-height: 53px;
+}
+.tutorial-symbol {
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  height: 30px;
+  border: 1px solid #77ddff50;
+  border-radius: 8px;
+  background: #77ddff0d;
+  color: #91e5ff;
+  font-size: 21px;
+}
+.lab-tutorial h2 {
+  margin: 0 0 7px;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.4px;
+  word-break: keep-all;
+}
+.lab-tutorial p {
+  margin: 0;
+  color: #a4c0d2;
+  font-size: 11px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+.tutorial-progress {
+  display: flex;
+  gap: 5px;
+  margin-top: 12px;
+}
+.tutorial-progress span {
+  height: 2px;
+  flex: 1;
+  background: #46617560;
+  transition: background 0.25s;
+}
+.tutorial-progress .current {
+  background: #8be5ff;
+  box-shadow: 0 0 7px #77ddff70;
+}
+.tutorial-progress .done {
+  background: #78ecc2;
+}
+.lab-tutorial.is-success,
+.lab-tutorial.is-complete {
+  border-color: #78ecc288;
+}
+.is-success .tutorial-symbol,
+.is-complete .tutorial-symbol {
+  color: #78ecc2;
+  border-color: #78ecc270;
+  background: #78ecc212;
+}
+.is-success h2 {
+  color: #acffdb;
+}
+.tutorial-mission {
+  display: grid;
+  gap: 5px;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid #77ddff25;
+  font-size: 12px;
+}
+.tutorial-mission b {
+  color: #ffe087;
+  font-weight: 500;
+}
+.tutorial-mission span {
+  color: #b9cddb;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.lab-tutorial.is-leaving {
+  animation: tutorialLeave 0.35s ease-in both;
+}
+.tutorial-sparkles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.tutorial-sparkles i {
+  position: absolute;
+  color: #a9ffdf;
+  font-size: 13px;
+  font-style: normal;
+  animation: tutorialSparkle 0.9s ease-out both;
+}
+.tutorial-sparkles i:nth-child(1) {
+  top: 40%;
+  left: 7%;
+}
+.tutorial-sparkles i:nth-child(2) {
+  top: 60%;
+  right: 10%;
+  animation-delay: 0.15s;
+}
+.tutorial-sparkles i:nth-child(3) {
+  top: 20%;
+  right: 25%;
+  animation-delay: 0.25s;
+}
+.tutorial-link {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  overflow: visible;
+  pointer-events: none;
+}
+.tutorial-link path {
+  fill: none;
+  stroke: #8be5ff;
+  stroke-width: 1;
+  stroke-dasharray: 3 8;
+  opacity: 0.38;
+}
+.tutorial-link circle {
+  fill: #b7f1ff;
+  opacity: 0.8;
+}
+.tutorial-link-battery path {
+  stroke: #ffe087;
+}
+.tutorial-link-battery circle {
+  fill: #ffe087;
+}
+.lab-game .game-controls .tutorial-key-pulse {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #8be5ff;
+  color: #d2f7ff;
+  animation: tutorialPulse 1s ease-in-out infinite;
+}
+.lab-game .tutorial-scale-pulse > div {
+  border-color: #8be5ff;
+  color: #d2f7ff;
+  animation: tutorialPulse 1s ease-in-out infinite;
+}
+.lab-game .tutorial-scale-pulse > div:nth-child(2) {
+  animation-delay: 0.33s;
+}
+.lab-game .tutorial-scale-pulse > div:nth-child(3) {
+  animation-delay: 0.66s;
+}
+.tutorial-battery-beacon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 36px;
+  border: 1px solid #ffe087;
+  border-radius: 8px 8px 12px 12px;
+  background: #30281bd9;
+  color: #ffe9a5;
+  font: bold 24px monospace;
+  box-shadow: 0 0 18px #ffcc5460;
+  animation: tutorialBatteryPulse 1s ease-in-out infinite;
+}
+.lab-sidebar {
+  transition: top 0.35s ease;
+}
+.tutorial-running .mission-card {
+  opacity: 0.72;
+}
+.lab-game .mission-card {
+  transition: opacity 0.35s;
+}
+@keyframes tutorialEnter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes tutorialLeave {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+@keyframes tutorialPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 4px #77ddff25;
+    background-color: #77ddff0b;
+  }
+  50% {
+    box-shadow: 0 0 13px #77ddff75;
+    background-color: #77ddff25;
+  }
+}
+@keyframes tutorialBatteryPulse {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: translateY(0);
+    box-shadow: 0 0 8px #ffcc5435;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+    box-shadow: 0 0 23px #ffcc5480;
+  }
+}
+@keyframes tutorialSparkle {
+  0% {
+    opacity: 0;
+    transform: translateY(5px) scale(0.4);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scale(1.2);
+  }
+}
+@media (max-width: 1100px) and (min-width: 901px) {
+  .lab-tutorial {
+    width: 330px;
+  }
+  .tutorial-running .lab-sidebar {
+    width: 255px;
+  }
+  .tutorial-running .lab-sidebar .mission-card {
+    width: 100%;
+  }
+}
+@media (max-width: 900px) {
+  .lab-tutorial {
+    top: 72px;
+  }
+  .tutorial-running .lab-sidebar {
+    top: 240px;
+  }
+  .tutorial-running:has(.is-complete) .lab-sidebar {
+    top: 285px;
+  }
+}
+@media (max-width: 580px) {
+  .lab-tutorial {
+    top: 65px;
+    padding: 11px 13px 9px;
+  }
+  .lab-tutorial h2 {
+    font-size: 13px;
+  }
+  .tutorial-running .lab-sidebar {
+    top: 218px;
+  }
+  .tutorial-running:has(.is-complete) .lab-sidebar {
+    top: 274px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-tutorial,
+  .lab-tutorial.is-leaving,
+  .tutorial-battery-beacon,
+  .lab-game .game-controls .tutorial-key-pulse,
+  .lab-game .tutorial-scale-pulse > div {
+    animation: none;
+  }
+  .tutorial-sparkles {
+    display: none;
+  }
+  .lab-sidebar,
+  .lab-game .mission-card,
+  .tutorial-progress span {
+    transition: none;
+  }
+}

@@ -23,6 +23,11 @@ import {
 import type { StageRuntime } from "./stages/shared";
 import { useGame } from "./store";
 import type { Scale } from "./rules";
+import {
+  tickLabTutorial,
+  tutorialMovement,
+  tutorialSizeChanged,
+} from "./stages/lab/tutorialState";
 const H = 0.75,
   R = 0.34,
   HALF = 0.41,
@@ -102,6 +107,11 @@ export function Player() {
     body.current.setTranslation(p, true);
     localSize.current = size;
     useGame.getState().patch({ size, flash: useGame.getState().flash + 1 });
+    const s = useGame.getState();
+    if (s.activeStage === 1 && !automatic && !s.panel) {
+      const labTutorial = tutorialSizeChanged(s.labTutorial);
+      if (labTutorial !== s.labTutorial) s.patch({ labTutorial });
+    }
     return true;
   }
   useEffect(() => {
@@ -341,6 +351,9 @@ export function Player() {
     }
     if (s.activeStage === 1) {
       if (updateLab(frame) === false) return;
+      const current = useGame.getState();
+      const labTutorial = tickLabTutorial(current.labTutorial, DT, frame.pos);
+      if (labTutorial !== current.labTutorial) current.patch({ labTutorial });
     } else if (updateCircuit(frame) === false) return;
     if (useGame.getState().screen !== "game") return;
     const forward =
@@ -363,7 +376,6 @@ export function Player() {
       localSize.current === 0.25 ? 2.8 : localSize.current === 2.5 ? 5 : 4;
     if (jumpQueued.current && ground.current) {
       velocity.current = localSize.current === 0.25 ? 3.6 : 6.4;
-      s.patch({ tutorial: s.tutorial | 1 });
     }
     jumpQueued.current = false;
     velocity.current = Math.max(-24, velocity.current - 18 * DT);
@@ -379,6 +391,14 @@ export function Player() {
       (col) => col.handle !== c.handle,
     );
     const delta = cc.computedMovement();
+    if (s.activeStage === 1 && moving) {
+      const current = useGame.getState();
+      const labTutorial = tutorialMovement(
+        current.labTutorial,
+        Math.hypot(delta.x, delta.z),
+      );
+      if (labTutorial !== current.labTutorial) current.patch({ labTutorial });
+    }
     ground.current = cc.computedGrounded();
     if (ground.current && velocity.current < 0) velocity.current = 0;
     b.setNextKinematicTranslation({
