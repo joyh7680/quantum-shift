@@ -159,7 +159,7 @@ test("vent guidance appears near the low passage sign instead of the chip", () =
 });
 
 test("power guidance appears near the emergency sign and disappears after collection", () => {
-  const message = "·비상 전기 바닥 건너편에 전원 작동 블록이 있는 것 같다!";
+  const message = "바닥 건너편에 뭔가가 있는 것 같다!";
   // Show the sign guidance on approach, before a giant enters the corridor.
   assert.equal(labPrompt([8, 0, -6.5]), message);
   assert.equal(labPrompt([8, 0, -5.5]), message);
