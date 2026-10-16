@@ -4,10 +4,8 @@ import { COMMANDS, PALETTE } from "./state";
 import type { Command } from "./state";
 import { editCode, resetPuzzle, startProgram } from "./gameplay";
 import { DeviceGuide } from "./DeviceGuide.tsx";
-import { useLabCamera } from "./cameraState";
 export function PowerPanel() {
   const lab = useGame((s) => s.lab);
-  const [help, setHelp] = useState(false);
   const [dragging, setDragging] = useState<number | null>(null);
   const [dropSlot, setDropSlot] = useState<number | null>(null);
   const codeList = useRef<HTMLOListElement>(null);
@@ -79,12 +77,6 @@ export function PowerPanel() {
         <div className="stage-coding-tags">
           <span>알고리즘</span>
           <span>순차 실행</span>
-        </div>
-        <div className="lab-camera-tools">
-          <p>드래그로 시점 회전 · 휠로 확대/축소</p>
-          <button onClick={() => useLabCamera.getState().reset()}>
-            ↻ 시점 초기화
-          </button>
         </div>
       </div>
       <DeviceGuide />
@@ -251,52 +243,6 @@ export function PowerPanel() {
                 : "아직 코드가 없어요. 보관함에서 블록을 골라보세요."}
             </li>
           </ol>
-          <button
-            className="lab-help"
-            aria-expanded={help}
-            aria-controls="escape-hints"
-            onClick={() => setHelp(!help)}
-          >
-            탈출 힌트 {help ? "−" : "+"}
-          </button>
-          {help && (
-            <div className="observation-help" id="escape-hints">
-              <p>
-                행동 블록마다 필요한 조건이 있어요. 내 코드에서 크기와 장치
-                상태를 확인해보세요.
-              </p>
-              <dl>
-                <div>
-                  <dt>환풍구에 들어가려면?</dt>
-                  <dd>
-                    <strong>팬이 멈춰 있어야</strong> 하고, 캐릭터는{" "}
-                    <strong>초소형</strong>이어야 해요. 두 조건이 모두 맞을 때
-                    ‘환풍구 이동’을 사용할 수 있어요.
-                  </dd>
-                </div>
-                <div>
-                  <dt>배터리가 너무 무거워요</dt>
-                  <dd>
-                    배터리는 <strong>거대 크기</strong>일 때만 들 수 있어요.
-                    ‘배터리 연결’ 블록을 실행할 때 캐릭터의 크기를 확인하세요.
-                  </dd>
-                </div>
-                <div>
-                  <dt>전원 버튼과 팬은 어떤 관계일까요?</dt>
-                  <dd>
-                    <strong>배터리가 연결된 상태</strong>에서{" "}
-                    <strong>일반 크기</strong>로 ‘전원 작동’을 실행하면 정비
-                    모드가 켜져요. 팬이 천천히 돌다가 완전히 멈출 때까지
-                    프로그램이 자동으로 기다려요.
-                  </dd>
-                </div>
-              </dl>
-              <p>
-                실패하면 이유를 읽고, 필요한 조건을 준비하는 블록이 있는지
-                살펴본 뒤 다시 실행해보세요.
-              </p>
-            </div>
-          )}
         </div>
         <footer>
           <p
