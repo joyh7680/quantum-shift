@@ -127,9 +127,20 @@
 .is-complete .tutorial-symbol {
   animation: tutorialCheck 0.45s ease-out both;
 }
+.lab-tutorial.is-handoff {
+  padding: 12px 16px;
+}
 .is-handoff .tutorial-body {
   align-items: center;
+  justify-content: center;
   min-height: 30px;
+  text-align: center;
+}
+.is-handoff .tutorial-symbol {
+  color: #70f2cd;
+}
+.is-handoff .tutorial-symbol svg {
+  display: block;
 }
 .is-handoff h2 {
   margin-bottom: 0;

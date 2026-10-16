@@ -154,7 +154,19 @@ export function LabTutorialCard() {
                 />
               </svg>
             ) : handoff ? (
-              "›"
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m12 3 9 5v9l-9 5-9-5V8Z" />
+                <path d="m3 8 9 5 9-5M12 13v9" />
+              </svg>
             ) : copy.target === "battery" ? (
               <CommandBlockIcon id="battery" />
             ) : (
