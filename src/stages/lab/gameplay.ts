@@ -145,6 +145,7 @@ export function updateLab({ pos, size, dt, die }: StageFrame) {
     if (
       s.lab.chips.includes(chip.id) ||
       (chip.id === "battery" && size !== 2.5) ||
+      (chip.id === "power" && size !== 1) ||
       (chip.id === "vent" && size !== 0.25)
     )
       continue;

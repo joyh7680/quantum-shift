@@ -155,3 +155,29 @@ test("the stair battery awards its block only at giant size", () => {
   assert.deepEqual(game().lab.chips, ["battery"]);
   assert.equal(game().lab.collectedAt, collectedAt);
 });
+
+test("the power item awards its block only at normal size", () => {
+  game().patchLab({ chips: ["battery", "vent"] });
+  const base = actionFrame();
+  for (const size of [0.25, 2.5] as const) {
+    // Align the character centre with the item to isolate the size restriction
+    // from the existing distance and height requirements.
+    for (const foot of [0, 0.7 - 0.75 * size])
+      updateLab({ ...base, pos: [8, foot, 8], size });
+    assert.deepEqual(game().lab.chips, ["battery", "vent"]);
+    assert.equal(game().lab.collectedAt, 0);
+    assert.equal(game().lab.mission, 0);
+    assert.equal(game().toast, "");
+  }
+  updateLab({ ...base, pos: [8, 0, 6], size: 1 });
+  assert.deepEqual(game().lab.chips, ["battery", "vent"]);
+  updateLab({ ...base, pos: [8, 0, 8], size: 1 });
+  assert.deepEqual(game().lab.chips, ["battery", "vent", "power"]);
+  assert.equal(game().lab.mission, 1);
+  assert.equal(game().lab.power, false);
+  assert.match(game().toast, /명령 블록 획득! 전원 작동/);
+  const collectedAt = game().lab.collectedAt;
+  updateLab({ ...base, pos: [8, 0, 8], size: 1 });
+  assert.deepEqual(game().lab.chips, ["battery", "vent", "power"]);
+  assert.equal(game().lab.collectedAt, collectedAt);
+});

@@ -45,7 +45,7 @@ export const CHIPS: { id: Chip; pos: Vec; checkpoint: Vec; hint: string }[] = [
     id: "power",
     pos: [8, 0.7, 8],
     checkpoint: [8, 0, -3],
-    hint: "비상 전기 바닥 건너편",
+    hint: "비상 전기 바닥 건너편 · 2번 일반 크기로 획득",
   },
   {
     id: "vent",
