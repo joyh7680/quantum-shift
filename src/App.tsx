@@ -260,27 +260,18 @@ function HUD() {
           {discoveryPrompt && (
             <svg
               className="discovery-prompt-icon"
-              viewBox="0 0 32 48"
+              viewBox="0 0 24 24"
               aria-hidden="true"
               focusable="false"
             >
-              <rect
-                x="2"
-                y="2"
-                width="28"
-                height="34"
-                rx="9"
-                fill="#101d28aa"
-                stroke="currentColor"
-                strokeWidth="1"
-              />
+              <circle cx="12" cy="12" r="11" fill="currentColor" />
               <path
-                d="M16 10v12"
-                stroke="currentColor"
-                strokeWidth="2.6"
+                d="M12 6.5v7"
+                stroke="#173b3c"
+                strokeWidth="2.5"
+                strokeLinecap="round"
               />
-              <circle cx="16" cy="28" r="1.3" fill="currentColor" />
-              <circle cx="16" cy="44" r="2" fill="currentColor" />
+              <circle cx="12" cy="17" r="1.5" fill="#173b3c" />
             </svg>
           )}
           <span>{prompt}</span>
