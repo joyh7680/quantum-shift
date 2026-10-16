@@ -103,6 +103,14 @@ export function MainMenu() {
   const [selectedStage, setSelectedStage] = useState(1);
   const asset = CHARACTERS.find((c) => c.id === id)!;
   const stage = CITY_STAGES[selectedStage - 1];
+  const briefHeading = (
+    <>
+      <span className="qc-overline">
+        MISSION BRIEF / {String(stage.number).padStart(2, "0")}
+      </span>
+      <h3>{stage.name}</h3>
+    </>
+  );
   const playable = canEnter(selectedStage);
   const start = () => useGame.getState().start(id);
   useEffect(() => {
@@ -293,11 +301,11 @@ export function MainMenu() {
             className={`stage-details ${stage.number === 1 ? "stage-one-details" : ""}`}
             aria-live="polite"
           >
+            {stage.number === 1 && (
+              <header className="stage-brief-heading">{briefHeading}</header>
+            )}
             <div>
-              <span className="qc-overline">
-                MISSION BRIEF / {String(stage.number).padStart(2, "0")}
-              </span>
-              <h3>{stage.name}</h3>
+              {stage.number !== 1 && briefHeading}
               <h4>{stage.learning ? "미션" : "목표"}</h4>
               <p>{stage.objective}</p>
               {stage.codingTags && (
@@ -309,23 +317,19 @@ export function MainMenu() {
               )}
             </div>
             <div>
-              <h4>{stage.learning ? "학습 요소" : "주요 플레이"}</h4>
-              {stage.learning ? (
-                <>
-                  <p>{stage.learning}</p>
-                  <ul>
-                    {stage.play?.map((p) => (
-                      <li key={p}>{p}</li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <ul>
-                  {stage.play?.map((p) => (
-                    <li key={p}>{p}</li>
-                  ))}
-                </ul>
-              )}
+              <h4>
+                {stage.number === 1
+                  ? "진행 방법"
+                  : stage.learning
+                    ? "학습 요소"
+                    : "주요 플레이"}
+              </h4>
+              {stage.number !== 1 && stage.learning && <p>{stage.learning}</p>}
+              <ul>
+                {stage.play?.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
             </div>
           </section>
           <footer className="dialog-footer">
