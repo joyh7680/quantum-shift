@@ -465,23 +465,6 @@ kbd {
 .game-top .brand svg {
   width: 30px;
 }
-.game-location {
-  font-size: 12px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  background: #18303e8c;
-  border: 1px solid #d0e0ca33;
-  border-radius: 5px;
-  padding: 9px 15px;
-  backdrop-filter: blur(10px);
-}
-.game-location small {
-  color: #a2bbb3;
-  letter-spacing: 2px;
-  margin-left: 16px;
-  font-size: 8px;
-}
 .pause-button {
   display: inline-flex;
   align-items: center;
@@ -494,9 +477,14 @@ kbd {
   color: #e6f7ff;
   background: linear-gradient(135deg, #193a54ed, #0b1c32f5);
   border: 1px solid #79d9ff66;
-  box-shadow: inset 0 1px 0 #cff3ff14, 0 4px 16px #020b1e40;
+  box-shadow:
+    inset 0 1px 0 #cff3ff14,
+    0 4px 16px #020b1e40;
   backdrop-filter: blur(12px);
-  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    box-shadow 0.18s;
 }
 .pause-button-icon {
   width: 20px;
@@ -508,7 +496,9 @@ kbd {
 .pause-button:focus-visible {
   border-color: #a0e9ff;
   background: linear-gradient(135deg, #214d69f5, #102b45fa);
-  box-shadow: inset 0 1px 0 #cff3ff20, 0 0 18px #59cfff24;
+  box-shadow:
+    inset 0 1px 0 #cff3ff20,
+    0 0 18px #59cfff24;
 }
 .mission-card {
   position: absolute;
@@ -524,10 +514,24 @@ kbd {
 }
 .mission-label {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   color: var(--mint);
   font-size: 8px;
   letter-spacing: 1.5px;
+}
+.mission-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #b9dce8;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.mission-location .green-dot {
+  width: 5px;
+  height: 5px;
 }
 .mission-label > span:last-child {
   color: #b9cebe;
@@ -1407,16 +1411,13 @@ kbd {
     padding: 15px;
   }
   .mission-card h2 {
-    font-size: 17px;
+    font-size: 16px;
   }
   .mission-card p {
     font-size: 10px;
   }
   .game-top {
     padding: 16px;
-  }
-  .game-location {
-    display: none;
   }
   .size-control {
     left: 15px;
@@ -1537,6 +1538,9 @@ kbd {
   }
   .mission-card p {
     font-size: 9px;
+  }
+  .mission-card h2 {
+    font-size: 14px;
   }
   .checkpoint {
     font-size: 7px;

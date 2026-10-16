@@ -17,6 +17,108 @@
   width: 320px;
   word-break: keep-all;
 }
+.lab-game .mission-label {
+  gap: 8px;
+  letter-spacing: 0.4px;
+}
+.lab-game .mission-label > span:last-child {
+  flex-shrink: 0;
+  color: #a4eaff;
+  letter-spacing: 0.5px;
+}
+.lab-objective-copy {
+  display: flow-root;
+  min-height: 86px;
+  animation: objectiveReveal 0.32s ease-out;
+}
+.lab-game .mission-track span {
+  transition:
+    background 0.32s,
+    box-shadow 0.32s;
+}
+.lab-game .mission-track .active {
+  background: #408ba5;
+  box-shadow: 0 0 7px #69dfff35;
+}
+.lab-game .mission-track .done {
+  background: #77ddff;
+  box-shadow: 0 0 8px #69dfff55;
+}
+.lab-game .lab-tutorial-toast {
+  top: 20px;
+  width: max-content;
+  min-width: 0;
+  max-width: min(560px, calc(100% - 32px));
+  color: #e0f3ff;
+  background: linear-gradient(130deg, #10233bf5, #091629f5);
+  border-color: #5bcfee80;
+  box-shadow: 0 8px 30px #020a1b66;
+  pointer-events: none;
+  line-height: 1.6;
+  word-break: keep-all;
+  animation: tutorialToast 5.2s ease both;
+}
+@keyframes objectiveReveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes tutorialToast {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+  6%,
+  92% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+  }
+}
+@media (max-width: 800px) {
+  .lab-game .lab-tutorial-toast {
+    top: 16px;
+    max-width: calc(100% - 160px);
+    padding: 10px 12px;
+  }
+}
+@media (max-width: 580px) {
+  .lab-game .lab-tutorial-toast {
+    top: auto;
+    bottom: calc(100% - 72px);
+    max-width: calc(100% - 100px);
+    font-size: 10px;
+    padding: 8px 10px;
+    gap: 7px;
+  }
+  .lab-game .mission-label {
+    font-size: 7px;
+    letter-spacing: 0;
+  }
+  .lab-game .mission-location {
+    font-size: 10px;
+  }
+  .lab-objective-copy {
+    min-height: 78px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-objective-copy,
+  .lab-game .lab-tutorial-toast {
+    animation: none;
+  }
+  .lab-game .mission-track span {
+    transition: none;
+  }
+}
 .chip-hud {
   position: absolute;
   top: 350px;

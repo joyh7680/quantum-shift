@@ -19,6 +19,8 @@ import { PowerPanel } from "./stages/lab/PowerPanel";
 import { LabCamera } from "./stages/lab/LabCamera";
 import { SuitPanel } from "./stages/circuit/SuitPanel";
 import { COMMANDS } from "./stages/lab/state";
+import { labObjectiveStep } from "./stages/lab/objective";
+import { useLabTutorial } from "./stages/lab/useLabTutorial";
 import "./stages/lab/lab.css";
 class AssetBoundary extends Component<
   { children: ReactNode },
@@ -90,6 +92,7 @@ function HUD() {
     captured = useGame((s) => s.cameraCaptured),
     deaths = progress.deaths;
   const stage = progress.mission;
+  const objectiveStep = activeStage === 1 ? labObjectiveStep(lab) : stage;
   const missions = activeStage === 1 ? LAB_MISSIONS : CIRCUIT_MISSIONS;
   const zones = activeStage === 1 ? LAB_ZONES : CIRCUIT_ZONES;
   const brief = CITY_STAGES[activeStage - 1];
@@ -97,11 +100,6 @@ function HUD() {
     <div className="hud">
       <header className="game-top">
         <Logo />
-        <div className="game-location">
-          <span className="green-dot" />
-          {brief.name}{" "}
-          <small>STAGE {String(activeStage).padStart(2, "0")}</small>
-        </div>
         <button
           onClick={() => {
             useGame.getState().patch({ panel: "pause" });
@@ -144,19 +142,43 @@ function HUD() {
       )}
       <aside className="mission-card">
         <div className="mission-label">
-          <span>CURRENT OBJECTIVE</span>
+          <span className="mission-location">
+            <span className="green-dot" aria-hidden="true" />
+            {brief.name}
+          </span>
           <span>
-            {String(stage + 1).padStart(2, "0")} /{" "}
+            {activeStage === 1 ? "STEP " : ""}
+            {String(objectiveStep + 1).padStart(2, "0")} /{" "}
             {String(missions.length).padStart(2, "0")}
           </span>
         </div>
-        <h2>{missions[stage][0]}</h2>
-        <p>{missions[stage][1]}</p>
+        <div
+          key={objectiveStep}
+          className={activeStage === 1 ? "lab-objective-copy" : undefined}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <h2>
+            STAGE {String(activeStage).padStart(2, "0")}.{" "}
+            {missions[objectiveStep][0]}
+          </h2>
+          <p>{missions[objectiveStep][1]}</p>
+        </div>
         <div className="mission-track">
           {missions.map((_, i) => (
             <span
               key={i}
-              className={i < stage ? "done" : i === stage ? "active" : ""}
+              className={
+                i < objectiveStep ? "done" : i === objectiveStep ? "active" : ""
+              }
+              aria-label={
+                `${i + 1}단계 ` +
+                (i < objectiveStep
+                  ? "완료"
+                  : i === objectiveStep
+                    ? "진행 중"
+                    : "대기")
+              }
             />
           ))}
         </div>
@@ -261,6 +283,7 @@ function HUD() {
   );
 }
 function Toast() {
+  const tutorial = useLabTutorial();
   const toast = useGame((s) => s.toast),
     id = useGame((s) => s.toastId),
     [show, setShow] = useState(false);
@@ -269,10 +292,16 @@ function Toast() {
     const t = setTimeout(() => setShow(false), 4500);
     return () => clearTimeout(t);
   }, [id]);
-  return show && toast ? (
-    <div className="toast" role="status">
-      <span>✦</span>
-      {toast}
+  const message = tutorial || (show ? toast : "");
+  return message ? (
+    <div
+      key={tutorial || id}
+      className={"toast" + (tutorial ? " lab-tutorial-toast" : "")}
+      role="status"
+      aria-atomic="true"
+    >
+      <span aria-hidden="true">✦</span>
+      {message}
     </div>
   ) : null;
 }
