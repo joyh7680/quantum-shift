@@ -10,6 +10,8 @@ import type { RapierCollider, RapierRigidBody } from "@react-three/rapier";
 import { Group, MathUtils, Raycaster, Vector3 } from "three";
 import { Character } from "./Character";
 import type { CharacterMotion } from "./characterAnimation";
+import { powerActionElapsed } from "./stages/lab/powerAnimation";
+import { crossesLiveElectricFloor } from "./stages/lab/electricFloor";
 import {
   interactLab,
   labPrompt,
@@ -123,23 +125,24 @@ export function Player() {
     const s = useGame.getState();
     if (s.screen !== "game") return;
     const progress = s.activeStage === 1 ? s.lab : s.circuit;
-    localSize.current = 1;
+    const size = s.size;
+    localSize.current = size;
     velocity.current = 0;
     body.current?.setTranslation(
       {
         x: progress.checkpoint[0],
-        y: progress.checkpoint[1] + H + 0.03,
+        y: progress.checkpoint[1] + H * size + 0.03,
         z: progress.checkpoint[2],
       },
       true,
     );
-    collider.current?.setRadius(R);
-    collider.current?.setHalfHeight(HALF);
+    collider.current?.setRadius(R * size);
+    collider.current?.setHalfHeight(HALF * size);
     keys.current.clear();
     yaw.current = 0;
     pitch.current = 0.32;
     facing.current = 0;
-    runtime.current = { previous: 1, clearTime: 0 };
+    runtime.current = { previous: size, clearTime: 0 };
     jumpQueued.current = false;
     lastSync.current = 0;
     ground.current = false;
@@ -404,6 +407,18 @@ export function Player() {
       (col) => col.handle !== c.handle,
     );
     const delta = cc.computedMovement();
+    if (
+      s.activeStage === 1 &&
+      crossesLiveElectricFloor(
+        frame.pos,
+        [p.x + delta.x, foot + delta.y, p.z + delta.z],
+        size,
+        useGame.getState().lab.time,
+      )
+    ) {
+      die("비상 전기 바닥에 닿았어요");
+      return;
+    }
     motion.current.speed =
       Math.hypot(delta.x, delta.z) / DT / localSize.current;
     if (s.activeStage === 1 && moving) {
@@ -440,6 +455,15 @@ export function Player() {
     const s = useGame.getState(),
       b = body.current;
     motion.current.airborne = !ground.current;
+    motion.current.powerPush =
+      s.activeStage === 1 && s.panel === "power"
+        ? powerActionElapsed(s.lab)
+        : undefined;
+    if (motion.current.powerPush !== undefined) {
+      // The final approach is diagonal; turn to face the breaker before pushing.
+      facing.current = 0;
+      motion.current.airborne = false;
+    }
     motion.current.paused =
       s.screen !== "game" ||
       !!(s.panel && !(s.activeStage === 1 && s.panel === "power"));

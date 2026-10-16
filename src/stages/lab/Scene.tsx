@@ -5,9 +5,19 @@ import { useGame } from "../../store";
 import { Box, Ball, Ring, Sign, Console } from "../WorldParts";
 import { CHIPS, EMERGENCY_POWER_SIGN, LOW_PASSAGE_SIGN } from "./state";
 import { CommandChip } from "./CommandChip";
-import { electricPhase } from "./gameplay";
+import {
+  electricPhase,
+  ELECTRIC_TILES,
+  ELECTRIC_TILE_WIDTH,
+  ELECTRIC_TILE_DEPTH,
+} from "./electricFloor";
 import { useDeviceGuide } from "./guideState";
 import { DeviceMarker } from "./DeviceMarker";
+import {
+  breakerAngle,
+  powerActionElapsed,
+  powerPushPose,
+} from "./powerAnimation";
 const cyan = "#59dcff",
   metal = "#26394e",
   dark = "#0b172b";
@@ -20,24 +30,24 @@ function ElectricTile({ lane }: { lane: number }) {
     material.color.set(
       phase === "safe"
         ? "#20726d"
-        : phase === "warning"
+        : phase === "waiting"
           ? "#f3b849"
           : "#ac79ff",
     );
     material.emissive.copy(material.color);
     material.emissiveIntensity =
-      phase === "live" ? 1.6 : phase === "warning" ? 0.8 : 0.15;
+      phase === "live" ? 1.6 : phase === "waiting" ? 0.8 : 0.15;
   });
   return (
     <group>
-      <mesh ref={mesh} position={[8, 0.025, lane * 2 + 0.5]}>
-        <boxGeometry args={[3.7, 0.045, 1.2]} />
+      <mesh ref={mesh} position={[8, 0.025, ELECTRIC_TILES[lane]]}>
+        <boxGeometry args={[ELECTRIC_TILE_WIDTH, 0.045, ELECTRIC_TILE_DEPTH]} />
         <meshStandardMaterial />
       </mesh>
       {[0, 1, 2, 3, 4].map((i) => (
         <Box
           key={i}
-          p={[6.5 + i * 0.75, 0.06, lane * 2 + 0.5]}
+          p={[6.5 + i * 0.75, 0.06, ELECTRIC_TILES[lane]]}
           s={[0.025, 0.02, 1.1]}
           c={cyan}
         />
@@ -147,25 +157,27 @@ function PrecisionLever() {
   useFrame(() => {
     if (!ref.current) return;
     const s = useGame.getState();
-    const operating =
-      s.lab.run === "running" &&
-      s.lab.code[s.lab.index] === "power" &&
-      s.lab.step >= 3;
-    ref.current.rotation.x = s.lab.power
-      ? -0.55
-      : operating
-        ? -Math.min(0.55, s.lab.elapsed * 0.8)
-        : 0.3;
+    const elapsed = powerActionElapsed(s.lab);
+    ref.current.rotation.x = breakerAngle(
+      s.lab.power ? 1 : elapsed === undefined ? 0 : powerPushPose(elapsed).push,
+    );
   });
   return (
-    <group ref={ref} position={[5, 1.65, 23.35]}>
-      <Box p={[0, 0.15, 0]} s={[0.1, 0.4, 0.1]} c="#afc3d5" />
-      <Ball p={[0, 0.4, 0]} r={0.16} c={highlighted ? cyan : "#bca5ff"} glow />
+    <group name="power-breaker" ref={ref} position={[5, 0.38, 23.04]}>
+      {[-0.28, 0.28].map((x) => (
+        <Box key={x} p={[x, 0.16, 0]} s={[0.08, 0.32, 0.08]} c="#afc3d5" />
+      ))}
+      <Box
+        p={[0, 0.32, 0]}
+        s={[0.8, 0.13, 0.16]}
+        c={highlighted ? cyan : "#bca5ff"}
+        glow
+      />
       {highlighted && (
         <DeviceMarker
           device="power"
-          position={[0, 0.4, 0]}
-          size={[0.65, 0.65, 0.65]}
+          position={[0, 0.32, 0]}
+          size={[1, 0.55, 0.55]}
         />
       )}
     </group>
@@ -308,12 +320,12 @@ export function LabScene() {
         <Box key={x} p={[x, 2.7, 3]} s={[0.25, 5.4, 12]} c={metal} solid />
       ))}
       <Box p={[8, 2.7, 9]} s={[4.4, 5.4, 0.25]} c={metal} solid />
-      {[0, 1, 2].map((i) => (
+      {ELECTRIC_TILES.map((_, i) => (
         <ElectricTile key={i} lane={i} />
       ))}
       <Sign
         p={EMERGENCY_POWER_SIGN}
-        text="비상 전기 / 청록 안전 · 보라 방전"
+        text="민트·노랑 통과 / 보라 방전"
         w={4.2}
         color="#bca5ff"
       />

@@ -1,10 +1,13 @@
 import { Box3, Group, MathUtils, Matrix4, Mesh, Vector3 } from "three";
+import { powerPushPose } from "./stages/lab/powerAnimation.ts";
 
 export type CharacterMotion = {
   /** Ground speed in character-size units per second, after collisions. */
   speed: number;
   airborne: boolean;
   paused: boolean;
+  /** Seconds since reaching the Stage 1 breaker; absent outside that action. */
+  powerPush?: number;
 };
 
 // The catalog shares one body layout, except these two older exports where
@@ -103,16 +106,39 @@ export function animateCharacter(
       (rig.phase + Math.min(motion.speed / 1.3, 4) * dt * Math.PI * 2) %
       (Math.PI * 2);
   const settle = 1 - Math.exp(-dt * 22);
+  const pushing =
+    motion.powerPush === undefined
+      ? undefined
+      : powerPushPose(motion.powerPush);
   rig.limbs.forEach((limb, index) => {
     const side = index % 2 === 0 ? 1 : -1;
     const swing = Math.sin(rig.phase) * side * rig.weight;
-    const target = motion.airborne
+    let target = motion.airborne
       ? index < 2
         ? side * 0.28
         : -0.6
       : swing * (index < 2 ? 0.72 : -0.48);
+    if (pushing) {
+      const pose = index < 2 ? side * 0.12 : -1.3 - pushing.push * 0.3;
+      target = MathUtils.lerp(target, pose, pushing.reach);
+    }
     limb.rotation.x = MathUtils.lerp(limb.rotation.x, target, settle);
+    limb.rotation.z = MathUtils.lerp(
+      limb.rotation.z,
+      index >= 2 && pushing ? side * 0.16 * pushing.reach : 0,
+      settle,
+    );
   });
+  rig.model.rotation.x = MathUtils.lerp(
+    rig.model.rotation.x,
+    pushing ? (0.08 + pushing.push * 0.12) * pushing.reach : 0,
+    settle,
+  );
+  rig.model.position.z = MathUtils.lerp(
+    rig.model.position.z,
+    pushing ? pushing.push * pushing.reach * 0.12 : 0,
+    settle,
+  );
   // Keep the supporting shoe on the floor instead of bouncing the whole model.
   // Cached box corners avoid recomputing mesh bounds in every rendered frame.
   let lowest = Infinity;
@@ -123,7 +149,8 @@ export function animateCharacter(
       rig.point
         .copy(corner)
         .applyMatrix4(leg.matrix)
-        .applyMatrix4(rig.rootToModel);
+        .applyMatrix4(rig.rootToModel)
+        .applyEuler(rig.model.rotation);
       lowest = Math.min(lowest, rig.point.y);
     }
   }

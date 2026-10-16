@@ -1,0 +1,196 @@
+{
+  "passed": true,
+  "before": {
+    "screen": "game",
+    "lab": {
+      "mission": 2,
+      "cleared": false,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 0.8166666666666675,
+      "deaths": 0,
+      "chips": [
+        "battery",
+        "power",
+        "vent"
+      ],
+      "code": [
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": false,
+      "fan": 1,
+      "index": 3,
+      "step": 3,
+      "elapsed": 0.08333333333333333,
+      "run": "running",
+      "feedback": "전원 차단 · 양손으로 차단기 레버를 끝까지 밀고 있어요.",
+      "collectedAt": 0
+    },
+    "pos": [
+      4.933948040008545,
+      0.014999926090240479,
+      22.68935775756836
+    ],
+    "facing": 0.236844228965141,
+    "lean": 0.002258219536562973,
+    "arms": [
+      -0.14933833390554055,
+      0.07594619896724392
+    ],
+    "breaker": -0.7
+  },
+  "pushing": {
+    "screen": "game",
+    "lab": {
+      "mission": 2,
+      "cleared": false,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 0.8166666666666675,
+      "deaths": 0,
+      "chips": [
+        "battery",
+        "power",
+        "vent"
+      ],
+      "code": [
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": false,
+      "fan": 1,
+      "index": 3,
+      "step": 3,
+      "elapsed": 1.3833333333333333,
+      "run": "running",
+      "feedback": "전원 차단 · 양손으로 차단기 레버를 끝까지 밀고 있어요.",
+      "collectedAt": 0
+    },
+    "pos": [
+      4.933948040008545,
+      0.014999926090240479,
+      22.68935775756836
+    ],
+    "facing": 8.048601217537529e-10,
+    "lean": 0.17862659077626994,
+    "arms": [
+      -1.5465664768623464,
+      -1.546566476862031
+    ],
+    "breaker": 0.47962962962962963
+  },
+  "cut": {
+    "screen": "game",
+    "lab": {
+      "mission": 2,
+      "cleared": false,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 0.8166666666666675,
+      "deaths": 0,
+      "chips": [
+        "battery",
+        "power",
+        "vent"
+      ],
+      "code": [
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": true,
+      "fan": 0.986666666666667,
+      "index": 3,
+      "step": 3,
+      "elapsed": 1.6833333333333322,
+      "run": "running",
+      "feedback": "전원 차단 완료 · 환풍기 팬이 감속하고 있어요.",
+      "collectedAt": 0
+    },
+    "pos": [
+      4.933948040008545,
+      0.014999926090240479,
+      22.68935775756836
+    ],
+    "facing": 8.941188306917234e-12,
+    "lean": 0.19944608537840863,
+    "arms": [
+      -1.598615213445915,
+      -1.5986152134459146
+    ],
+    "breaker": 0.6500000000000001
+  },
+  "released": {
+    "screen": "game",
+    "lab": {
+      "mission": 2,
+      "cleared": false,
+      "checkpoint": [
+        0,
+        0.03,
+        13
+      ],
+      "time": 0.8166666666666675,
+      "deaths": 0,
+      "chips": [
+        "battery",
+        "power",
+        "vent"
+      ],
+      "code": [
+        "giant",
+        "battery",
+        "normal",
+        "power",
+        "tiny",
+        "vent"
+      ],
+      "battery": "installed",
+      "power": true,
+      "fan": 0.5866666666666684,
+      "index": 3,
+      "step": 3,
+      "elapsed": 2.6833333333333287,
+      "run": "running",
+      "feedback": "전원 차단 완료 · 환풍기 팬이 감속하고 있어요.",
+      "collectedAt": 0
+    },
+    "pos": [
+      4.933948040008545,
+      0.014999926090240479,
+      22.68935775756836
+    ],
+    "facing": 2.7351302517268008e-18,
+    "lean": 1.4527787042770973e-7,
+    "arms": [
+      -0.0000011622238132416178,
+      -0.0000011622238132416172
+    ],
+    "breaker": 0.6500000000000001
+  },
+  "errors": []
+}

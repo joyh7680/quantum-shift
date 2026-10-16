@@ -10,6 +10,12 @@ import {
 } from "./state.ts";
 import type { Chip, Command, LabState } from "./state.ts";
 import type { Scale } from "../../rules.ts";
+import { crossesLiveElectricFloor } from "./electricFloor.ts";
+import {
+  POWER_FAN_STOP,
+  POWER_PUSH_END,
+  POWER_STAND,
+} from "./powerAnimation.ts";
 
 export function resetPuzzle(message = "", leave = false) {
   const s = useGame.getState();
@@ -64,10 +70,6 @@ export function commandFailure(
     if (size !== 0.25) return "입구가 좁아 현재 크기로는 들어갈 수 없어요.";
   }
   return "";
-}
-export function electricPhase(time: number, lane = 0) {
-  const phase = (time + lane * 0.6) % 5.5;
-  return phase < 2.6 ? "safe" : phase < 3.4 ? "warning" : "live";
 }
 function chipSound() {
   try {
@@ -137,22 +139,17 @@ export function labPrompt(pos: Vec) {
 export function updateLab({ pos, size, dt, die }: StageFrame) {
   const s = useGame.getState();
   if (s.activeStage !== 1) return;
-  s.patchLab({ time: s.lab.time + dt });
+  const time = s.lab.time + dt;
+  s.patchLab({ time });
   let checkpoint: Vec | undefined;
   if (pos[0] < -5 && pos[2] < 11) checkpoint = [-8, 0, -4];
   else if (pos[0] > 5 && pos[2] < 10) checkpoint = [8, 0, -3];
   else if (pos[0] < -5 && pos[2] >= 11) checkpoint = [-8, 0, 13];
   if (checkpoint && checkpoint.some((n, i) => n !== s.lab.checkpoint[i]))
     s.patchLab({ checkpoint });
-  if (pos[0] > 6 && pos[0] < 10 && pos[1] < 0.28) {
-    for (let i = 0; i < 3; i++)
-      if (
-        Math.abs(pos[2] - (i * 2 + 0.5)) < 0.63 &&
-        electricPhase(s.lab.time, i) === "live"
-      ) {
-        die("비상 전기 바닥에 닿았어요");
-        return false;
-      }
+  if (crossesLiveElectricFloor(pos, pos, size, time)) {
+    die("비상 전기 바닥에 닿았어요");
+    return false;
   }
   if (
     pos[0] < -5.8 &&
@@ -206,11 +203,7 @@ const batteryRoute: Vec[] = [
   [3, 0, 16],
   [3, 0, 18],
 ];
-const powerRoute: Vec[] = [
-  [3, 0, 18],
-  [3, 0, 21],
-  [5, 0, 22],
-];
+const powerRoute: Vec[] = [[3, 0, 18], [3, 0, 21], POWER_STAND];
 const ventRoute: Vec[] = [
   [3, 0, 22],
   [0, 0, 22],
@@ -296,14 +289,14 @@ export function tickProgram(frame: ProgramFrame) {
     const elapsed = lab.elapsed + frame.dt;
     s.patchLab({
       elapsed,
-      power: elapsed > 0.7,
-      fan: Math.max(0, 1 - Math.max(0, elapsed - 0.7) / 2.5),
+      power: elapsed >= POWER_PUSH_END,
+      fan: Math.max(0, 1 - Math.max(0, elapsed - POWER_PUSH_END) / 2.5),
       feedback:
-        elapsed < 0.7
-          ? "전원 차단 · 정지 장치의 버튼을 누르고 있어요."
+        elapsed < POWER_PUSH_END
+          ? "전원 차단 · 양손으로 차단기 레버를 끝까지 밀고 있어요."
           : "전원 차단 완료 · 환풍기 팬이 감속하고 있어요.",
     });
-    if (elapsed >= 3.2) {
+    if (elapsed >= POWER_FAN_STOP) {
       s.patchLab({ fan: 0 });
       next();
     }

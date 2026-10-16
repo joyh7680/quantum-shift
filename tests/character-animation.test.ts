@@ -117,3 +117,35 @@ test("stride phase follows distance independently of render frame rate", async (
     animateCharacter(b, { ...walk, speed: 2 }, 1 / 30);
   close(a.phase, b.phase);
 });
+
+test("breaker push reaches with both arms, leans forward, freezes and returns to idle", async () => {
+  for (const id of ["basic", "lucy", "codmos_nova"]) {
+    const rig = createCharacterRig(await load(id), id);
+    const idle = { speed: 0, airborne: false, paused: false };
+    for (let i = 0; i < 90; i++)
+      animateCharacter(rig, { ...idle, powerPush: i / 60 }, 1 / 60);
+    assert(
+      rig.limbs.slice(2).every((arm) => arm.rotation.x < -1.4),
+      id,
+    );
+    assert(rig.model.rotation.x > 0.15, `${id}: leans into the push`);
+    assert(rig.model.position.z > 0.08, `${id}: follows through`);
+    rig.model.updateMatrixWorld(true);
+    close(
+      new Box3()
+        .setFromObject(rig.limbs[0])
+        .union(new Box3().setFromObject(rig.limbs[1])).min.y,
+      0,
+    );
+    const angle = rig.limbs[2].rotation.x;
+    animateCharacter(rig, { ...idle, powerPush: 2, paused: true }, 1);
+    close(rig.limbs[2].rotation.x, angle);
+    for (let i = 0; i < 120; i++) animateCharacter(rig, idle, 1 / 60);
+    for (const limb of rig.limbs) {
+      close(limb.rotation.x, 0);
+      close(limb.rotation.z, 0);
+    }
+    close(rig.model.rotation.x, 0);
+    close(rig.model.position.z, 0);
+  }
+});

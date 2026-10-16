@@ -12,6 +12,13 @@ import {
 } from "../src/stages/lab/gameplay.ts";
 import type { Command } from "../src/stages/lab/state.ts";
 import type { Vec } from "../src/stages/shared.ts";
+import {
+  POWER_FAN_STOP,
+  POWER_PUSH_END,
+  POWER_STAND,
+  powerActionElapsed,
+  powerPushPose,
+} from "../src/stages/lab/powerAnimation.ts";
 const game = () => useGame.getState();
 beforeEach(() => {
   useGame.setState(useGame.getInitialState(), true);
@@ -89,6 +96,40 @@ test("extra and repeated blocks succeed by device state, not exact sequence", ()
   assert.equal(game().lab.fan, 0);
   assert(game().pos[2] > 28);
   assert.equal(game().character, "alien");
+});
+
+test("power cuts only after the breaker push, then waits for the fan to stop", () => {
+  game().patchLab({
+    code: ["power", "tiny", "vent"],
+    run: "running",
+    index: 0,
+    battery: "installed",
+  });
+  assert.equal(
+    powerActionElapsed(game().lab),
+    undefined,
+    "no pushing on approach",
+  );
+  for (let i = 0; i < 3; i++) tickProgram(actionFrame());
+  assert.deepEqual(game().pos, POWER_STAND);
+  assert.equal(powerActionElapsed(game().lab), 0);
+  while (game().lab.elapsed < POWER_PUSH_END - 1 / 60)
+    tickProgram(actionFrame());
+  assert.equal(game().lab.power, false);
+  assert.equal(game().lab.fan, 1);
+  assert(powerPushPose(game().lab.elapsed).push > 0.99);
+  tickProgram(actionFrame());
+  tickProgram(actionFrame());
+  assert.equal(game().lab.power, true);
+  assert(game().lab.fan > 0);
+  while (game().lab.index === 0) tickProgram(actionFrame());
+  assert.equal(game().lab.fan, 0);
+  assert.equal(powerActionElapsed(game().lab), undefined);
+  assert.equal(
+    powerPushPose(POWER_FAN_STOP).reach,
+    0,
+    "arms released before next block",
+  );
 });
 test("stop and exploration reset devices but retain inventory and code", () => {
   const code: Command[] = ["giant", "battery"];

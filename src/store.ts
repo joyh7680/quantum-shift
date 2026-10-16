@@ -208,7 +208,7 @@ export const useGame = create<GameState>((set, get) => ({
             },
           }),
       respawn: s.respawn + 1,
-      size: 1,
+      size: s.activeStage === 1 ? s.size : 1,
       prompt: "",
       toast: reason + " · 체크포인트에서 재시작합니다.",
       toastId: s.toastId + 1,
