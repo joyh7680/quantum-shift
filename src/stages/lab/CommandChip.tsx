@@ -6,6 +6,7 @@ import { useGame } from "../../store";
 import { COMMANDS } from "./state";
 import type { Chip } from "./state";
 import type { Vec } from "../shared";
+import { TutorialBatteryBeacon } from "./Tutorial";
 
 const shell = "#14263b";
 const alloy = "#65819b";
@@ -277,6 +278,15 @@ export function CommandChipModel({ id }: { id: Chip }) {
 export function CommandChip({ id, pos }: { id: Chip; pos: Vec }) {
   const ref = useRef<Group>(null);
   const collected = useGame((s) => s.lab.chips.includes(id));
+  const tutorial = useGame(
+    (s) =>
+      id === "battery" &&
+      s.screen === "game" &&
+      s.activeStage === 1 &&
+      !s.panel &&
+      s.labTutorial.step === 3 &&
+      s.labTutorial.phase === "active",
+  );
   const elapsed = useRef(0);
   useFrame(({ clock }, dt) => {
     if (!ref.current) return;
@@ -299,6 +309,7 @@ export function CommandChip({ id, pos }: { id: Chip; pos: Vec }) {
   return (
     <group ref={ref} position={pos} userData={{ commandChip: id }}>
       <CommandChipModel id={id} />
+      {tutorial && !collected && <TutorialBatteryBeacon />}
     </group>
   );
 }

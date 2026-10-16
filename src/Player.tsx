@@ -352,7 +352,12 @@ export function Player() {
     if (s.activeStage === 1) {
       if (updateLab(frame) === false) return;
       const current = useGame.getState();
-      const labTutorial = tickLabTutorial(current.labTutorial, DT, frame.pos);
+      const labTutorial = tickLabTutorial(
+        current.labTutorial,
+        DT,
+        frame.pos,
+        current.lab.chips.includes("battery"),
+      );
       if (labTutorial !== current.labTutorial) current.patch({ labTutorial });
     } else if (updateCircuit(frame) === false) return;
     if (useGame.getState().screen !== "game") return;

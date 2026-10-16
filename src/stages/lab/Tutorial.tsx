@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Html, useProgress } from "@react-three/drei";
 import { useGame } from "../../store";
 import { DeviceMarker } from "./DeviceMarker";
+import { CommandBlockIcon } from "./CommandInventory";
 import "./tutorial.css";
 
 const STEPS = [
@@ -24,7 +25,6 @@ const STEPS = [
     help: "배터리 가까이 이동해 보세요.",
     success: "배터리를 찾았어요! 잘했어요! 🎉",
     target: "battery",
-    icon: "ϟ",
   },
 ] as const;
 
@@ -119,8 +119,30 @@ export function LabTutorialCard() {
           aria-live="polite"
           aria-atomic="true"
         >
-          <span className="tutorial-symbol" aria-hidden="true">
-            {success || complete ? "✓" : copy.icon}
+          <span
+            className="tutorial-symbol"
+            data-device={
+              !success && !complete && copy.target === "battery"
+                ? "battery"
+                : undefined
+            }
+            aria-hidden="true"
+          >
+            {success || complete ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="m5 12 5 5L19 7"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ) : copy.target === "battery" ? (
+              <CommandBlockIcon id="battery" />
+            ) : (
+              copy.icon
+            )}
           </span>
           <div>
             <h2>
@@ -175,20 +197,20 @@ export function LabTutorialCard() {
   );
 }
 
-// Lives inside the existing battery group; Html projects the beacon into the
+// Lives inside the stair collectible group; Html projects the beacon into the
 // same screen coordinates used by the card's guide wire.
 export function TutorialBatteryBeacon() {
   return (
     <>
       <DeviceMarker
         device="battery"
-        position={[0, 0.75, 0]}
-        size={[1.85, 1.8, 1.45]}
+        position={[0, 0.035, 0]}
+        size={[0.65, 0.9, 0.5]}
         color="#ffe087"
         period={1}
       />
       <Html
-        position={[0, 2.9, 0]}
+        position={[0, 1, 0]}
         center
         zIndexRange={[4, 0]}
         style={{ pointerEvents: "none" }}

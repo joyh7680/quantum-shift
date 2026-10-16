@@ -1,4 +1,5 @@
 import type { Vec } from "../shared.ts";
+import { CHIPS } from "./state.ts";
 
 export type LabTutorial = {
   step: 1 | 2 | 3;
@@ -7,7 +8,11 @@ export type LabTutorial = {
   distance: number;
 };
 
-export const BATTERY_POSITION: Vec = [-4, 0.1, 18];
+// Share the collectible's position so guidance and arrival detection always
+// follow the battery on top of the book stairs, rather than the heavy device.
+export const TUTORIAL_BATTERY_POSITION: Vec = CHIPS.find(
+  (chip) => chip.id === "battery",
+)!.pos;
 export const TUTORIAL_SUCCESS_SECONDS = 1.5;
 export const TUTORIAL_COMPLETE_SECONDS = 4.5;
 export const createLabTutorial = (): LabTutorial => ({
@@ -44,13 +49,17 @@ export function tickLabTutorial(
   t: LabTutorial,
   dt: number,
   pos: Vec,
+  batteryCollected = false,
 ): LabTutorial {
   if (t.phase === "active") {
     if (
       t.step === 3 &&
-      Math.hypot(pos[0] - BATTERY_POSITION[0], pos[2] - BATTERY_POSITION[2]) <
-        2.8 &&
-      Math.abs(pos[1] - BATTERY_POSITION[1]) < 2
+      (batteryCollected ||
+        (Math.hypot(
+          pos[0] - TUTORIAL_BATTERY_POSITION[0],
+          pos[2] - TUTORIAL_BATTERY_POSITION[2],
+        ) < 2.8 &&
+          Math.abs(pos[1] - TUTORIAL_BATTERY_POSITION[1]) < 1.3))
     )
       return { ...t, phase: "success", elapsed: 0 };
     return t;

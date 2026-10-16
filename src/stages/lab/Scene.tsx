@@ -8,8 +8,6 @@ import { CommandChip } from "./CommandChip";
 import { electricPhase } from "./gameplay";
 import { useDeviceGuide } from "./guideState";
 import { DeviceMarker } from "./DeviceMarker";
-import { TutorialBatteryBeacon } from "./Tutorial";
-import { BATTERY_POSITION } from "./tutorialState";
 const cyan = "#59dcff",
   metal = "#26394e",
   dark = "#0b172b";
@@ -49,14 +47,6 @@ function ElectricTile({ lane }: { lane: number }) {
 }
 function Battery() {
   const state = useGame((s) => s.lab.battery);
-  const tutorial = useGame(
-    (s) =>
-      s.screen === "game" &&
-      s.activeStage === 1 &&
-      !s.panel &&
-      s.labTutorial.step === 3 &&
-      s.labTutorial.phase === "active",
-  );
   const highlighted = useDeviceGuide((s) => s.active === "battery");
   const ref = useRef<Group>(null);
   useFrame(() => {
@@ -69,18 +59,17 @@ function Battery() {
         s.pos[2] + Math.cos(s.yaw) * 1.25,
       );
     else if (state === "installed") ref.current.position.set(4.8, 0.2, 19);
-    else ref.current.position.set(...BATTERY_POSITION);
+    else ref.current.position.set(-4, 0.1, 18);
   });
   return (
     <group ref={ref}>
       <Box
         p={[0, 0.65, 0]}
         s={[1.5, 1.3, 1.1]}
-        c={tutorial ? "#ffcf62" : highlighted ? cyan : "#6d829b"}
-        glow={highlighted || tutorial}
+        c={highlighted ? cyan : "#6d829b"}
+        glow={highlighted}
       />
-      {tutorial && <TutorialBatteryBeacon />}
-      {highlighted && !tutorial && (
+      {highlighted && (
         <DeviceMarker
           device="battery"
           position={[0, 0.75, 0]}

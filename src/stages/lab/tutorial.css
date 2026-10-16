@@ -64,6 +64,12 @@
   background: #77ddff0d;
   color: #91e5ff;
   font-size: 21px;
+  line-height: 1;
+}
+.tutorial-symbol[data-device="battery"] {
+  color: #ffe087;
+  border-color: #ffe08770;
+  background: #ffe08712;
 }
 .lab-tutorial h2 {
   margin: 0 0 7px;
@@ -109,6 +115,10 @@
 }
 .is-success h2 {
   color: #acffdb;
+  margin-bottom: 0;
+}
+.is-success .tutorial-body {
+  align-items: center;
 }
 .tutorial-mission {
   display: grid;

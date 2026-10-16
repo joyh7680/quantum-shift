@@ -112,7 +112,25 @@ try {
     "active",
     "distant battery is not arrival",
   );
-  await move(-4, 15.5, true);
+  await move(-4, 16);
+  assert.equal(
+    (await state()).tutorial.phase,
+    "active",
+    "the heavy floor battery is not the tutorial target",
+  );
+  // Isolate the target correction from the existing stair-jump challenge.
+  // From the fourth book, use actual keyboard movement to approach the item.
+  await page.evaluate(() => {
+    const s = window.__quantumGame.getState();
+    s.patchLab({ checkpoint: [-8, 2.6, 4] });
+    s.patch({ respawn: s.respawn + 1 });
+  });
+  await waitFor(
+    (s) => s.pos[1] > 2.4 && s.pos[0] < -7.5,
+    "stair fixture ready",
+  );
+  assert.equal((await state()).tutorial.phase, "active");
+  await move(-8, 4.6, true);
   await waitFor((s) => s.tutorial.phase === "success", "real battery arrival");
   await waitFor((s) => s.tutorial.phase === "complete", "completion message");
   await screenshot("complete");
