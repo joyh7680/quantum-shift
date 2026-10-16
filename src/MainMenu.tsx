@@ -166,7 +166,21 @@ export function MainMenu() {
         </div>
         <div className="menu-buttons">
           <button className="city-launch" onClick={start}>
-            게임 시작 <span>↗</span>
+            <svg
+              className="launch-play-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M7 4.5 19 12 7 19.5Z" />
+            </svg>
+            게임 시작
           </button>
           <button
             className="city-secondary character-trigger"

@@ -286,6 +286,13 @@
   font-size: 22px;
   line-height: 1;
 }
+.menu-buttons > .city-launch {
+  justify-content: center;
+  gap: 13px;
+}
+.launch-play-icon {
+  flex: 0 0 16px;
+}
 .city-launch:hover:not(:disabled) {
   background: #c3faff;
   box-shadow: 0 0 35px #44bfff44;
