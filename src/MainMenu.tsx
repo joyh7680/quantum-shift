@@ -133,11 +133,6 @@ export function MainMenu() {
           <br />
           당신의 크기가 이 도시의 가능성을 바꾼다.
         </p>
-        <div className="city-genres">
-          <span>3D 어드벤처</span>
-          <span>크기 변환</span>
-          <span>코딩 미션</span>
-        </div>
       </section>
       <div className="hero-readout">
         <span>
@@ -163,6 +158,11 @@ export function MainMenu() {
         <div className="launch-label">
           <span className="status-dot" /> STAGE 01 · 거인의 연구실{" "}
           <small>플레이 가능</small>
+          <div className="city-genres">
+            <span>3D 어드벤처</span>
+            <span>크기 변환</span>
+            <span>코딩 미션</span>
+          </div>
         </div>
         <div className="menu-buttons">
           <button className="city-launch" onClick={start}>
