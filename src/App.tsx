@@ -11,7 +11,11 @@ import { World } from "./World";
 import { Player } from "./Player";
 import { useGame } from "./store";
 import { SIZE_NAMES } from "./rules";
-import { LAB_MISSIONS, LAB_ZONES } from "./stages/lab/state";
+import {
+  LAB_DISCOVERY_HINTS,
+  LAB_MISSIONS,
+  LAB_ZONES,
+} from "./stages/lab/state";
 import { CIRCUIT_MISSIONS, CIRCUIT_ZONES } from "./stages/circuit/state";
 import { CITY_STAGES } from "./stages";
 import { PausePanel } from "./Panels";
@@ -139,6 +143,8 @@ function HUD() {
   const missions = activeStage === 1 ? LAB_MISSIONS : CIRCUIT_MISSIONS;
   const zones = activeStage === 1 ? LAB_ZONES : CIRCUIT_ZONES;
   const brief = CITY_STAGES[activeStage - 1];
+  const discoveryPrompt =
+    activeStage === 1 && Object.values(LAB_DISCOVERY_HINTS).includes(prompt);
   return (
     <div className={`hud${tutorialRunning ? " tutorial-running" : ""}`}>
       <header className="game-top">
@@ -246,7 +252,30 @@ function HUD() {
       <div className="reticle">+</div>
       {!tutorialRunning && <CaptureHint />}
       {prompt && !tutorialRunning && (
-        <div className="interaction-prompt">{prompt}</div>
+        <div
+          className={`interaction-prompt${discoveryPrompt ? " discovery-prompt" : ""}`}
+          role="status"
+          aria-atomic="true"
+        >
+          {discoveryPrompt && (
+            <svg
+              className="discovery-prompt-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle cx="12" cy="12" r="11" fill="currentColor" />
+              <path
+                d="M12 6.5v7"
+                stroke="#173b3c"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              <circle cx="12" cy="17" r="1.5" fill="#173b3c" />
+            </svg>
+          )}
+          <span>{prompt}</span>
+        </div>
       )}
       <div className="game-controls">
         <span>

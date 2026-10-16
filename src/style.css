@@ -650,6 +650,21 @@ kbd {
   box-shadow: 0 4px 18px #07292f2f;
   white-space: nowrap;
 }
+.discovery-prompt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  white-space: normal;
+}
+.discovery-prompt-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: #ffda75;
+  filter: drop-shadow(0 0 5px #ffda754d);
+}
 .game-controls {
   position: absolute;
   left: 28px;

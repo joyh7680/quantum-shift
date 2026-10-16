@@ -135,7 +135,7 @@ test("chips unlock only commands, persist on death, and can be collected in any 
 });
 
 test("vent guidance appears near the low passage sign instead of the chip", () => {
-  const message = "✣ 환풍구 이동 블록 · 장비 아래 좁은 통로";
+  const message = "아래 통로에 뭔가가 있는 것 같다!";
   assert.equal(labPrompt([-8, 0, 11.5]), message);
   assert.equal(labPrompt([-6, 0, 13]), message);
   assert.equal(labPrompt([-8, 0, 10]), "");
@@ -159,8 +159,7 @@ test("vent guidance appears near the low passage sign instead of the chip", () =
 });
 
 test("power guidance appears near the emergency sign and disappears after collection", () => {
-  const message =
-    "❕ ·비상 전기 바닥 건너편에 전원 작동 블록이 있는 것 같다!";
+  const message = "·비상 전기 바닥 건너편에 전원 작동 블록이 있는 것 같다!";
   assert.equal(labPrompt([8, 0, -4.5]), message);
   assert.equal(labPrompt([6, 0, -2]), message);
   assert.equal(labPrompt([8, 0, 0.5]), message);

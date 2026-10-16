@@ -36,6 +36,10 @@ export const PALETTE: Command[] = [
 ];
 export const LOW_PASSAGE_SIGN: Vec = [-8, 1.6, 13.95];
 export const EMERGENCY_POWER_SIGN: Vec = [8, 1.8, -2];
+export const LAB_DISCOVERY_HINTS: Record<"power" | "vent", string> = {
+  power: "·비상 전기 바닥 건너편에 전원 작동 블록이 있는 것 같다!",
+  vent: "아래 통로에 뭔가가 있는 것 같다!",
+};
 export const CHIPS: {
   id: Chip;
   pos: Vec;
