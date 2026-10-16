@@ -97,7 +97,7 @@ function CaptureHint() {
 
   return visible && !captured && !panel && !loading ? (
     <div className="capture-hint" role="status">
-      화면을 클릭하면 마우스로 둘러볼 수 있습니다
+      화면 클릭으로 둘러보기 시작 · 다시 클릭하면 해제
     </div>
   ) : null;
 }

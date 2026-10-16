@@ -1,4 +1,6 @@
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { useGame } from "../../store";
 import { COMMANDS } from "./state";
 import type { Chip } from "./state";
@@ -10,6 +12,11 @@ const BLOCK_COLORS: Record<Chip, string> = {
   vent: "#70f2cd",
 };
 const BLOCK_ORDER: Chip[] = ["battery", "power", "vent"];
+const BLOCK_HINTS: Record<Chip, string> = {
+  battery: "무거운 배터리를 옮기려면 어떤 크기가 필요할까요?",
+  power: "전원 버튼은 어떤 크기에서 누르기 쉬울까요?",
+  vent: "좁은 환풍구를 지나가려면 어떻게 해야 할까요?",
+};
 export function commandBlockStyle(id: Chip): CSSProperties {
   return { "--block-color": BLOCK_COLORS[id] } as CSSProperties;
 }
@@ -55,6 +62,25 @@ export function CommandBlockIcon({ id }: { id: Chip }) {
   );
 }
 
+function LockIcon() {
+  return (
+    <svg
+      className="command-block-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="5" y="10" width="14" height="11" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2" />
+    </svg>
+  );
+}
+
 function CollectionStatusIcon({ collected }: { collected: boolean }) {
   return (
     <svg
@@ -75,17 +101,107 @@ function CollectionStatusIcon({ collected }: { collected: boolean }) {
         </>
       ) : (
         <>
-          <rect x="5" y="10" width="14" height="11" rx="2" />
-          <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2" />
+          <circle cx="12" cy="12" r="9" />
+          <path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1-1.5 2.5m0 3h.01" />
         </>
       )}
     </svg>
   );
 }
 
+function CommandHint({
+  id,
+  anchor,
+  tooltipId,
+}: {
+  id: Chip;
+  anchor: HTMLLIElement;
+  tooltipId: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<CSSProperties>({
+    visibility: "hidden",
+  });
+
+  useLayoutEffect(() => {
+    const tooltip = ref.current;
+    if (!tooltip) return;
+    const updatePosition = () => {
+      const row = anchor.getBoundingClientRect();
+      const { width, height } = tooltip.getBoundingClientRect();
+      const margin = 12;
+      const gap = 10;
+      const viewportWidth = document.documentElement.clientWidth;
+      const viewportHeight = document.documentElement.clientHeight;
+      const beside = row.right + gap + width <= viewportWidth - margin;
+      const left = beside ? row.right + gap : row.left;
+      const top = beside
+        ? row.top + (row.height - height) / 2
+        : row.top - gap - height;
+      setPosition({
+        left: Math.max(margin, Math.min(left, viewportWidth - width - margin)),
+        top: Math.max(margin, Math.min(top, viewportHeight - height - margin)),
+      });
+    };
+    updatePosition();
+    const observer = new ResizeObserver(updatePosition);
+    observer.observe(anchor);
+    observer.observe(tooltip);
+    // The sidebar also moves when objective text or viewport dimensions change.
+    const sidebar = anchor.closest(".lab-sidebar");
+    if (sidebar) observer.observe(sidebar);
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [anchor]);
+
+  // A portal keeps the hint outside HUD clipping and stacking contexts.
+  return createPortal(
+    <div
+      ref={ref}
+      id={tooltipId}
+      role="tooltip"
+      className="command-hint"
+      style={position}
+    >
+      <div className="command-hint-label">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 18h6m-5 3h4M8.5 14.5a6 6 0 1 1 7 0c-1 .7-1 1.5-1 2.5h-5c0-1 0-1.8-1-2.5Z" />
+        </svg>
+        <strong>힌트</strong>
+      </div>
+      <p>{BLOCK_HINTS[id]}</p>
+    </div>,
+    document.body,
+  );
+}
+
 export function CommandInventory() {
   const chips = useGame((s) => s.lab.chips);
   const panel = useGame((s) => s.panel);
+  const [hovered, setHovered] = useState<Chip | null>(null);
+  const [focused, setFocused] = useState<Chip | null>(null);
+  const rows = useRef<Partial<Record<Chip, HTMLLIElement>>>({});
+  const tooltipId = useId();
+  const active = hovered ?? focused;
+
+  useEffect(() => {
+    setHovered(null);
+    setFocused(null);
+  }, [panel]);
+
   return (
     <aside
       className="chip-hud"
@@ -96,24 +212,49 @@ export function CommandInventory() {
       <b aria-live="polite" aria-atomic="true">
         명령 블록 수집함 {chips.length}/3
       </b>
+      <p className="chip-hud-help">
+        각 블록에 마우스를 올리면 힌트를 볼 수 있어요.
+      </p>
       <ul>
         {BLOCK_ORDER.map((id) => {
           const collected = chips.includes(id);
           return (
             <li
-              key={`${id}-${collected}`}
+              key={id}
+              ref={(element) => {
+                rows.current[id] = element ?? undefined;
+              }}
               data-command={id}
               className={collected ? "found" : "locked"}
               style={commandBlockStyle(id)}
               aria-label={`${COMMANDS[id].label}: ${collected ? "수집 완료" : "미수집"}`}
+              aria-describedby={
+                active === id && panel !== "power" ? tooltipId : undefined
+              }
+              tabIndex={0}
+              onMouseEnter={() => setHovered(id)}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={(event) => {
+                if (event.currentTarget.matches(":focus-visible"))
+                  setFocused(id);
+              }}
+              onBlur={() => setFocused(null)}
             >
-              <CommandBlockIcon id={id} />
+              {collected ? <CommandBlockIcon id={id} /> : <LockIcon />}
               <span>{COMMANDS[id].label}</span>
               <CollectionStatusIcon collected={collected} />
             </li>
           );
         })}
       </ul>
+      {active && panel !== "power" && rows.current[active] && (
+        <CommandHint
+          key={active}
+          id={active}
+          anchor={rows.current[active]}
+          tooltipId={tooltipId}
+        />
+      )}
     </aside>
   );
 }

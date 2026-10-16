@@ -12,7 +12,46 @@ const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 const inventory = page.locator(".chip-hud");
 const notice = page.locator(".command-acquisition");
+const tooltip = page.getByRole("tooltip");
+const hints = {
+  battery: "무거운 배터리를 옮기려면 어떤 크기가 필요할까요?",
+  power: "전원 버튼은 어떤 크기에서 누르기 쉬울까요?",
+  vent: "좁은 환풍구를 지나가려면 어떻게 해야 할까요?",
+};
 fs.mkdirSync("artifacts/command-inventory", { recursive: true });
+
+async function checkHint(id) {
+  const row = inventory.locator(`[data-command="${id}"]`);
+  const before = await inventory.boundingBox();
+  const bounds = await row.boundingBox();
+  // Include both padded edges, the name and the status icon in the hover target.
+  for (const x of [2, bounds.width / 2, bounds.width - 2]) {
+    await row.hover({ position: { x, y: bounds.height / 2 } });
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText(`힌트${hints[id]}`);
+    assert.equal(
+      await row.getAttribute("aria-describedby"),
+      await tooltip.getAttribute("id"),
+    );
+    assert.deepEqual(
+      await inventory.boundingBox(),
+      before,
+      "hint does not move inventory",
+    );
+  }
+  const hintBounds = await tooltip.boundingBox();
+  const viewport = page.viewportSize();
+  assert(
+    hintBounds.x >= 12 &&
+      hintBounds.x + hintBounds.width <= viewport.width - 12,
+  );
+  assert(
+    hintBounds.y >= 12 &&
+      hintBounds.y + hintBounds.height <= viewport.height - 12,
+  );
+  await page.mouse.move(viewport.width - 2, viewport.height - 2);
+  await expect(tooltip).toHaveCount(0);
+}
 
 async function collect(id) {
   await page.evaluate(async (id) => {
@@ -90,6 +129,18 @@ try {
   );
   assert.equal(await inventory.locator(".locked").count(), 3);
   assert.equal(await inventory.locator("li svg").count(), 6);
+  await expect(inventory.locator(".chip-hud-help")).toHaveText(
+    "각 블록에 마우스를 올리면 힌트를 볼 수 있어요.",
+  );
+  for (const id of Object.keys(hints)) await checkHint(id);
+  await inventory.locator('[data-command="battery"]').click();
+  await expect(inventory.locator(".locked")).toHaveCount(3);
+  await expect(notice).toHaveCount(0);
+  await page.mouse.move(1278, 718);
+  await expect(tooltip).toHaveCount(0);
+  await page
+    .locator(":focus")
+    .evaluateAll((elements) => elements.forEach((el) => el.blur()));
   await checkLayout();
   await page.screenshot({ path: "artifacts/command-inventory/empty.png" });
 
@@ -151,6 +202,15 @@ try {
   assert.match(await notice.innerText(), /3\/3 완료! 탈출 콘솔로 이동하세요\./);
   assert.equal(await page.locator(".collection-complete").count(), 1);
   assert.equal(await inventory.locator(".found").count(), 3);
+  for (const id of Object.keys(hints)) {
+    await checkHint(id);
+    assert.equal(
+      await inventory
+        .locator(`[data-command="${id}"] .chip-status-icon`)
+        .evaluate((el) => getComputedStyle(el).color),
+      "rgb(112, 242, 205)",
+    );
+  }
   assert.equal(
     await inventory
       .locator('[data-command="vent"]')
@@ -169,6 +229,7 @@ try {
     window.__quantumGame.getState().patch({ panel: "power" }),
   );
   await expect(inventory).toBeHidden();
+  await expect(tooltip).toHaveCount(0);
   await page.screenshot({ path: "artifacts/command-inventory/coding.png" });
   await page.getByRole("button", { name: /탐험으로 돌아가기/ }).click();
   assert.equal(await inventory.locator(".found").count(), 3);
@@ -180,10 +241,27 @@ try {
   ]) {
     await page.setViewportSize(viewport);
     await checkLayout();
+    for (const id of Object.keys(hints)) await checkHint(id);
+    await inventory.locator('[data-command="vent"]').hover();
     await page.screenshot({
       path: `artifacts/command-inventory/layout-${viewport.width}.png`,
+      animations: "disabled",
     });
+    await page.mouse.move(viewport.width - 2, viewport.height - 2);
   }
+  const focusedRow = inventory.locator('[data-command="battery"]');
+  await page.keyboard.press("Tab");
+  await focusedRow.focus();
+  await expect(tooltip).toHaveText(`힌트${hints.battery}`);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect
+    .poll(
+      async () =>
+        (await tooltip.boundingBox()).x + (await tooltip.boundingBox()).width,
+    )
+    .toBeLessThanOrEqual(378);
+  await focusedRow.evaluate((el) => el.blur());
+  await expect(tooltip).toHaveCount(0);
   await page.emulateMedia({ reducedMotion: "reduce" });
   assert.equal(
     await power.evaluate((el) => getComputedStyle(el).animationName),
@@ -196,13 +274,15 @@ try {
   assert.equal(await notice.count(), 0);
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: collection, SVG/color/lock/check states, expiry, completion/STEP 02, panel persistence, desktop/mobile layout, reduced motion and restart; no browser errors",
+    "PASS: collection, SVG/color/lock/check states, all-row hints before/after collection, no click-to-collect, viewport positioning, keyboard focus, expiry, completion/STEP 02, panel persistence, desktop/mobile layout, reduced motion and restart; no browser errors",
   );
 } catch (error) {
-  await page.screenshot({
-    path: "artifacts/command-inventory/failure.png",
-    animations: "disabled",
-  });
+  await page
+    .screenshot({
+      path: "artifacts/command-inventory/failure.png",
+      animations: "disabled",
+    })
+    .catch(() => {});
   throw error;
 } finally {
   await browser.close();

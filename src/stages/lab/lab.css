@@ -115,8 +115,15 @@
 }
 .chip-hud > b {
   display: block;
-  margin: 7px 0 10px;
+  margin: 7px 0 4px;
   font-size: 15px;
+}
+.chip-hud-help {
+  margin: 0 0 10px;
+  color: #8ba3b8;
+  font-size: 10px;
+  line-height: 1.6;
+  word-break: keep-all;
 }
 .chip-hud ul {
   display: grid;
@@ -135,6 +142,12 @@
   background: #939aa609;
   color: #9098a2;
   font-size: 12px;
+  pointer-events: auto;
+  cursor: help;
+}
+.chip-hud li:focus-visible {
+  outline: 2px solid #77ddff;
+  outline-offset: 2px;
 }
 .chip-hud li > span {
   flex: 1;
@@ -152,9 +165,56 @@
 }
 .chip-hud .found {
   color: var(--block-color);
-  border-color: color-mix(in srgb, var(--block-color) 35%, transparent);
+  border-color: color-mix(in srgb, var(--block-color) 65%, transparent);
   background: color-mix(in srgb, var(--block-color) 8%, #0b1a2d);
   animation: chipActivate 0.7s ease-out;
+}
+.chip-hud .found .chip-status-icon {
+  color: #70f2cd;
+}
+.command-hint {
+  position: fixed;
+  z-index: 30;
+  width: 260px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid #77ddff70;
+  border-radius: 8px;
+  background: linear-gradient(130deg, #10263cfb, #091629fc);
+  box-shadow: 0 8px 28px #020a1b80;
+  color: #d6e6f1;
+  font-size: 12px;
+  line-height: 1.7;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  animation: commandHintReveal 0.16s ease-out;
+}
+.command-hint-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+  color: #a4eaff;
+  font-size: 11px;
+}
+.command-hint-label svg {
+  width: 16px;
+  height: 16px;
+  color: #ffda75;
+}
+.command-hint p {
+  margin: 0;
+}
+@keyframes commandHintReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes chipActivate {
   0%,
@@ -228,6 +288,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .chip-hud .found,
+  .command-hint,
   .toast.command-acquisition {
     animation: none;
   }

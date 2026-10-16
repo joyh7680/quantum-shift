@@ -142,6 +142,7 @@ export function Player() {
     else interactCircuit();
   }
   useEffect(() => {
+    let releasedByClick = false;
     const down = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
@@ -223,11 +224,14 @@ export function Player() {
     };
     const lock = () => {
       const captured = document.pointerLockElement === gl.domElement;
+      const intentionalRelease = releasedByClick;
+      releasedByClick = false;
       const s = useGame.getState();
       s.patch({ cameraCaptured: captured });
       if (!captured) {
         keys.current.clear();
-        if (s.screen === "game" && !s.panel) s.patch({ panel: "pause" });
+        if (!intentionalRelease && s.screen === "game" && !s.panel)
+          s.patch({ panel: "pause" });
       }
     };
     const blur = () => {
@@ -238,8 +242,15 @@ export function Player() {
       }
     };
     const click = () => {
-      if (useGame.getState().screen === "game" && !useGame.getState().panel)
+      const s = useGame.getState();
+      if (s.screen !== "game" || s.panel) return;
+      if (document.pointerLockElement === gl.domElement) {
+        // Releasing mouse look by clicking should keep exploration running.
+        releasedByClick = true;
+        document.exitPointerLock?.();
+      } else {
         gl.domElement.requestPointerLock?.();
+      }
     };
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
