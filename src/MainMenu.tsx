@@ -106,7 +106,7 @@ export function MainMenu() {
         </a>
         <span className="city-system">
           <i /> QUANTUM LINK ONLINE{" "}
-          <b>{stageTwoUnlocked ? "02" : "01"} / 05 SECTORS</b>
+          <b>{stageTwoUnlocked ? "02" : "01"} / 05 STAGES</b>
         </span>
       </header>
       <section className="city-intro">
