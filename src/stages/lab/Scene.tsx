@@ -325,7 +325,7 @@ export function LabScene() {
       ))}
       <Sign
         p={EMERGENCY_POWER_SIGN}
-        text="민트·노랑 통과 / 보라 복귀"
+        text="보라색 감전 바닥 주의"
         w={4.2}
         color="#bca5ff"
       />

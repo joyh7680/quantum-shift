@@ -39,12 +39,12 @@ const tick = (deltas) =>
     }
     return samples;
   }, deltas);
-const reset = async () => {
-  await page.evaluate(() => {
+const reset = async (checkpoint = [0, 0, -2]) => {
+  await page.evaluate((checkpoint) => {
     const game = window.__quantumGame.getState();
-    game.patchLab({ checkpoint: [0, 0, -2] });
+    game.patchLab({ checkpoint });
     game.patch({ panel: null, size: 1, respawn: game.respawn + 1 });
-  });
+  }, checkpoint);
   await page.waitForTimeout(100);
   await tick(Array(60).fill(1 / 60));
 };
@@ -67,7 +67,9 @@ try {
   }, rendererUrl);
   const results = [];
   for (const fps of [30, 60, 120, 144]) {
-    await reset();
+    // Isolate interpolation from ground-contact corrections. The existing
+    // character-walk QA separately covers grounded walking and collisions.
+    await reset([0, 100, -2]);
     await page.keyboard.down("w");
     await tick(Array(12).fill(1 / fps));
     const samples = await tick(Array(Math.ceil(fps / 2)).fill(1 / fps));
@@ -78,10 +80,8 @@ try {
     const maxError = Math.max(
       ...increments.map((delta) => Math.abs(delta - 4 / fps)),
     );
-    // Allow Rapier's small ground-contact corrections, while rejecting the
-    // repeated zero/full physics-step jumps caused by un-interpolated motion.
     assert(
-      maxError < (4 / fps) * 0.1,
+      maxError < 0.0001,
       `${fps} Hz: every render frame must advance smoothly, error=${maxError}`,
     );
     results.push({
@@ -90,7 +90,7 @@ try {
       stationaryFrames: increments.filter((d) => d < 0.00001).length,
     });
   }
-  await reset();
+  await reset([0, 100, -2]);
   await page.keyboard.down("w");
   await tick(Array(12).fill(1 / 60));
   const variableDeltas = Array.from(
@@ -105,7 +105,7 @@ try {
         variable[i].position[2] -
           variable[i - 1].position[2] -
           4 * variableDeltas[i],
-      ) < 4 * variableDeltas[i] * 0.1,
+      ) < 0.0001,
       "irregular frame timing preserves smooth movement",
     );
 
