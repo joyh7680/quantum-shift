@@ -92,6 +92,10 @@ export function interactLab() {
   const s = useGame.getState();
   if (s.activeStage !== 1 || s.panel) return;
   if (near(s.pos, 0, 10, 3)) {
+    if (!CHIPS.every(({ id }) => s.lab.chips.includes(id))) {
+      s.notify("명령 블록 3개를 모두 모은 뒤 블록 코딩을 시작하세요.");
+      return;
+    }
     resetPuzzle();
     document.exitPointerLock?.();
   } else if (near(s.pos, -4, 18))
@@ -107,7 +111,10 @@ export function interactLab() {
 }
 export function labPrompt(pos: Vec) {
   const s = useGame.getState();
-  if (near(pos, 0, 10, 3)) return "E  탈출 콘솔 · 블록 코딩";
+  if (near(pos, 0, 10, 3))
+    return CHIPS.every(({ id }) => s.lab.chips.includes(id))
+      ? "E  탈출 콘솔 · 블록 코딩"
+      : "명령 블록 3개를 모두 모으면 블록 코딩을 시작할 수 있어요.";
   const chip = CHIPS.find((c) => {
     const hintPos = c.hintPos ?? c.pos;
     return (

@@ -3,10 +3,13 @@ import type { CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useGame } from "../../store";
 import { COMMANDS } from "./state";
-import type { Chip } from "./state";
+import type { Chip, Command } from "./state";
 
 // HUD colors are independent of the existing 3D item materials.
-const BLOCK_COLORS: Record<Chip, string> = {
+const BLOCK_COLORS: Record<Command, string> = {
+  tiny: COMMANDS.tiny.color,
+  normal: COMMANDS.normal.color,
+  giant: COMMANDS.giant.color,
   battery: "#ffda75",
   power: "#ff94c7",
   vent: "#70f2cd",
@@ -17,7 +20,7 @@ const BLOCK_HINTS: Record<Chip, string> = {
   power: "전원 버튼은 어떤 크기에서 누르기 쉬울까요?",
   vent: "좁은 환풍구를 지나가려면 어떻게 해야 할까요?",
 };
-export function commandBlockStyle(id: Chip): CSSProperties {
+export function commandBlockStyle(id: Command): CSSProperties {
   return { "--block-color": BLOCK_COLORS[id] } as CSSProperties;
 }
 
@@ -203,11 +206,7 @@ export function CommandInventory() {
   }, [panel]);
 
   return (
-    <aside
-      className="chip-hud"
-      hidden={panel === "power"}
-      aria-label="명령 블록 수집함"
-    >
+    <aside className="chip-hud" aria-label="명령 블록 수집함">
       <span>COMMAND BLOCK INVENTORY</span>
       <b aria-live="polite" aria-atomic="true">
         명령 블록 수집함 {chips.length}/3
@@ -228,9 +227,7 @@ export function CommandInventory() {
               className={collected ? "found" : "locked"}
               style={commandBlockStyle(id)}
               aria-label={`${COMMANDS[id].label}: ${collected ? "수집 완료" : "미수집"}`}
-              aria-describedby={
-                active === id && panel !== "power" ? tooltipId : undefined
-              }
+              aria-describedby={active === id ? tooltipId : undefined}
               tabIndex={0}
               onMouseEnter={() => setHovered(id)}
               onMouseLeave={() => setHovered(null)}
@@ -247,7 +244,7 @@ export function CommandInventory() {
           );
         })}
       </ul>
-      {active && panel !== "power" && rows.current[active] && (
+      {active && rows.current[active] && (
         <CommandHint
           key={active}
           id={active}

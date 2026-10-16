@@ -3,7 +3,15 @@ import { useGame } from "../../store";
 import { COMMANDS, PALETTE } from "./state";
 import type { Command } from "./state";
 import { editCode, resetPuzzle, startProgram } from "./gameplay";
-import { DeviceGuide } from "./DeviceGuide.tsx";
+import { CommandBlockIcon, commandBlockStyle } from "./CommandInventory";
+
+function CommandIcon({ id }: { id: Command }) {
+  return id === "tiny" || id === "normal" || id === "giant" ? (
+    <>{COMMANDS[id].icon}</>
+  ) : (
+    <CommandBlockIcon id={id} />
+  );
+}
 export function PowerPanel() {
   const lab = useGame((s) => s.lab);
   const [dragging, setDragging] = useState<number | null>(null);
@@ -71,15 +79,6 @@ export function PowerPanel() {
   }
   return (
     <>
-      <div className="lab-live-caption">
-        <span>LIVE / 실제 3D 실행</span>
-        <b>거인의 연구실</b>
-        <div className="stage-coding-tags">
-          <span>알고리즘</span>
-          <span>순차 실행</span>
-        </div>
-      </div>
-      <DeviceGuide />
       <section className="escape-editor" aria-label="탈출 블록 코딩">
         <header>
           <span>ESCAPE PROGRAM / 블록 코딩</span>
@@ -110,13 +109,11 @@ export function PowerPanel() {
                   }}
                   onDragEnd={clearDrag}
                   onClick={() => editCode([...lab.code, id])}
-                  style={
-                    {
-                      "--block-color": COMMANDS[id].color,
-                    } as React.CSSProperties
-                  }
+                  style={commandBlockStyle(id)}
                 >
-                  <span>{COMMANDS[id].icon}</span>
+                  <span>
+                    <CommandIcon id={id} />
+                  </span>
                   {COMMANDS[id].label}
                   {!available && <small>미수집</small>}
                 </button>
@@ -155,6 +152,7 @@ export function PowerPanel() {
               <li
                 key={index}
                 className={[
+                  "command-code-block",
                   index === lab.index
                     ? lab.run === "failed"
                       ? "failed"
@@ -188,6 +186,7 @@ export function PowerPanel() {
                   drop(e, insertionSlot(e, index));
                 }}
                 aria-current={index === lab.index ? "step" : undefined}
+                style={commandBlockStyle(id)}
               >
                 <span
                   className="code-grip"
@@ -200,7 +199,7 @@ export function PowerPanel() {
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <b>
-                  {COMMANDS[id].icon} {COMMANDS[id].label}
+                  <CommandIcon id={id} /> {COMMANDS[id].label}
                 </b>
                 <button
                   aria-label={`${index + 1}번 블록 위로`}

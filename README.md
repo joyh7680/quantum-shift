@@ -76,7 +76,7 @@ npm run audit:assets
 - GLB 148개의 헤더·JSON 청크·SHA-256·메시·노드·재질·텍스처·애니메이션을 검사했습니다. 캐릭터는 중복 없이 47종입니다.
 - 우주 탐사와 어울리는 노바, 제트, 보라, 포비, 레미, 테오, M254, 암스트롱을 먼저 표시하며 전체 47종도 선택할 수 있습니다.
 - 우주여행 폴더에는 우주선만 있습니다. 캐릭터는 `models/dosan-park/characters`에 있으며 회사 소품과 우주선은 게임에 로드하지 않습니다.
-- 캐릭터에 리깅과 애니메이션 클립이 없어 원본 재질을 유지한 채 몸체 바운스·기울기·점프 자세를 절차적으로 보완합니다.
+- 캐릭터에 원본 애니메이션 클립이 없어 팔·다리 부위에 회전축을 추가했습니다. 실제 충돌 처리 후 이동 속도와 크기에 맞춰 팔다리를 번갈아 움직이며, 발바닥 접지·점프 자세·정지 전환·일시정지를 지원합니다. 원본 메시와 재질은 유지합니다.
 - 실제 바운딩 박스로 중심·바닥·높이·폭을 정규화하고 모든 캐릭터에 같은 Rapier 캡슐과 조작 규칙을 적용합니다.
 - 브라우저는 `/codmos-glb-assets-2026-10-15/models/...glb` URL을 사용합니다. 로드 오류는 화면에 표시하며 임의 캐릭터로 대체하지 않습니다.
 - 검사 결과: [artifacts/asset-audit.json](artifacts/asset-audit.json)
@@ -94,6 +94,7 @@ npm run audit:assets
 | `src/stages/WorldParts.tsx` | 재사용 메시·장치·문·표지판 |
 | `src/stages/PanelParts.tsx`, `shared.ts` | 공통 패널 헤더, 진행·물리 프레임 타입 |
 | `src/Character.tsx` | GLB 로드·정규화·동작 보완 |
+| `src/characterAnimation.ts` | 47종 팔·다리 회전축, 이동 속도별 보행·발 접지·점프 자세 |
 | `src/rules.ts` | STAGE 2 지원 요청 판별, 허용 슈트 명령 |
 | `src/Panels.tsx` | 공통 일시정지 패널 |
 | `src/store.ts` | 독립된 lab/circuit 상태, 클리어·전환·세션·재시작 관리 |
@@ -111,6 +112,7 @@ npm run audit:assets
 ```powershell
 node scripts/menu-smoke.mjs       # 기본 5173, QC_QA_URL로 실제 개발 서버 지정
 node scripts/character-ui-qa.mjs  # 47종 썸네일 매칭, 선택 동기화, 데스크톱·모바일 배치
+node scripts/character-walk-qa.mjs # 실제 이동·정지·벽 충돌·점프·크기별 보행·자동 이동
 node scripts/lab-smoke.mjs        # STAGE 1 수집·충돌·실패·중단·수정·실제 탈출
 node scripts/playthrough.mjs      # STAGE 1 → STAGE 2 전체 진행, QC_QA_URL 지정 가능
 node scripts/asset-browser-qa.mjs

@@ -104,9 +104,6 @@
   display: flex;
   max-width: none;
 }
-.chip-hud[hidden] {
-  display: none;
-}
 .chip-hud > span {
   display: block;
   font: 8px monospace;
@@ -170,7 +167,7 @@
   animation: chipActivate 0.7s ease-out;
 }
 .chip-hud .found .chip-status-icon {
-  color: #70f2cd;
+  color: var(--block-color);
 }
 .command-hint {
   position: fixed;
@@ -296,35 +293,19 @@
 .coding-open .game-canvas {
   right: 40%;
 }
-.coding-open .hud {
+.coding-open .hud > :not(.game-top):not(.lab-sidebar) {
   display: none;
 }
-.lab-live-caption {
-  max-width: 300px;
-  position: absolute;
-  left: 22px;
-  top: 22px;
-  width: calc(60% - 44px);
-  padding: 14px 18px;
-  background: #09172cdb;
-  border: 1px solid #4abed450;
-  border-radius: 8px;
-  pointer-events: none;
+.coding-open .lab-sidebar {
+  max-width: calc(60% - 40px);
+  grid-template-columns: minmax(0, 1fr);
+  z-index: 12;
 }
-.lab-live-caption > span {
-  color: #6cdaec;
-  font: 10px monospace;
-  letter-spacing: 1px;
+.coding-open .chip-hud {
+  max-width: 100%;
 }
-.lab-live-caption b {
-  display: block;
-  font-size: 20px;
-  margin: 7px 0;
-}
-.lab-live-caption p {
-  font-size: 11px;
-  line-height: 1.8;
-  color: #b1ccd9;
+.coding-open .lab-sidebar .mission-card {
+  width: 100%;
 }
 .coding-open .game-canvas canvas {
   cursor: grab;
@@ -428,6 +409,8 @@
   min-height: 43px;
 }
 .escape-palette button span {
+  display: inline-flex;
+  vertical-align: middle;
   font-size: 17px;
   margin-right: 7px;
 }
@@ -467,6 +450,11 @@
   cursor: grab;
   user-select: none;
 }
+.escape-code .command-code-block {
+  color: var(--block-color);
+  border-color: color-mix(in srgb, var(--block-color) 65%, transparent);
+  background: color-mix(in srgb, var(--block-color) 8%, #0b1a2d);
+}
 .escape-code li[draggable="true"]:active {
   cursor: grabbing;
 }
@@ -503,6 +491,9 @@
   font: 10px monospace;
 }
 .escape-code b {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 12px;
   font-weight: 500;
   flex: 1;
@@ -622,17 +613,6 @@
     flex-direction: column;
     gap: 6px;
   }
-  .lab-live-caption {
-    left: 12px;
-    width: calc(60% - 24px);
-    padding: 10px;
-  }
-  .lab-live-caption p {
-    font-size: 10px;
-  }
-  .lab-live-caption b {
-    font-size: 16px;
-  }
   .lab-sidebar {
     width: 255px;
   }
@@ -694,9 +674,6 @@
   .escape-code b {
     flex-basis: 70%;
   }
-  .lab-live-caption p {
-    line-height: 1.7;
-  }
   .run-feedback {
     font-size: 10px;
   }
@@ -717,95 +694,5 @@
 @media (max-width: 900px) and (min-width: 581px) {
   .lab-game .mission-card {
     width: 255px;
-  }
-}
-
-.device-guide {
-  position: absolute;
-  left: 22px;
-  bottom: 22px;
-  z-index: 12;
-  display: grid;
-  gap: 8px;
-  width: 146px;
-}
-.device-guide-row {
-  position: relative;
-}
-.device-guide-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 40px;
-  padding: 9px 12px;
-  border: 1px solid #65cde54d;
-  border-radius: 6px;
-  background: #0b1b30ee;
-  color: #c2dae8;
-  font-size: 12px;
-  text-align: left;
-  box-shadow: 0 4px 18px #02091840;
-}
-.device-guide-card > span {
-  width: 20px;
-  color: #77ddff;
-  font-size: 20px;
-  text-align: center;
-}
-.device-guide-card:hover,
-.device-guide-card.inspecting,
-.device-guide-card:focus-visible {
-  border-color: #77ddff;
-  background: #153d53f5;
-  color: #ecfbff;
-  box-shadow: 0 0 16px #59dcff25;
-}
-.device-guide-tooltip {
-  position: absolute;
-  left: calc(100% + 12px);
-  bottom: 0;
-  z-index: 1;
-  width: 224px;
-  margin: 0;
-  padding: 12px 14px;
-  border: 1px solid #77ddff99;
-  border-radius: 6px;
-  background: #0d263bee;
-  color: #dcf4ff;
-  font-size: 12px;
-  line-height: 1.8;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-  box-shadow: 0 5px 24px #02091866;
-  pointer-events: none;
-}
-.device-guide-tooltip::before {
-  content: "";
-  position: absolute;
-  left: -5px;
-  bottom: 14px;
-  width: 8px;
-  height: 8px;
-  background: #0d263b;
-  border-left: 1px solid #77ddff99;
-  border-bottom: 1px solid #77ddff99;
-  transform: rotate(45deg);
-}
-@media (max-width: 700px) {
-  .device-guide {
-    left: 12px;
-    bottom: 12px;
-    width: 136px;
-  }
-  .device-guide-tooltip {
-    left: 0;
-    bottom: calc(100% + 8px);
-    width: min(224px, calc(60vw - 24px));
-  }
-  .device-guide-tooltip::before {
-    left: 18px;
-    bottom: -5px;
-    transform: rotate(-45deg);
   }
 }

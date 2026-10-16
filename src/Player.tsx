@@ -9,6 +9,7 @@ import {
 import type { RapierCollider, RapierRigidBody } from "@react-three/rapier";
 import { Group, MathUtils, Raycaster, Vector3 } from "three";
 import { Character } from "./Character";
+import type { CharacterMotion } from "./characterAnimation";
 import {
   interactLab,
   labPrompt,
@@ -32,6 +33,11 @@ const H = 0.75,
   HALF = 0.41,
   DT = 1 / 60;
 export function Player() {
+  const motion = useRef<CharacterMotion>({
+    speed: 0,
+    airborne: false,
+    paused: false,
+  });
   const { world, rapier } = useRapier();
   const { camera, gl, scene } = useThree();
   const body = useRef<RapierRigidBody>(null),
@@ -138,6 +144,7 @@ export function Player() {
     lastSync.current = 0;
     ground.current = false;
     respawning.current = false;
+    motion.current = { speed: 0, airborne: false, paused: false };
   }, [screen, respawn]);
   function die(reason: string) {
     // A physics frame may contain several fixed steps before React commits.
@@ -277,6 +284,7 @@ export function Player() {
     };
   }, [gl, world]);
   useBeforePhysicsStep(() => {
+    motion.current.speed = 0;
     const s = useGame.getState(),
       b = body.current,
       c = collider.current,
@@ -335,12 +343,19 @@ export function Player() {
             (col) => col.handle !== c.handle,
           );
           const movement = cc.computedMovement();
+          ground.current = cc.computedGrounded();
+          motion.current.speed =
+            Math.hypot(movement.x, movement.z) / DT / localSize.current;
           b.setNextKinematicTranslation({
             x: p.x + movement.x,
             y: p.y + movement.y,
             z: p.z + movement.z,
           });
-          s.patch({ moving: true, airborne: false, yaw: facing.current });
+          s.patch({
+            moving: motion.current.speed > 0.05,
+            airborne: !ground.current,
+            yaw: facing.current,
+          });
           return false;
         },
       });
@@ -389,6 +404,8 @@ export function Player() {
       (col) => col.handle !== c.handle,
     );
     const delta = cc.computedMovement();
+    motion.current.speed =
+      Math.hypot(delta.x, delta.z) / DT / localSize.current;
     if (s.activeStage === 1 && moving) {
       const current = useGame.getState();
       const labTutorial = tutorialMovement(
@@ -412,15 +429,20 @@ export function Player() {
       s.patch({
         pos: [p.x, foot, p.z],
         yaw: facing.current,
-        moving,
+        moving: moving && motion.current.speed > 0.05,
         airborne: !ground.current,
         prompt,
       });
     }
   });
+  // Publish motion and the parent transform before Character animates its limbs.
   useFrame((_, dt) => {
     const s = useGame.getState(),
       b = body.current;
+    motion.current.airborne = !ground.current;
+    motion.current.paused =
+      s.screen !== "game" ||
+      !!(s.panel && !(s.activeStage === 1 && s.panel === "power"));
     if (s.screen === "start") {
       camera.position.lerp(new Vector3(15, 18, -20), Math.min(1, dt * 3));
       camera.lookAt(0, 1, 10);
@@ -468,9 +490,7 @@ export function Player() {
       camera.position.copy(destination);
     else camera.position.lerp(destination, 1 - Math.exp(-dt * 9));
     camera.lookAt(target);
-  });
-  const moving = useGame((s) => s.moving),
-    airborne = useGame((s) => s.airborne);
+  }, -1);
   return (
     <>
       <RigidBody
@@ -483,7 +503,7 @@ export function Player() {
         <CapsuleCollider ref={collider} args={[HALF, R]} friction={0} />
       </RigidBody>
       <group ref={model} visible={screen !== "start"}>
-        <Character id={selected} moving={moving} airborne={airborne} />
+        <Character id={selected} motion={motion} />
       </group>
     </>
   );

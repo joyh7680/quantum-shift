@@ -147,7 +147,10 @@ function HUD() {
     activeStage === 1 && Object.values(LAB_DISCOVERY_HINTS).includes(prompt);
   const showPromptIcon =
     discoveryPrompt ||
-    (activeStage === 1 && prompt === "E  탈출 콘솔 · 블록 코딩");
+    (activeStage === 1 &&
+      (prompt === "E  탈출 콘솔 · 블록 코딩" ||
+        prompt ===
+          "명령 블록 3개를 모두 모으면 블록 코딩을 시작할 수 있어요."));
   return (
     <div className={`hud${tutorialRunning ? " tutorial-running" : ""}`}>
       <header className="game-top">

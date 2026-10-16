@@ -1,0 +1,15 @@
+{
+  "keyboard": true,
+  "alternatingLimbs": true,
+  "idle": true,
+  "pause": true,
+  "jump": true,
+  "sizes": [
+    0.25,
+    1,
+    2.5
+  ],
+  "blocked": true,
+  "blockProgram": true,
+  "errors": []
+}
