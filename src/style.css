@@ -483,15 +483,14 @@ kbd {
   font-size: 8px;
 }
 .pause-button {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
   flex-shrink: 0;
-  min-height: 44px;
-  padding: 0 13px;
-  border-radius: 6px 12px 6px 6px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 6px;
   color: #e6f7ff;
   background: linear-gradient(135deg, #193a54ed, #0b1c32f5);
   border: 1px solid #79d9ff66;
@@ -499,38 +498,11 @@ kbd {
   backdrop-filter: blur(12px);
   transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
 }
-.pause-button::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 13px;
-  width: 26px;
-  height: 2px;
-  border-radius: 2px;
-  background: #85e2ff;
-  box-shadow: 0 0 8px #59cfff60;
-  pointer-events: none;
-}
 .pause-button-icon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
   color: #a8ebff;
-}
-.pause-button-label {
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  letter-spacing: 0.2px;
-}
-.pause-button kbd {
-  height: 20px;
-  padding: 0 5px;
-  border: 1px solid #91cbe630;
-  background: #a7dfff08;
-  color: #9bbcd0;
-  font-size: 9px;
-  letter-spacing: 0.5px;
 }
 .pause-button:hover,
 .pause-button:focus-visible {
@@ -1263,31 +1235,6 @@ kbd {
   margin-top: 12px;
   text-align: center;
 }
-.pause-card {
-  max-width: 420px;
-  width: 100%;
-  background: #1b3542;
-  border: 1px solid #71928577;
-  border-radius: 14px;
-  padding: 35px;
-}
-.pause-card .eyebrow {
-  color: var(--mint);
-}
-.pause-card h2 {
-  font-size: 24px;
-  letter-spacing: -1px;
-  margin: 20px 0 12px;
-}
-.pause-card p {
-  font-size: 12px;
-  color: #9cb8ae;
-  margin-bottom: 25px;
-}
-.pause-card button {
-  width: 100%;
-  margin-top: 12px;
-}
 .fatal {
   position: fixed;
   inset: 0;
@@ -1580,13 +1527,6 @@ kbd {
     margin-top: 25px;
   }
   .game-top .brand small {
-    display: none;
-  }
-  .pause-button {
-    gap: 7px;
-    padding: 0 10px;
-  }
-  .pause-button kbd {
     display: none;
   }
   .mission-card {

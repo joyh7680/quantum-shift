@@ -110,7 +110,6 @@ function HUD() {
           className="pause-button"
           aria-label="일시정지"
           aria-haspopup="dialog"
-          title="일시정지 (Esc)"
         >
           <svg
             className="pause-button-icon"
@@ -122,8 +121,6 @@ function HUD() {
             <rect x="5" y="4" width="5" height="16" rx="1" />
             <rect x="14" y="4" width="5" height="16" rx="1" />
           </svg>
-          <span className="pause-button-label">일시정지</span>
-          <kbd aria-hidden="true">ESC</kbd>
         </button>
       </header>
       {activeStage === 1 && (
