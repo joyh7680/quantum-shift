@@ -104,14 +104,8 @@ try {
   );
   assert(pushing.breaker > before.breaker + 0.8, "lever moves with hands");
   assert.equal(pushing.lab.power, false, "power remains on until full push");
-  // Show the actual game scene from beside the breaker to inspect contact.
-  await page.evaluate(() => {
-    const r = window.__powerRoot.getState();
-    r.camera.position.set(8.5, 2.6, 20.5);
-    r.camera.lookAt(5, 1, 23.2);
-    r.gl.render(r.scene, r.camera);
-  });
-  await page.screenshot({ path: "artifacts/power-push.png" });
+  // Use the camera the player actually sees; never reposition it in QA.
+  await page.screenshot({ path: "artifacts/power-push-default-before.png" });
   await until((s) => s.lab.power, "power cuts at end of push");
   const cut = await sample();
   assert(Math.abs(cut.breaker - 0.65) < 0.001);
