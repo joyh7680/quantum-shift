@@ -398,7 +398,21 @@ function Toast() {
         <CommandAcquisition id={acquired} count={chips.length} />
       ) : (
         <>
-          <span aria-hidden="true">✦</span>
+          <svg
+            className="discovery-prompt-icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="12" cy="12" r="11" fill="currentColor" />
+            <path
+              d="M12 6.5v7"
+              stroke="#173b3c"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <circle cx="12" cy="17" r="1.5" fill="#173b3c" />
+          </svg>
           {message}
         </>
       )}

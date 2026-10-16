@@ -851,7 +851,7 @@ kbd {
 .toast {
   position: absolute;
   left: 50%;
-  top: 20px;
+  bottom: 174px;
   transform: translateX(-50%);
   z-index: 15;
   background: #153b3cef;
@@ -865,9 +865,6 @@ kbd {
   align-items: center;
   gap: 12px;
   animation: toastIn 0.3s ease-out;
-}
-.toast > span {
-  color: var(--mint);
 }
 .shift-fx {
   position: absolute;
@@ -1304,11 +1301,11 @@ kbd {
 @keyframes toastIn {
   from {
     opacity: 0;
-    top: 10px;
+    transform: translateX(-50%) translateY(10px);
   }
   to {
     opacity: 1;
-    top: 20px;
+    transform: translateX(-50%) translateY(0);
   }
 }
 @keyframes shift {
@@ -1509,6 +1506,7 @@ kbd {
     display: none;
   }
   .toast {
+    bottom: 145px;
     font-size: 10px;
     min-width: 300px;
     max-width: 70%;
