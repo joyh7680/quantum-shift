@@ -88,24 +88,6 @@
   line-height: 1.8;
   color: #b1ccd9;
 }
-.lab-camera-tools {
-  margin-top: 12px;
-  border-top: 1px solid #4abed430;
-  padding-top: 9px;
-}
-.lab-camera-tools > p {
-  font-size: 10px;
-}
-.lab-camera-tools > button {
-  pointer-events: auto;
-  margin-top: 6px;
-  padding: 5px 8px;
-  border: 1px solid #4abed450;
-  border-radius: 4px;
-  background: #16334a;
-  color: #a6e4f5;
-  font-size: 10px;
-}
 .coding-open .game-canvas canvas {
   cursor: grab;
 }
@@ -185,8 +167,7 @@
   font-weight: 400;
   color: #80a5ba;
 }
-.lab-section-label button,
-.lab-help {
+.lab-section-label button {
   color: #9dc9df;
   font-size: 11px;
   background: transparent;
@@ -315,39 +296,6 @@
 .escape-code .failed {
   border-color: #ff9c82;
   background: #512b35;
-}
-.lab-help {
-  border-bottom: 1px solid #497c9b55;
-}
-.observation-help {
-  font-size: 13px;
-  line-height: 1.8;
-  color: #a6d4e2;
-  padding: 12px 0;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-.observation-help dl {
-  display: grid;
-  gap: 10px;
-  margin: 12px 0;
-}
-.observation-help dl > div {
-  border: 1px solid #497c9b55;
-  background: #142d43;
-  border-radius: 6px;
-  padding: 12px;
-}
-.observation-help dt {
-  color: #e0f3ff;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-.observation-help dd {
-  margin: 0;
-}
-.observation-help strong {
-  color: #93e9ff;
 }
 .escape-editor footer {
   border-top: 1px solid #71abc630;
