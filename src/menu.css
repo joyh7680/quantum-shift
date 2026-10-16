@@ -398,12 +398,14 @@
   letter-spacing: -1px;
 }
 .dialog-close {
+  display: grid;
+  place-items: center;
   width: 38px;
   height: 38px;
+  padding: 0;
   flex-shrink: 0;
   border: 1px solid #55718c77;
   background: #21304b;
-  font-size: 25px;
   color: #abd2e9;
 }
 .dialog-lead {
