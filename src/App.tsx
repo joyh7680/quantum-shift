@@ -145,6 +145,9 @@ function HUD() {
   const brief = CITY_STAGES[activeStage - 1];
   const discoveryPrompt =
     activeStage === 1 && Object.values(LAB_DISCOVERY_HINTS).includes(prompt);
+  const showPromptIcon =
+    discoveryPrompt ||
+    (activeStage === 1 && prompt === "E  탈출 콘솔 · 블록 코딩");
   return (
     <div className={`hud${tutorialRunning ? " tutorial-running" : ""}`}>
       <header className="game-top">
@@ -253,11 +256,11 @@ function HUD() {
       {!tutorialRunning && <CaptureHint />}
       {prompt && (!tutorialRunning || discoveryPrompt) && (
         <div
-          className={`interaction-prompt${discoveryPrompt ? " discovery-prompt" : ""}`}
+          className={`interaction-prompt${showPromptIcon ? " discovery-prompt" : ""}`}
           role="status"
           aria-atomic="true"
         >
-          {discoveryPrompt && (
+          {showPromptIcon && (
             <svg
               className="discovery-prompt-icon"
               viewBox="0 0 24 24"
