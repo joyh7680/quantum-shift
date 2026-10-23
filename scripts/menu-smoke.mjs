@@ -75,16 +75,13 @@ try {
   for (let i = 1; i < 5; i++) {
     const card = page.locator(".route-card").nth(i);
     assert.equal(await card.isEnabled(), true);
-    assert.match(
-      await card.innerText(),
-      i === 1 ? /STAGE 1 클리어 후 해금/ : /준비 중/,
-    );
+    assert.match(await card.innerText(), /준비 중/);
     await card.click();
     assert.equal(await card.getAttribute("aria-pressed"), "true");
     assert.equal(
       await page
         .getByRole("button", {
-          name: i === 1 ? /STAGE 1 클리어 필요/ : /준비 중 · 진입 불가/,
+          name: /준비 중 · 진입 불가/,
         })
         .isDisabled(),
       true,

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { MenuDialog } from "./MenuDialog";
 import { useGame } from "./store";
 import { CITY_STAGES } from "./stages";
 import { LAB_MISSIONS } from "./stages/lab/state";
@@ -9,6 +11,7 @@ export function ClearScreen() {
   const progress = useGame((s) => (s.activeStage === 1 ? s.lab : s.circuit));
   const count = (activeStage === 1 ? LAB_MISSIONS : CIRCUIT_MISSIONS).length;
   const stageNumber = String(activeStage).padStart(2, "0");
+  const [showStageNotice, setShowStageNotice] = useState(activeStage === 1);
 
   return (
     <main className="clear-screen" aria-labelledby="clear-title">
@@ -67,7 +70,7 @@ export function ClearScreen() {
                 <>
                   직접 만든 블록 프로그램으로 환풍구를 탈출했습니다.
                   <br />
-                  다음 스테이지로 향할 준비가 완료되었습니다.
+                  거인의 연구실 탐험을 완료했습니다. 함께해 주셔서 감사합니다!
                 </>
               ) : (
                 <>
@@ -112,9 +115,10 @@ export function ClearScreen() {
             {activeStage === 1 && (
               <button
                 className="clear-action clear-action-primary"
-                onClick={() => useGame.getState().nextStage()}
+                aria-haspopup="dialog"
+                onClick={() => setShowStageNotice(true)}
               >
-                STAGE 2로 이동 <span aria-hidden="true">→</span>
+                다음 스테이지 안내 <span aria-hidden="true">→</span>
               </button>
             )}
             <button
@@ -127,9 +131,7 @@ export function ClearScreen() {
 
           <footer className="clear-console-foot">
             <span className="clear-foot-line" />
-            {activeStage === 1
-              ? "NEXT SECTOR UNLOCKED"
-              : "EXPLORATION COMPLETE"}
+            EXPLORATION COMPLETE
             <span className="clear-foot-line" />
           </footer>
         </section>
@@ -139,6 +141,36 @@ export function ClearScreen() {
           <span>STAGE {stageNumber} — CLEARED</span>
         </footer>
       </div>
+      {showStageNotice && (
+        <MenuDialog
+          title="다음 탐험을 기다려 주세요"
+          className="stage-notice-dialog"
+          onClose={() => setShowStageNotice(false)}
+        >
+          <p className="stage-notice-message">
+            스테이지 1이 재밌었다면,
+            <br />
+            스테이지 2도 개발해 볼게요!
+          </p>
+          <p className="dialog-lead">
+            스테이지 2 ‘마이크로 회로’는 아직 준비 중입니다.
+          </p>
+          <footer className="dialog-footer">
+            <button
+              className="city-secondary"
+              onClick={() => setShowStageNotice(false)}
+            >
+              클리어 기록 보기
+            </button>
+            <button
+              className="city-launch"
+              onClick={() => useGame.getState().reset()}
+            >
+              메인 메뉴로 <span aria-hidden="true">→</span>
+            </button>
+          </footer>
+        </MenuDialog>
+      )}
     </main>
   );
 }

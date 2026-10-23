@@ -305,7 +305,14 @@ try {
   await page.evaluate(() => {
     const s = window.__quantumGame.getState();
     s.patchLab({ cleared: true });
-    s.start(s.character, 2);
+    // Inspect the draft scene directly; normal Stage 2 entry is locked.
+    s.patch({
+      activeStage: 2,
+      screen: "game",
+      size: 1,
+      pos: [0, 0, 32],
+      panel: null,
+    });
   });
   assert.equal(
     await page

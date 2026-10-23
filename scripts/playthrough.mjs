@@ -66,15 +66,36 @@ try {
     await page.evaluate(() => {
       const game = window.__quantumGame.getState();
       game.patchLab({ power: true, cleared: true });
-      game.start(game.character, 2);
-      game.patch({ panel: "suit" });
+      // Development fixture for the unreleased scene; player entry stays locked.
+      game.patch({
+        activeStage: 2,
+        screen: "game",
+        size: 1,
+        pos: [0, 0, 32],
+        panel: "suit",
+      });
     });
   } else {
     await page.getByRole("button", { name: /게임 시작/ }).click();
     await runLab(page, { extended: false });
     completedLab = JSON.stringify((await state()).lab);
     await page.screenshot({ path: "artifacts/stage1-clear.png" });
-    await page.getByRole("button", { name: /STAGE 2로 이동/ }).click();
+    await page.getByRole("button", { name: "클리어 기록 보기" }).click();
+    await page.evaluate(() => window.__quantumGame.getState().nextStage());
+    assert(
+      (await state()).activeStage === 1,
+      "Stage 2 remains locked after clear",
+    );
+    // Continue draft gameplay QA using a fixture, independently of player entry.
+    await page.evaluate(() =>
+      window.__quantumGame.getState().patch({
+        activeStage: 2,
+        screen: "game",
+        size: 1,
+        pos: [0, 0, 32],
+        panel: null,
+      }),
+    );
     await waitFor((s) => s.activeStage === 2 && s.time > 0.5, "Stage 2 start");
     assert(
       Math.abs((await state()).pos[2] - 32) < 0.5,
@@ -285,20 +306,15 @@ try {
   await page.getByRole("button", { name: /메인 메뉴로/ }).click();
   await page.getByRole("button", { name: /스테이지 안내/ }).click();
   await page.locator(".route-card").nth(1).click();
-  const stageTwoStart = page.getByRole("button", { name: /STAGE 2 시작/ });
-  assert(await stageTwoStart.isEnabled(), "Stage 2 remains unlocked in menu");
-  await stageTwoStart.click();
-  await waitFor((s) => s.activeStage === 2 && s.time > 0.5, "Stage 2 replay");
-  assert(
-    (await state()).bossHP === 3 && !(await state()).equipped,
-    "Stage 2 replay starts clean",
-  );
+  const stageTwoStart = page.getByRole("button", {
+    name: /준비 중 · 진입 불가/,
+  });
+  assert(await stageTwoStart.isDisabled(), "Stage 2 remains locked in menu");
   assert(
     JSON.stringify((await state()).lab) === completedLab,
-    "Stage 2 replay preserves lab",
+    "menu return preserves lab",
   );
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "메인 메뉴로", exact: true }).click();
   assert(
     (await state()).screen === "start",
     "restart returns to character selection",

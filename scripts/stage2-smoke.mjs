@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 // Development fixtures isolate Stage 2 from collection-route changes. Optional
-// transition mode prepares Stage 1 chips/code, then runs its real 3D program.
+// transition mode runs the real Stage 1 program and verifies its release gate.
+// Only development fixtures below enter the unreleased Stage 2 scene.
 const browser = await chromium.launch({
   executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
   headless: true,
@@ -78,14 +79,25 @@ try {
     assert.equal((await state()).activeStage, 1);
     assert.equal((await state()).lab.run, "success");
     assert.equal((await state()).circuit.time, 0);
-    await page.getByRole("button", { name: /STAGE 2로 이동/ }).click();
+    await page.getByRole("button", { name: "클리어 기록 보기" }).click();
+    await page.evaluate(() => window.__quantumGame.getState().nextStage());
+    assert.equal((await state()).activeStage, 1, "Stage 2 remains locked");
   } else {
     await page.evaluate(() => {
       const s = window.__quantumGame.getState();
       s.patchLab({ cleared: true, time: 75, deaths: 2 });
-      s.start(s.character, 2);
     });
   }
+  await page.evaluate(() => {
+    const s = window.__quantumGame.getState();
+    s.patch({
+      activeStage: 2,
+      screen: "game",
+      size: 1,
+      pos: [0, 0, 32],
+      panel: null,
+    });
+  });
   await waitFor((s) => s.circuit.time > 0.5, "Stage 2 ready");
   const lab = JSON.stringify((await state()).lab);
   assert.equal((await state()).circuit.mission, 0);

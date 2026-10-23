@@ -157,14 +157,13 @@ test("completed or skipped tutorial stays dismissed across death, menu return an
 });
 
 test("Stage 2 never starts the tutorial or changes its progress", () => {
-  game().patchLab({ cleared: true });
-  game().start("codmos_nova", 2);
+  // Exercise the unfinished scene directly without opening player entry.
+  game().patch({ activeStage: 2, screen: "game" });
   game().advanceLabTutorial(10, TUTORIAL_BATTERY_POSITION, 2.5);
   assert.deepEqual(game().labTutorial, createLabTutorial());
   game().reset();
   game().start("codmos_nova", 1);
   const t = game().labTutorial;
-  game().patchLab({ cleared: true });
-  game().start("codmos_nova", 2);
+  game().patch({ activeStage: 2, screen: "game" });
   assert.equal(game().labTutorial, t);
 });

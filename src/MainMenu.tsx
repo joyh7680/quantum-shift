@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { MenuDialog } from "./MenuDialog";
 import { CHARACTERS } from "./Character";
 import { TitleScene } from "./TitleScene";
 import { TitleLogo } from "./TitleLogo";
@@ -20,82 +20,11 @@ function CharacterThumbnail({ id }: { id: string }) {
   );
 }
 
-function MenuDialog({
-  title,
-  onClose,
-  children,
-  className = "",
-}: {
-  title: string;
-  onClose: () => void;
-  children: ReactNode;
-  className?: string;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const previousFocus = useRef(document.activeElement as HTMLElement | null);
-  useEffect(() => {
-    const dialog = ref.current!;
-    dialog.showModal();
-    return () => {
-      dialog.close();
-      queueMicrotask(() => previousFocus.current?.focus());
-    };
-  }, []);
-  return (
-    <dialog
-      ref={ref}
-      className={`menu-dialog ${className}`}
-      aria-labelledby="menu-dialog-title"
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
-      onClick={(e) => {
-        if (e.target !== e.currentTarget) return;
-        const rect = e.currentTarget.getBoundingClientRect();
-        if (
-          e.clientX < rect.left ||
-          e.clientX > rect.right ||
-          e.clientY < rect.top ||
-          e.clientY > rect.bottom
-        )
-          onClose();
-      }}
-    >
-      <header className="menu-dialog-header">
-        <div>
-          <span className="qc-overline">QUANTUM CITY / MISSION CONTROL</span>
-          <h2 id="menu-dialog-title">{title}</h2>
-        </div>
-        <button
-          className="dialog-close"
-          onClick={onClose}
-          aria-label="닫기"
-          autoFocus
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="m6 6 12 12M18 6 6 18" />
-          </svg>
-        </button>
-      </header>
-      {children}
-    </dialog>
-  );
-}
-
 export function MainMenu() {
   const id = useGame((s) => s.character);
-  const stageTwoUnlocked = useGame((s) => s.lab.cleared);
+  const stageTwoUnlocked = useGame(
+    (s) => CITY_STAGES[1].available && s.lab.cleared,
+  );
   const canEnter = (number: number) =>
     CITY_STAGES[number - 1]?.available &&
     (number === 1 || (number === 2 && stageTwoUnlocked));
@@ -288,11 +217,7 @@ export function MainMenu() {
                 <strong>{s.name}</strong>
                 <p>{s.description}</p>
                 <span className="route-status">
-                  {canEnter(s.number)
-                    ? "● 플레이 가능"
-                    : s.number === 2
-                      ? "◇ STAGE 1 클리어 후 해금"
-                      : "◇ 준비 중"}
+                  {canEnter(s.number) ? "● 플레이 가능" : "◇ 준비 중"}
                 </span>
               </button>
             ))}
@@ -336,9 +261,7 @@ export function MainMenu() {
             <span>
               {playable
                 ? `STAGE ${stage.number}을 플레이할 수 있습니다.`
-                : stage.number === 2
-                  ? "STAGE 1을 클리어하면 진입할 수 있습니다."
-                  : "이 구역은 준비 중입니다. 추후 공개됩니다."}
+                : "이 구역은 준비 중입니다. 추후 공개됩니다."}
             </span>
             <button
               className="city-launch"
@@ -347,11 +270,7 @@ export function MainMenu() {
                 useGame.getState().start(id, selectedStage as StageId)
               }
             >
-              {playable
-                ? `STAGE ${stage.number} 시작`
-                : stage.number === 2
-                  ? "STAGE 1 클리어 필요"
-                  : "준비 중 · 진입 불가"}
+              {playable ? `STAGE ${stage.number} 시작` : "준비 중 · 진입 불가"}
               <span>{playable ? "→" : "◇"}</span>
             </button>
           </footer>

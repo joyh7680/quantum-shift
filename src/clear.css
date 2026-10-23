@@ -11,6 +11,31 @@
     radial-gradient(ellipse at 85% 80%, #39316b26, transparent 48%), #060d18;
 }
 
+.menu-dialog.stage-notice-dialog {
+  width: min(560px, 92vw);
+}
+.stage-notice-dialog .menu-dialog-header h2 {
+  font-size: clamp(20px, 4vw, 24px);
+  line-height: 1.4;
+  word-break: keep-all;
+}
+.stage-notice-message {
+  margin: 32px 0 16px;
+  color: #b5edff;
+  font-size: clamp(18px, 4vw, 24px);
+  font-weight: 600;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+.stage-notice-dialog .dialog-lead {
+  line-height: 1.8;
+  word-break: keep-all;
+}
+.stage-notice-dialog .dialog-footer {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .clear-screen::before {
   content: "";
   position: fixed;

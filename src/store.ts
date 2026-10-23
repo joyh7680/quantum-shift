@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { CITY_STAGES } from "./stages.ts";
 import type { Scale } from "./rules.ts";
 import { createLabState } from "./stages/lab/state.ts";
 import type { LabState } from "./stages/lab/state.ts";
@@ -105,6 +106,7 @@ export const useGame = create<GameState>((set, get) => ({
   notify: (toast) => set((s) => ({ toast, toastId: s.toastId + 1 })),
   start: (character, activeStage = 1) => {
     const s = get();
+    if (!CITY_STAGES[activeStage - 1]?.available) return;
     if (activeStage === 2 && !s.lab.cleared) return;
     releasePointer();
     // Restart only the selected stage; its neighbour keeps its own progress.
@@ -181,7 +183,7 @@ export const useGame = create<GameState>((set, get) => ({
   },
   reset: () => {
     releasePointer();
-    // Returning to the menu retains session progress and the Stage 2 unlock.
+    // Returning to the menu retains session progress; availability still gates entry.
     set({ ...transient(), screen: "start", toast: "" });
   },
   die: (reason) =>

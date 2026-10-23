@@ -1,4 +1,4 @@
-// Stages 1 and 2 have separate playable scenes and progress; later stages are briefs.
+// Only Stage 1 is released. Keep unfinished stages locked, including after a clear.
 export const CITY_STAGES = [
   {
     number: 1,
@@ -18,7 +18,7 @@ export const CITY_STAGES = [
   {
     number: 2,
     name: "마이크로 회로",
-    available: true,
+    available: false,
     description:
       "자동 축소 슈트를 개발해 레이저를 통과하고 수호자에 도전하세요.",
     objective: "자동 축소 슈트 개발 → 레이저 통과 → 수호자 전투",

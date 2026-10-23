@@ -23,7 +23,13 @@ function enterCircuit() {
   game().patchLab({ power: true, mission: 2, run: "success", fan: 0 });
   game().patch({ size: 0.25, pos: [0, 0, 29] });
   game().completeLab();
-  game().nextStage();
+  // Draft gameplay fixtures bypass the release gate; player entry stays locked.
+  game().patch({
+    activeStage: 2,
+    screen: "game",
+    size: 1,
+    pos: [...game().circuit.checkpoint],
+  });
 }
 function equippedCircuit() {
   enterCircuit();
@@ -51,7 +57,7 @@ function frame(overrides: Partial<StageFrame> = {}): StageFrame {
     ...overrides,
   };
 }
-test("Stage 2 entry and transitions require Stage 1 completion", () => {
+test("unreleased Stage 2 rejects entry and transitions before Stage 1 completion", () => {
   game().start("codmos_nova", 2);
   assert.equal(game().screen, "start");
   game().start("codmos_nova");
@@ -75,7 +81,7 @@ test("Stage 1 exploration cannot bypass coding or progress Stage 2", () => {
   assert.equal(game().panel, null);
   assert.deepEqual(game().circuit, createCircuitState());
 });
-test("Stage 1 clear freezes its stats and initializes Stage 2 independently", () => {
+test("Stage 1 clear cannot unlock Stage 2 through transition, direct entry or menu return", () => {
   game().start("alien");
   game().patchLab({
     power: true,
@@ -91,10 +97,22 @@ test("Stage 1 clear freezes its stats and initializes Stage 2 independently", ()
   const lab = structuredClone(game().lab);
   assert.equal(game().screen, "clear");
   game().nextStage();
-  assert.equal(game().activeStage, 2);
+  game().start("codmos_nova", 2);
+  assert.equal(game().activeStage, 1);
+  assert.equal(game().screen, "clear");
   assert.equal(game().character, "alien");
-  assert.deepEqual(game().pos, [0, 0, 32]);
+  assert.deepEqual(game().pos, [0, 0, 29]);
   assert.deepEqual(game().circuit, createCircuitState());
+  game().reset();
+  game().start("codmos_nova", 2);
+  assert.equal(game().screen, "start");
+  assert.equal(game().activeStage, 1);
+  assert.deepEqual(game().lab, lab);
+});
+
+test("draft Stage 2 gameplay keeps Stage 1 clear stats independent", () => {
+  enterCircuit();
+  const lab = structuredClone(game().lab);
   updateCircuit(frame());
   updateLab(frame({ pos: [0, 0, 14] }));
   interactLab();
@@ -184,15 +202,17 @@ test("guardian without the ability never exposes its weak point", () => {
   updateCircuit(frame({ pos: [0, 0, 62] }));
   assert.equal(game().circuit.bossPhase, "shield");
 });
-test("menu return and Stage 2 replay preserve Stage 1 progress", () => {
+test("menu return preserves progress and rejects replay of unreleased Stage 2", () => {
   enterCircuit();
   const lab = structuredClone(game().lab);
   game().patchCircuit({ time: 30, deaths: 3, bossHP: 1 });
   game().reset();
   assert.equal(game().screen, "start");
   assert.deepEqual(game().lab, lab);
+  const circuit = structuredClone(game().circuit);
   game().start(game().character, 2);
-  assert.deepEqual(game().circuit, createCircuitState());
+  assert.equal(game().screen, "start");
+  assert.deepEqual(game().circuit, circuit);
   assert.deepEqual(game().lab, lab);
   game().reset();
   game().start(game().character, 1);

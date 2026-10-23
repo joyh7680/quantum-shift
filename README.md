@@ -27,7 +27,8 @@ npm run audit:assets
 - 게임 시작: 선택한 캐릭터로 STAGE 1 거인의 연구실에 진입합니다.
 - 캐릭터 선택: 기존 47종을 선택하며 메인 화면과 플레이어에 동일하게 적용합니다.
 - 캐릭터 옵션은 원본 GLB를 정면 렌더링한 얼굴 썸네일·이름·선택 체크를 표시합니다. 선택창을 닫아도 선택 버튼에 현재 캐릭터의 썸네일과 이름이 유지됩니다.
-- 스테이지 안내: 5개 스테이지의 경로와 학습 목표·주요 플레이를 확인합니다. STAGE 1 클리어 후 STAGE 2가 해금되며, 클리어 화면이나 스테이지 안내에서 진입할 수 있습니다. STAGE 3~5는 준비 중으로 진입이 잠겨 있습니다.
+- 스테이지 안내: 5개 스테이지의 경로와 학습 목표·주요 플레이를 확인합니다. 현재 STAGE 1만 플레이할 수 있으며, 미완성인 STAGE 2~5는 준비 중으로 잠겨 있습니다. STAGE 1 클리어 후에도 STAGE 2는 해금되지 않습니다.
+- STAGE 1 클리어 시 “스테이지 1이 재밌었다면, 스테이지 2도 개발해 볼게요!” 안내 모달이 표시됩니다. 클리어 기록을 확인하거나 메인 메뉴로 돌아갈 수 있으며, 클리어 화면의 ‘다음 스테이지 안내’로 다시 열 수 있습니다.
 - 모달은 닫기 버튼, 배경 클릭, ESC로 닫히며 키보드 포커스가 열었던 버튼으로 복귀합니다.
 - 메인 메뉴에서는 게임 플레이어·물리·이동 입력·포인터 잠금이 연결되지 않습니다. 게임의 일시정지 화면과 클리어 화면에서 메인 메뉴로 돌아갈 수 있습니다. 복귀 시 선택한 캐릭터와 두 스테이지의 진행·클리어 기록을 세션 내에서 유지합니다. 스테이지 시작 버튼은 해당 스테이지만 처음부터 시작합니다.
 
@@ -60,6 +61,8 @@ npm run audit:assets
 기획서: `docs/Quantum_City_Stage1_Plan.html`. 기존 수정본 백업: `artifacts/pre-stage1-blocks/`.
 
 ### STAGE 2 — 마이크로 회로
+
+미완성·미공개 상태입니다. 아래 내용은 개발 중인 기능이며, 스테이지 선택·클리어 후 전환·직접 시작 호출 모두 진입을 차단합니다.
 
 학습 목표: **바이브 코딩 · 조건문**
 
@@ -111,12 +114,13 @@ npm run audit:assets
 
 ```powershell
 node scripts/menu-smoke.mjs       # 기본 5173, QC_QA_URL로 실제 개발 서버 지정
+node scripts/stage-lock-smoke.mjs # STAGE 2 잠금, 클리어 안내 모달·모바일·메뉴 복귀
 node scripts/character-ui-qa.mjs  # 47종 썸네일 매칭, 선택 동기화, 데스크톱·모바일 배치
 node scripts/character-walk-qa.mjs # 실제 이동·정지·벽 충돌·점프·크기별 보행·자동 이동
 node scripts/lab-smoke.mjs        # STAGE 1 수집·충돌·실패·중단·수정·실제 탈출
-node scripts/playthrough.mjs      # STAGE 1 → STAGE 2 전체 진행, QC_QA_URL 지정 가능
+node scripts/playthrough.mjs      # STAGE 1 + 개발용 fixture로 STAGE 2 초안 검증
 node scripts/asset-browser-qa.mjs
-node scripts/stage2-smoke.mjs     # STAGE 2 단독 회귀 검증
+node scripts/stage2-smoke.mjs     # 개발용 fixture로 미공개 STAGE 2 단독 검증
 ```
 
 슈트 제작 화면만 검증하려면 `$env:QC_QA_SUIT_ONLY = '1'`을 설정한 뒤 `node scripts/playthrough.mjs`를 실행하세요. 빈 입력·공백 입력 잠금, 도움말, 코드 생성, 테스트, 수정 후 재생성·재테스트, 패널 재진입, 장착을 확인합니다.
@@ -124,6 +128,6 @@ node scripts/stage2-smoke.mjs     # STAGE 2 단독 회귀 검증
 스크립트는 Windows에 설치된 Chrome을 사용합니다. 다른 환경은 executablePath를 변경하거나 Playwright 브라우저를 설치하세요. STAGE 1 검증은 칩이나 캐릭터 위치를 주입하지 않고 실제 키보드로 통로·발판·전기 바닥을 진행합니다. 잘못된 명령 실패, 운반 중 중단과 복원, 코드 유지·순서 변경·드래그, 편집 잠금, 팬 감속, 실제 환풍구 도달을 확인합니다. 결과와 화면은 artifacts/lab-result.json 및 artifacts/lab-*.png에 저장됩니다. STAGE 2 회귀 검증은 scripts/stage2-smoke.mjs로 별도 실행할 수도 있습니다.
 STAGE 1은 로컬 HTML 기획서 전체와 추가 요구사항을 기준으로 구현했습니다.
 
-STAGE 1 → STAGE 2 연결을 집중 검증하려면 `QC_QA_STAGE1_TRANSITION=1`을 설정하고 `scripts/stage2-smoke.mjs`를 실행하세요. 이 모드는 칩과 코드를 개발용 준비 상태로 설정한 뒤 실제 3D 프로그램 실행·탈출·클리어 버튼을 거쳐 STAGE 2의 세 미션을 키보드와 UI로 검증합니다. 칩 수집을 포함한 전체 경로는 `scripts/lab-smoke.mjs` 또는 `scripts/playthrough.mjs`로 검증합니다.
+`QC_QA_STAGE1_TRANSITION=1`을 설정하고 `scripts/stage2-smoke.mjs`를 실행하면 칩과 코드를 개발용 준비 상태로 설정한 뒤 실제 3D 프로그램 실행·탈출·안내 모달과 STAGE 2 잠금을 확인합니다. 이후 개발용 fixture로만 미공개 STAGE 2의 세 미션을 검증합니다. `scripts/playthrough.mjs`도 STAGE 1 클리어 후 잠금을 확인한 다음 fixture로 초안을 검증하며, 플레이어에게 진입 경로를 제공하지 않습니다. 칩 수집을 포함한 STAGE 1 전체 경로는 `scripts/lab-smoke.mjs`로 검증합니다.
 
 STAGE 1 최종 검증 요약: [artifacts/stage1-verification.json](artifacts/stage1-verification.json). 수집 포함 전체 검증과 장치 실행 집중 검증을 분리해 기록하며, 집중 검증의 개발용 fixture 사용 범위도 결과에 표시합니다.
