@@ -27,11 +27,13 @@ export default defineConfig(({ command }) => ({
             source: readFileSync(resolve("public", thumbnail)),
           });
         }
-        this.emitFile({
-          type: "asset",
-          fileName: "favicon.svg",
-          source: readFileSync(resolve("public/favicon.svg")),
-        });
+        for (const fileName of ["favicon.svg", "community-thumbnail.jpg"]) {
+          this.emitFile({
+            type: "asset",
+            fileName,
+            source: readFileSync(resolve("public", fileName)),
+          });
+        }
       },
     },
   ],
